@@ -7,25 +7,25 @@
       <div class="content" v-if="isLogin">
         <div class="formItem">
           <div class="formItemLabel"><span>注册邮箱</span></div>
-          <div class="formItemInput"><input type="text" name="email" id="email" placeholder="输入您的注册邮箱"></div>
+          <div class="formItemInput"><input v-model="loginEmail" type="text" name="email" id="email" placeholder="输入您的注册邮箱"></div>
         </div>
         <div class="formItem" style="margin-top: 5vh">
           <div class="formItemLabel"><span>密码</span></div>
-          <div class="formItemInput"><input type="password" name="password" id="email" placeholder="输入您的密码"></div>
+          <div class="formItemInput"><input v-model="loginPassword" type="password" name="password" id="password" placeholder="输入您的密码"></div>
         </div>
       </div>
       <div class="content" v-else>
         <div class="formItem">
           <div class="formItemLabel"><span>邮箱</span></div>
-          <div class="formItemInput"><input type="text" name="email" id="email" placeholder="输入您的注册邮箱"></div>
+          <div class="formItemInput"><input type="text" v-model="registerEmail" name="email" id="email" placeholder="输入您的注册邮箱"></div>
         </div>
         <div class="formItem" style="margin-top: 2vh">
           <div class="formItemLabel"><span>昵称</span></div>
-          <div class="formItemInput"><input type="text" name="nickname" id="nickname" placeholder="输入您的昵称"></div>
+          <div class="formItemInput"><input type="text" v-model="registerNickname" name="nickname" id="nickname" placeholder="输入您的昵称"></div>
         </div>
         <div class="formItem" style="margin-top: 2vh">
           <div class="formItemLabel"><span>密码</span></div>
-          <div class="formItemInput"><input type="password" name="password" id="email" placeholder="输入您的密码"></div>
+          <div class="formItemInput"><input type="password" v-model="registerPassword" name="password" id="password" placeholder="输入您的密码"></div>
         </div>
       </div>
       <div class="footer">
@@ -45,19 +45,64 @@
 </template>
 
 <script>
+  import { login,register } from '@/network/user.js'
+  import { validateEmail } from '@/utils/validate.js'
+
   export default {
     name: "Login",
     data () {
       return {
         isLogin: true,
+        loginEmail: '',
+        loginPassword: '',
+        registerEmail: '',
+        registerNickname: '',
+        registerPassword: '',
       }
     },
     methods:{
       goLogin() {
-        this.$router.replace('/home')
+        if(this.loginEmail=='') {
+          this.$store.commit('showTip', '请输入邮箱')
+        } else if (validateEmail(this.loginEmail)==false) {
+          this.$store.commit('showTip', '邮箱格式不正确')
+        } else if (this.loginPassword=='') {
+          this.$store.commit('showTip', '请输入密码')
+        } else {
+          login(this.loginEmail, this.loginPassword).then(res=>{
+            if(res.data.status=='200') {
+              console.log(res);
+              this.$store.commit('showTip', '登陆成功')
+            } else {
+              this.$store.commit('showTip', res.data.msg)
+            }
+          })
+        }
       },
       goRegister() {
-        this.$router.replace('/home')
+        if(this.registerEmail=='') {
+          this.$store.commit('showTip', '请输入邮箱')
+        } else if (validateEmail(this.registerEmail)==false) {
+          this.$store.commit('showTip', '邮箱格式不正确')
+        } else if (this.registerNickname=='') {
+          this.$store.commit('showTip', '请输入昵称')
+        } else if (this.registerNickname.length<2||this.registerNickname.length>20) {
+          this.$store.commit('showTip', '昵称限长 2~20 位')
+        } else if (this.registerPassword=='') {
+          this.$store.commit('showTip', '请输入密码')
+        } else {
+          register(this.registerEmail,this.registerNickname,this.registerPassword).then(res=>{
+            if(res.data.status=='200') {
+              console.log(res);
+              this.loginEmail = this.registerEmail;
+              this.loginPassword = '';
+              this.isLogin = true;
+              this.$store.commit('showTip', '注册成功')
+            } else {
+              this.$store.commit('showTip', res.data.msg)
+            }
+          })
+        }
       },
     }
   }
@@ -82,7 +127,7 @@
     height: 15vh;
     line-height: 15vh;
     font-size: 35px;
-    color: #e66b75;
+    color: var(--color-all);
     text-align: center;
   }
   .content {
@@ -90,7 +135,7 @@
     flex-direction: column;
     justify-content: center;
     height: 40vh;
-    color: #555;
+    color: #bbb;
     padding: 0 30px;
   }
   .content .formItemLabel span {
@@ -103,9 +148,9 @@
     font-size: 22px;
     border-bottom: 1px #aaa solid;
     padding: 16px 5px;
-    color: #000;
+    color: #666;
   }
-  input::-webkit-input-placeholder, textarea::-webkit-input-placeholder{
+  /* input::-webkit-input-placeholder, textarea::-webkit-input-placeholder{
     color: #cecece;
   }
   input:-moz-placeholder, textarea:-moz-placeholder{
@@ -116,10 +161,12 @@
   }
   input:-ms-input-placeholder, textarea:-ms-input-placeholder {
     color: #cecece;
-  }
-  input:focus {
-    border: none;
+  } */
+  .content .formItemInput input:focus {
     outline: none;
+    border-bottom: 2px solid var(--color-all);
+    border-bottom-left-radius: 1px;
+    border-bottom-right-radius: 1px;
   }
   .footer {
     padding: 0 20px;
@@ -132,7 +179,7 @@
     text-align: center;
     font-size: 18px;
     border-radius: 5px;
-    background-color: #e66b75;
+    background-color: var(--color-all);
   }
   .footer .switch {
     text-align: center;
@@ -141,7 +188,7 @@
     font-size: 14px;
   }
   .footer .switch span {
-    color: #e66b75;
+    color: var(--color-all);
     font-size: 14px;
     text-decoration: underline;
     padding: 10px;

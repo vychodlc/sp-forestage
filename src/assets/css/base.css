@@ -7,6 +7,9 @@
   --color-background: #f9f9f9;
   --font-size: 14px;
   --line-height: 1.5;
+  /* --color-all: #e66b75; */
+  --color-all: #16a085;
+  --color-all-opacity: #16a08566;
 }
 * {
   font-size: 12px;
