@@ -2,17 +2,26 @@
   <div class="home">
     <router-view/>
     <div class="navbar">
-      <div class="navbarItem">
-        <div class="icon"></div>
-        <div class="name">资讯</div>
+      <div :class="$route.name=='Post'?'navbarActive':'navbarItem'">
+        <router-link :to="{path:'/'}" append>
+          <div class="icon" v-if="$route.name=='Post'"><img src="~/assets/images/comment-filling.png" alt=""></div>
+          <div class="icon" v-else><img src="~/assets/images/comment.png" alt=""></div>
+          <div class="name">资讯</div>
+        </router-link>
       </div>
-      <div class="navbarItem">
-        <div class="icon"></div>
-        <div class="name">服务</div>
+      <div :class="$route.name=='Application'?'navbarActive':'navbarItem'">    
+        <router-link :to="{path:'/application'}" append>
+          <div class="icon" v-if="$route.name=='Application'"><img src="~/assets/images/dynamic-filling.png" alt=""></div>
+          <div class="icon" v-else><img src="~/assets/images/modular.png" alt=""></div>
+          <div class="name">服务</div>
+        </router-link>
       </div>
-      <div class="navbarItem">
-        <div class="icon"></div>
-        <div class="name">我的</div>
+      <div :class="$route.name=='My'?'navbarActive':'navbarItem'">
+        <router-link :to="{path:'/my'}" append>
+          <div class="icon" v-if="$route.name=='My'"><img src="~/assets/images/user-filling.png" alt=""></div>
+          <div class="icon" v-else><img src="~/assets/images/user.png" alt=""></div>
+          <div class="name">我的</div>
+        </router-link>
       </div>
     </div>
   </div>
@@ -24,7 +33,14 @@
     data () {
       return {}
     },
-    methods:{}
+    methods:{
+    },
+    created() {
+      if((localStorage.token=='')||(localStorage.token==undefined)) {
+        this.$store.commit('rmToken');
+        this.$router.replace('/login')
+      }
+    }
   }
 </script>
 
@@ -44,12 +60,22 @@
     border-top: 1px solid #777;
     display: flex;
     flex-direction: row;
+    text-align: center;
+    z-index: 1000;
   }
-  .navbarItem {
+  .navbarItem,
+  .navbarActive {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+  .navbarActive .name {
+    color: var(--color-all);
+  }
+  .icon img {
+    width: 30px;
+    height: 30px;
   }
 </style>

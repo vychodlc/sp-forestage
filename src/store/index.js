@@ -6,8 +6,15 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     message: {
-      tip: { text: '', show: false }
-    }
+      tip: { text: '', show: false },
+      loading: { show: false },
+    },
+    token: localStorage.getItem('token') ? localStorage.getItem('token'):'',
+    user: {
+      id: null,
+      nickname: null,
+      right: null
+    },
   },
   mutations: {
     showTip(state, tip) {
@@ -17,7 +24,26 @@ export default new Vuex.Store({
         state.message.tip.show = false;
         state.message.tip.text = '';
       }, 1000)
-    }
+    },
+    showLoading(state, boolean) {
+      state.message.loading.show = boolean;
+    },
+    setToken(state, token) {
+      state.token = token
+      localStorage.token = token
+    },
+    setUser(state, id, nickname, right) {
+      state.user.nickname = nickname
+      state.user.id = id
+      state.user.right = right
+    },
+    rmToken(state) {
+      state.token = ''
+      state.user.nickname = null
+      state.user.id = null
+      state.user.right = null
+      localStorage.clear()
+    },
   },
   actions: {
   },

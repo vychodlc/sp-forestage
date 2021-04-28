@@ -6,8 +6,8 @@
       </div>
       <div class="content" v-if="isLogin">
         <div class="formItem">
-          <div class="formItemLabel"><span>注册邮箱</span></div>
-          <div class="formItemInput"><input v-model="loginEmail" type="text" name="email" id="email" placeholder="输入您的注册邮箱"></div>
+          <div class="formItemLabel"><span>邮箱</span></div>
+          <div class="formItemInput"><input v-model="loginEmail" type="text" name="email" id="email" placeholder="输入您的邮箱"></div>
         </div>
         <div class="formItem" style="margin-top: 5vh">
           <div class="formItemLabel"><span>密码</span></div>
@@ -45,7 +45,7 @@
 </template>
 
 <script>
-  import { login,register } from '@/network/user.js'
+  import { login,register,auth,getUserInfo } from '@/network/user.js'
   import { validateEmail } from '@/utils/validate.js'
 
   export default {
@@ -53,6 +53,7 @@
     data () {
       return {
         isLogin: true,
+        loading: false,
         loginEmail: '',
         loginPassword: '',
         registerEmail: '',
@@ -69,12 +70,24 @@
         } else if (this.loginPassword=='') {
           this.$store.commit('showTip', '请输入密码')
         } else {
+          this.$store.commit('showLoading',true);
           login(this.loginEmail, this.loginPassword).then(res=>{
             if(res.data.status=='200') {
-              console.log(res);
-              this.$store.commit('showTip', '登陆成功')
+              let token = res.data.token;
+              this.$store.commit('setToken', token);
+              auth(token).then(res=>{
+                let id = res.data.data.sub;
+                getUserInfo(id).then(res=>{
+                  let data = res.data.data;
+                  this.$store.commit('setUser',data.uuid,data.user_nickname,data.user_right);
+                  this.$store.commit('showLoading',false);
+                  this.$store.commit('showTip', '登陆成功');
+                  this.$router.replace('/home')
+                })
+              })
             } else {
-              this.$store.commit('showTip', res.data.msg)
+              this.$store.commit('showTip', res.data.msg);
+              this.$store.commit('showLoading',false);
             }
           })
         }
@@ -91,9 +104,9 @@
         } else if (this.registerPassword=='') {
           this.$store.commit('showTip', '请输入密码')
         } else {
+          this.$store.commit('showLoading',true);
           register(this.registerEmail,this.registerNickname,this.registerPassword).then(res=>{
             if(res.data.status=='200') {
-              console.log(res);
               this.loginEmail = this.registerEmail;
               this.loginPassword = '';
               this.isLogin = true;
@@ -101,9 +114,15 @@
             } else {
               this.$store.commit('showTip', res.data.msg)
             }
+            this.$store.commit('showLoading',false);
           })
         }
       },
+    },
+    created() {
+      if((localStorage.token!='')&&(localStorage.token!=undefined)) {
+        this.$router.replace('/home')
+      }
     }
   }
 </script>

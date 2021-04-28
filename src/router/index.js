@@ -4,7 +4,7 @@ import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
 const routes = [
-  { path: '/',redirect: '/login'},
+  { path: '/', name: 'Root',redirect: '/login'},
   { path: '/login',name: 'Login',component: () => import('../views/login/index.vue') },
   {
     path: '/home',name: 'Home',component: () => import('../views/home/index.vue'),
@@ -23,6 +23,8 @@ const routes = [
     ]
   },
   { path: '/pay',name: 'Pay',component: () => import('../views/pay/index.vue') },
+  { path: '/post_detail',name: 'PostDetail',component: () => import('../views/home/post_detail.vue')},
+  { path: '/search',name: 'Search',component: () => import('../views/home/search.vue')},
 ] 
 
 const router = new VueRouter({
