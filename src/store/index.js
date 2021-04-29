@@ -15,6 +15,7 @@ export default new Vuex.Store({
       nickname: null,
       right: null
     },
+    tags: null,
   },
   mutations: {
     showTip(state, tip) {
@@ -44,6 +45,9 @@ export default new Vuex.Store({
       state.user.right = null
       localStorage.clear()
     },
+    setTags(state,tags) {
+      state.tags = tags
+    }
   },
   actions: {
   },

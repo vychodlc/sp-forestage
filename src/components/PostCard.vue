@@ -36,11 +36,8 @@
       }
     },
     mounted() {
-      this.post_tags = this.data.tags.split(',');
-      
-      getTag().then(res=>{
-        this.tags = res.data.data;
-      });
+      this.post_tags = this.data.tags.split(',');      
+      this.tags = this.$store.state.tags;
     },
     computed: {
       timeShow() {
@@ -66,7 +63,7 @@
             }
           }
         }
-        return 'by ' + this.data.author
+        return this.data.post_date.toString().slice(0,12) + ' by ' + this.data.author
       }  
     },
     methods:{
@@ -97,10 +94,10 @@
   }
   .card-left .title {
     font-size: 18px;
-    padding-right: 20px;
+    padding-right: 10px;
     line-height: 25px;
     font-weight: bold;
-    width: 60vw;
+    width: calc(60vw - 20px);
     height: 12vh;
     word-wrap:break-word;
     text-align: left;

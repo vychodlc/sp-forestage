@@ -4,8 +4,8 @@ import store from '../store'
 
 export function request(config) {
   const instance = axios.create({
-    baseURL: 'http://api.bupt404.cn/sp/',
-    // baseURL: 'http://api.bupt404.cn/v1/',
+    // baseURL: 'http://api.bupt404.cn/sp/',
+    baseURL: 'http://api.bupt404.cn/v1/',
     // baseURL: '/api',
     timeout: 20000
   })

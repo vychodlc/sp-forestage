@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <router-view/>
+    <transition :name="transitionName">   
+      <router-view></router-view>
+    </transition>
     <!-- <div class="messageHover">
       <div class="messageBox"></div>
     </div> -->
@@ -16,6 +18,28 @@
 <script>
   export default({
     name: 'App',
+    data() {
+      return {
+        transitionName:''
+      }
+    },
+    watch: {
+      $route(to, from) {
+        if(
+          to.name=='Search'&&from.name=='Post'
+          ||to.name=='PostDetail'&&from.name=='Post'
+        ) {
+          this.transitionName = 'slide-left'
+          console.log(from.name,to.name);
+        } else if (
+          from.name=='Search'&&to.name=='Post'
+          ||from.name=='PostDetail'&&to.name=='Post'
+        ){
+          this.transitionName = 'slide-right';
+          console.log(from.name,to.name);
+        }
+      }
+    }
   })
 </script>
 
@@ -68,7 +92,8 @@
   }
   
   .messageTip {
-    position: absolute;
+    z-index: 1000;
+    position: fixed;
     left: 50%;
     transform: translateX(-50%);
     top: 30px;
@@ -78,4 +103,23 @@
     border-radius: 10px;
     padding: 10px 10px;
   }
+
+  /* 路由切换动画 */
+  .slide-right-enter-active,
+  .slide-right-leave-active,
+  .slide-left-enter-active,
+  .slide-left-leave-active,
+  .slide-top-enter-active,
+  .slide-top-leave-active,
+  .slide-bottom-enter-active,
+  .slide-bottom-leave-active {
+    will-change: transform;
+    transition: all 500ms;
+    position: absolute;
+  }
+  .slide-right-enter {opacity: 0; transform: translate3d(-100%, 0, 0);}
+  .slide-right-leave-active {opacity: 0;transform: translate3d(100%, 0, 0);}
+  .slide-left-enter {opacity: 0;transform: translate3d(100%, 0, 0);}
+  .slide-left-leave-active {opacity: 0;transform: translate3d(-100%, 0, 0);}
+
 </style>

@@ -35,7 +35,7 @@
     },
     methods:{
       goLink() {
-        this.$store.commit('showTip', '即将跳往：' + this.data.link)  
+        this.$store.commit('showTip', '即将跳往：' + this.data.link) 
       }
     }
   }
@@ -45,8 +45,10 @@
   .post {
     position: relative;
     padding: 0 20px;
+    padding-bottom: 20px;
   }
   .header {
+    z-index: 1000;
     /* flex: ; */
   }
   .back, .link {

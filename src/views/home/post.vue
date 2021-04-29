@@ -3,7 +3,7 @@
     <div class="header">
       <div class="logo">SMART</div>
       <div class="search">
-        <input type="text" name="search" id="search" placeholder="搜索资讯 ~">
+        <input type="text" name="search" id="search" @focus="$router.push({name:'Search'})" placeholder="搜索资讯 ~">
       </div>
     </div>
     <div class="navtab">
@@ -15,28 +15,40 @@
     <div class="content">
       <swiper :options="swiperOption1" ref="tabSwiper">
         <swiper-slide class="tabSlide">
-          <div class="post-content">
+          <div class="post-content" @scroll="scrollBottom($event,0)">
             <div class="banners">
-              <swiper :options="swiperOption2" ref="bannerSwiper">
-                <swiper-slide v-for="(bannerImg,index) in bannerImgs" :key="index">
-                  <div class="bannerSlide">
-                    <img :src="bannerImg.src" alt="">
-                    <span class="bannerTitle">{{bannerImg.title}}</span>
+              <swiper v-if="bannerData.length>0" :options="swiperOption2" ref="bannerSwiper">
+                <swiper-slide v-for="(item,index) in bannerData" :key="index">
+                  <div class="bannerSlide" @click='$router.push({name:"PostDetail",params:{id:item.ID}})'>
+                    <img :src="item.cover_img" alt="">
+                    <span class="bannerTitle">{{item.post_title}}</span>
                   </div>
                 </swiper-slide>
                 <div class="swiper-pagination" slot="pagination"></div>
               </swiper>
             </div>
             <div class="PostCards">
-              <post-card v-for="(item,index1) in postData[0]" :key="index1" :data="item"></post-card>
-              <!-- <post-card v-for="(item,index2) in postData[0]" :key="index2" :data="item"></post-card>
-              <post-card v-for="(item,index3) in postData[0]" :key="index3" :data="item"></post-card> -->
+              <post-card v-for="(item,index) in postData[0].slice(5)" :key="index" :data="item"></post-card>
+            </div>
+            <div class="loadMore">
+              <div class="tip" v-if="hasMore[0]==false">没有更多啦 ~</div>
+              <div class="tip" v-if="hasMore[0]==true&&loadflag[0]==true">往下滑还有更多资讯哦 ~</div>
+              <div class="tip" v-if="hasMore[0]==true&&loadflag[0]==false"><img style="width:40px;height:40px" src="~/assets/images/load.gif" alt=""> ~</div>
             </div>
           </div>
         </swiper-slide>
-        <swiper-slide class="tabSlide">品牌</swiper-slide>
-        <swiper-slide class="tabSlide">种类</swiper-slide>
-        <swiper-slide class="tabSlide">年代</swiper-slide>
+        <swiper-slide class="tabSlide" v-for="(item,index) in 3" :key="index">
+          <div class="post-content" @scroll="scrollBottom($event,item)">
+            <div class="PostCards">
+              <post-card v-for="(item,index1) in postData[item]" :key="index1" :data="item"></post-card>
+            </div>
+            <div class="loadMore">
+              <div class="tip" v-if="hasMore[item]==false">没有更多啦 ~</div>
+              <div class="tip" v-if="hasMore[item]==true&&loadflag[item]==true">往下滑还有更多资讯哦 ~</div>
+              <div class="tip" v-if="hasMore[item]==true&&loadflag[item]==false"><img style="width:40px;height:40px" src="~/assets/images/load.gif" alt=""> ~</div>
+            </div>
+          </div>
+        </swiper-slide>
       </swiper>
     </div>
   </div>
@@ -44,8 +56,10 @@
 
 <script>
   import PostCard from "@/components/PostCard"
+  // import PullUpReload from "@/components/PullUpReload"
   import { swiper, swiperSlide } from "vue-awesome-swiper";
-  import { getPostList } from "@/network/post.js";
+  import { getPostList,getPostFilter } from "@/network/post.js";
+  import { getTag } from "@/network/tag.js";
 
   import "swiper/dist/css/swiper.css";
   export default {
@@ -68,7 +82,7 @@
         swiperOption2: {
           loop: true,
           autoplay: {
-            delay: 1000,
+            delay: 2000,
             stopOnLastSlide: false,
             disableOnInteraction: false
           },
@@ -76,17 +90,14 @@
             el: ".swiper-pagination",
             clickable: true
           },
+          observer:true,
+          observeParents:true,
         },
-        bannerImgs: [
-          {src: 'http://www2.flightclub.cn/news/uploads/allimg/210427/27-21042G34454.jpg', title: '这个牌子侃爷都在穿！已经卖断码！机能党们夏日必备！'},
-          {src: 'http://www2.flightclub.cn/news/uploads/allimg/210426/6-210426125001.jpg', title: '又是樱花、又是棉花糖！这些球鞋一曝光，刚中签的「限量鞋」瞬间不香了！'},
-          {src: 'http://www2.flightclub.cn/news/uploads/allimg/210425/23-210425132156.jpg', title: '「能玩一天」的鞋又来了！上次发售还是一年前！别等买不到再后悔！'},
-          {src: 'http://www2.flightclub.cn/news/uploads/allimg/210423/27-2104231Q245.jpg', title: '王一博带火的「小 FOG」只要三百多！买得起的「明星同款」竟有这么多！'}
-        ],      
+        bannerData: [],      
         currentPage: [1,1,1,1],
-        postData: [
-          [],[],[],[]
-        ],
+        postData: [[],[],[],[]],
+        hasMore: [false,false,false,false],
+        loadflag: [false,false,false,false],
       }
     },
     methods:{
@@ -95,17 +106,54 @@
         this.tabSwiper.slideTo(tabIndex,300,false)
       },
       _getPostList(index) {
-        getPostList(this.currentPage[index]).then(res=>{
-          if(res.data.status=="200") {
-            this.currentPage[index]+=1;
-            let data = res.data.data
-            for(let item of data) {
-              this.postData[index].push(item)
+        if(index==0) {
+          getPostList(this.currentPage[index]).then(res=>{
+            if(res.data.status=="200") {
+              this.currentPage[index]+=1;
+              console.log(this.currentPage);
+              let data = res.data.data;
+              this.hasMore[index] = res.data.more;
+              for(let item of data) {
+                this.postData[index].push(item)
+              }
+            }else{
+              this.$store.commit('showTip', res.data.msg)
             }
-          }else{
-            this.$store.commit('showTip', res.data.msg)
-          }
-        })
+            this.loadflag[index] = false;
+            if(this.currentPage[index]==2) {
+              this._getPostList(0);
+              this.bannerData = this.postData[index].slice(0,5)
+            }
+          })
+        }else{
+          const menulist = ['品牌','种类','年代'];
+          getPostFilter('menu',menulist[index-1],this.currentPage[index]).then(res=>{
+            if(res.data.status=="200") {
+              this.currentPage[index]+=1;
+              let data = res.data.data;
+              console.log(res.data);
+              this.hasMore[index] = res.data.more;
+              for(let item of data) {
+                this.postData[index].push(item)
+              }
+            }else{
+              this.$store.commit('showTip', res.data.msg)
+            }
+            this.loadflag[index] = false;
+          })          
+        }
+      },
+      scrollBottom(e,index) {
+        let Scroll = e.target
+        // 网页可见区域高：document.body.clientHeight
+        // 网页正文全文高：document.body.scrollHeight
+        let scrollHeight = Scroll.scrollHeight - Scroll.clientHeight
+        // self.scrollTop = Scroll.scrollTop
+        if (scrollHeight - Scroll.scrollTop < 20 && !this.loadflag[index] && this.hasMore[index]) {
+          console.log(index+'到底部了')
+          this.loadflag[index] = true;
+          this._getPostList(index);
+        }
       }
     },
     computed: {
@@ -116,9 +164,15 @@
         return this.$refs.bannerSwiper.swiper;
       }
     },
-    mounted() {
-      this._getPostList(0)
-    }
+    created() {
+      getTag().then(res=>{
+        this.$store.commit('setTags',res.data.data)
+        this._getPostList(0);
+        this._getPostList(1);
+        this._getPostList(2);
+        this._getPostList(3);
+      })
+    },
   }
 </script>
 
@@ -225,10 +279,14 @@
   }
   .post-content {
     height: calc(100vh - 80px - 50px);
-    overflow-y: scroll;    
+    overflow-y: scroll;
+    padding-bottom: 20px;   
   }
   .bannerSlide img {
     max-height: 200px;
     width: 100%;
+  }
+  .bannerSlide span {
+    width: 100vw;
   }
 </style>
