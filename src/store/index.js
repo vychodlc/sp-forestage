@@ -11,9 +11,9 @@ export default new Vuex.Store({
     },
     token: localStorage.getItem('token') ? localStorage.getItem('token'):'',
     user: {
-      id: null,
-      nickname: null,
-      right: null
+      id: localStorage.getItem('id') ? localStorage.getItem('id'):'',
+      nickname: localStorage.getItem('nickname') ? localStorage.getItem('nickname'):'',
+      right: localStorage.getItem('right') ? localStorage.getItem('right'):'',
     },
     tags: null,
   },
@@ -33,10 +33,14 @@ export default new Vuex.Store({
       state.token = token
       localStorage.token = token
     },
-    setUser(state, id, nickname, right) {
-      state.user.nickname = nickname
-      state.user.id = id
-      state.user.right = right
+    setUser(state, data) {
+      console.log(data);
+      state.user.nickname = data[1]
+      state.user.id = data[0]
+      state.user.right = data[2]
+      // state.user.nickname = data.nickname
+      // state.user.id = data.id
+      // state.user.right = data.right
     },
     rmToken(state) {
       state.token = ''

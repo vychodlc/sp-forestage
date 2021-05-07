@@ -1,9 +1,11 @@
 <template>
   <div class="home">
-    <router-view/>
+    <keep-alive>
+      <router-view/>
+    </keep-alive>
     <div class="navbar">
       <div :class="$route.name=='Post'?'navbarActive':'navbarItem'">
-        <router-link :to="{path:'/'}" append>
+        <router-link :to="{path:'/post'}" append>
           <div class="icon" v-if="$route.name=='Post'"><img src="~/assets/images/comment-filling.png" alt=""></div>
           <div class="icon" v-else><img src="~/assets/images/comment.png" alt=""></div>
           <div class="name">资讯</div>

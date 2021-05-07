@@ -1,7 +1,9 @@
 <template>
   <div id="app">
-    <transition :name="transitionName">   
-      <router-view></router-view>
+    <transition :name="transitionName">
+      <keep-alive exclude="PostDetail">
+        <router-view></router-view>
+      </keep-alive>
     </transition>
     <!-- <div class="messageHover">
       <div class="messageBox"></div>
@@ -23,21 +25,40 @@
         transitionName:''
       }
     },
+    created() {
+      // console.log(123);
+      // let Height = $('body').height();
+      // console.log(Height);
+      // // $(window).resize(function() {
+      // //     $('body').height(Height);
+      // // });
+      // const that = this
+      const Height = window.innerHeight;
+      console.log(Height);
+      window.onresize = () => {
+        return (() => {
+          window.innerHeight = Height
+        })()
+      }
+    },
     watch: {
       $route(to, from) {
-        if(
-          to.name=='Search'&&from.name=='Post'
-          ||to.name=='PostDetail'&&from.name=='Post'
-        ) {
-          this.transitionName = 'slide-left'
-          console.log(from.name,to.name);
-        } else if (
-          from.name=='Search'&&to.name=='Post'
-          ||from.name=='PostDetail'&&to.name=='Post'
-        ){
-          this.transitionName = 'slide-right';
-          console.log(from.name,to.name);
-        }
+        // this.transitionName = "fade"
+        // if(
+        //   to.name=='Search'&&from.name=='Post'
+        //   ||to.name=='PostDetail'&&from.name=='Post'
+        //   ||to.name=='PostDetail'&&from.name=='Search'
+        // ) {
+        //   this.transitionName = 'slide-left'
+        //   console.log(from.name,to.name);
+        // } else if (
+        //   from.name=='Search'&&to.name=='Post'
+        //   ||from.name=='PostDetail'&&to.name=='Post'
+        //   ||from.name=='PostDetail'&&to.name=='Search'
+        // ){
+        //   this.transitionName = 'slide-right';
+        //   console.log(from.name,to.name);
+        // }
       }
     }
   })
@@ -122,4 +143,8 @@
   .slide-left-enter {opacity: 0;transform: translate3d(100%, 0, 0);}
   .slide-left-leave-active {opacity: 0;transform: translate3d(-100%, 0, 0);}
 
+  .fade-enter-active {transition: opacity .5s;}
+  .fade-enter {opacity: 0;}
+  .fade-leave {opacity: 1;}
+  .fade-leave-active {opacity:0; transition: opacity .5s;}
 </style>

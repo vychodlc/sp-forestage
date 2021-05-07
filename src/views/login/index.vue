@@ -28,7 +28,7 @@
           <div class="formItemInput"><input type="password" v-model="registerPassword" name="password" id="password" placeholder="输入您的密码"></div>
         </div>
       </div>
-      <div class="footer">
+      <div class="bottom">
         <div class="button">
           <div class="submit" v-if="isLogin" @click="goLogin">登录</div>
           <div class="submit" v-else @click="goRegister">注册</div>
@@ -59,6 +59,7 @@
         registerEmail: '',
         registerNickname: '',
         registerPassword: '',
+        flag: new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？ ]")
       }
     },
     methods:{
@@ -79,7 +80,11 @@
                 let id = res.data.data.sub;
                 getUserInfo(id).then(res=>{
                   let data = res.data.data;
-                  this.$store.commit('setUser',data.uuid,data.user_nickname,data.user_right);
+                  localStorage.id = data.uuid;
+                  localStorage.nickname = data.user_nickname;
+                  localStorage.right = data.user_right;
+                  this.$store.commit('setUser', [data.uuid, data.user_nickname,data.user_right]);
+                  console.log(this.$store.state);
                   this.$store.commit('showLoading',false);
                   this.$store.commit('showTip', '登陆成功');
                   this.$router.replace('/home')
@@ -101,8 +106,12 @@
           this.$store.commit('showTip', '请输入昵称')
         } else if (this.registerNickname.length<2||this.registerNickname.length>20) {
           this.$store.commit('showTip', '昵称限长 2~20 位')
+        } else if (this.flag.test(this.registerNickname)==true) {
+          this.$store.commit('showTip', '用户名为英文数字与中文，不能含有特殊字符')
         } else if (this.registerPassword=='') {
           this.$store.commit('showTip', '请输入密码')
+        } else if (this.registerPassword.length<6||this.registerPassword.length>20) {
+          this.$store.commit('showTip', '密码限长 6~20 位')
         } else {
           this.$store.commit('showLoading',true);
           register(this.registerEmail,this.registerNickname,this.registerPassword).then(res=>{
@@ -132,19 +141,21 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .loginContainer {
-    margin-left: 5vw;
-    margin-top: 15vh;
-    width: 90vw;
-    height: 70vh;
+    width: 350px;
+    height: 600px;
     border-radius: 10px;
     box-shadow: darkgrey 0px 0px 20px 5px;
-    background-color: #fff;
+    background-color: #ffffff;
+    position: relative;
   }
   .header .title {
-    height: 15vh;
-    line-height: 15vh;
+    height: 180px;
+    line-height: 180px;
     font-size: 35px;
     color: var(--color-all);
     text-align: center;
@@ -153,7 +164,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 40vh;
+    height: 250px;
     color: #bbb;
     padding: 0 30px;
   }
@@ -164,9 +175,9 @@
     background: transparent;
     border: none;
     width: 100%;
-    font-size: 22px;
+    font-size: 20px;
     border-bottom: 1px #aaa solid;
-    padding: 16px 5px;
+    padding: 12px 5px;
     color: #666;
   }
   /* input::-webkit-input-placeholder, textarea::-webkit-input-placeholder{
@@ -187,26 +198,27 @@
     border-bottom-left-radius: 1px;
     border-bottom-right-radius: 1px;
   }
-  .footer {
+  .bottom {
     padding: 0 20px;
+    margin-top: 50px;
   }
-  .footer .button .submit {
+  .bottom .button .submit {
     width: 100%;
-    height: 6vh;
-    line-height: 6vh;
+    height: 50px;
+    line-height: 50px;
     color: #fff;
     text-align: center;
     font-size: 18px;
     border-radius: 5px;
     background-color: var(--color-all);
   }
-  .footer .switch {
+  .bottom .switch {
     text-align: center;
-    line-height: 10vh;
+    line-height: 80px;
     color: #aaa;
     font-size: 14px;
   }
-  .footer .switch span {
+  .bottom .switch span {
     color: var(--color-all);
     font-size: 14px;
     text-decoration: underline;

@@ -12,10 +12,10 @@
       <div @click="changeTab(2)" class="navtabItem"><span :class="this.currentTab==2?'active':''">种类</span></div>
       <div @click="changeTab(3)" class="navtabItem"><span :class="this.currentTab==3?'active':''">年代</span></div>
     </div>
-    <div class="content">
-      <swiper :options="swiperOption1" ref="tabSwiper">
+    <div class="content" style="padding-top:20px">
+      <swiper :options="swiperOption1" ref="tabSwiper" style="transform: translateY(-20px);">
         <swiper-slide class="tabSlide">
-          <div class="post-content" @scroll="scrollBottom($event,0)">
+          <div class="post-content" id="content1" @scroll="scrollBottom($event,0)">
             <div class="banners">
               <swiper v-if="bannerData.length>0" :options="swiperOption2" ref="bannerSwiper">
                 <swiper-slide v-for="(item,index) in bannerData" :key="index">
@@ -56,7 +56,6 @@
 
 <script>
   import PostCard from "@/components/PostCard"
-  // import PullUpReload from "@/components/PullUpReload"
   import { swiper, swiperSlide } from "vue-awesome-swiper";
   import { getPostList,getPostFilter } from "@/network/post.js";
   import { getTag } from "@/network/tag.js";
@@ -110,7 +109,7 @@
           getPostList(this.currentPage[index]).then(res=>{
             if(res.data.status=="200") {
               this.currentPage[index]+=1;
-              console.log(this.currentPage);
+              // console.log(this.currentPage);
               let data = res.data.data;
               this.hasMore[index] = res.data.more;
               for(let item of data) {
@@ -131,7 +130,7 @@
             if(res.data.status=="200") {
               this.currentPage[index]+=1;
               let data = res.data.data;
-              console.log(res.data);
+              // console.log(res.data);
               this.hasMore[index] = res.data.more;
               for(let item of data) {
                 this.postData[index].push(item)
@@ -144,13 +143,21 @@
         }
       },
       scrollBottom(e,index) {
+        // if(e.target.scrollTop==0) {
+        //   let content = document.getElementById("content1");
+        //   let h = content.offsetHeight;
+        //   console.log(content.style['padding-top']=='');
+        //   // content.style['padding-top'] = '40px';
+        // }
+
+        // console.log(document.getElementById("content1").style['padding-top']);
         let Scroll = e.target
         // 网页可见区域高：document.body.clientHeight
         // 网页正文全文高：document.body.scrollHeight
         let scrollHeight = Scroll.scrollHeight - Scroll.clientHeight
         // self.scrollTop = Scroll.scrollTop
         if (scrollHeight - Scroll.scrollTop < 20 && !this.loadflag[index] && this.hasMore[index]) {
-          console.log(index+'到底部了')
+          // console.log(index+'到底部了')
           this.loadflag[index] = true;
           this._getPostList(index);
         }

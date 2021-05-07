@@ -24,12 +24,14 @@
       }
     },
     mounted() {
+      this.$store.commit('showLoading', true);
       const postID = this.$route.params.id?this.$route.params.id:15
       getPostDetail(postID).then(res=>{
         if(res.data.status=='200') {
           this.data = res.data.data;
           this.data.post_content = this.data.post_content.replace(/<img/g, "<img style='width:100%;'");
           this.data.post_content = this.data.post_content.replace(/<p/g, "<p style='font-size:18px;'");
+          this.$store.commit('showLoading', false);
         }
       })
     },

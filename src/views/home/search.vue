@@ -3,7 +3,7 @@
     <div class="close" @click="$router.go(-1)"><img src="~/assets/images/close.png" alt=""></div>
     <div class="search_box">
       <div class="input"><input v-model="search" type="text" placeholder="Search" @focus="editSearch"></div>
-      <div class="icon" v-if="search!=''" id="input_close" @click="search=''"><img src="~/assets/images/close-filling.png" alt=""></div>
+      <div class="icon" v-if="search!=''" id="input_close" @click="search='',data=[],isShow = false"><img src="~/assets/images/close-filling.png" alt=""></div>
       <div class="icon"><img src="~/assets/images/search.png" @click="_searchPost" alt=""></div>
     </div>
     <div class="results_nums" v-if="data.length>0">
@@ -51,21 +51,31 @@
     },
     methods:{
       _searchPost() {
-        searchPost(this.search,this.currentPage).then(res=>{
-          console.log(res);
-          if(res.data.status=='200') {
-            this.hasMore = res.data.more;
-            this.data = res.data.data;
-            this.search_number = res.data.posts_num;
-            this.isShow = true;
-            console.log(this.data);
-          }
-        }) 
+        if(this.search!='') {
+          searchPost(this.search,this.currentPage).then(res=>{
+            // console.log(res);
+            if(res.data.status=='200') {
+              this.hasMore = res.data.more;
+              this.data = res.data.data;
+              this.search_number = res.data.posts_num;
+              this.isShow = true;
+              // console.log(this.data);
+            }
+          }) 
+        }
       },
       editSearch() {
         this.isShow = false;
         this.data = [];
       }
+    },
+    activated() {
+      // this.hasMore = false;
+      // this.data = [];
+      // this.search_number = null;
+      // this.isShow = false;
+      // this.search = '';
+      console.log(this.$route);
     }
   }
 </script>
@@ -77,7 +87,7 @@
     overflow: hidden;
     position: relative;
     padding: 0 20px;
-    padding-top: 10vh;
+    padding-top: 80px;
   }
   .close {
     position: absolute;
@@ -90,15 +100,15 @@
   }
   .search_box {
     width: 100%;
-    height: 8vh;
-    border-radius: 4vh;
+    height: 60px;
+    border-radius: 30px;
     border: 2px solid var(--color-all);
     display: flex;
     flex-direction: row;
   }
   .search_box .icon {
     width: 15vw;
-    height: 8vh;
+    height: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -115,7 +125,7 @@
   }
   .search_box .input input {
     width: calc(100vw - 20px * 2 - 15vw * 2);
-    height: 6vh;
+    height: 50px;
     font-size: 18px;
     line-height: 30px;
     caret-color: var(--color-all);
