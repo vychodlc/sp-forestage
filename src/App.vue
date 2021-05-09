@@ -26,15 +26,8 @@
       }
     },
     created() {
-      // console.log(123);
-      // let Height = $('body').height();
-      // console.log(Height);
-      // // $(window).resize(function() {
-      // //     $('body').height(Height);
-      // // });
-      // const that = this
       const Height = window.innerHeight;
-      console.log(Height);
+      // console.log(Height);
       window.onresize = () => {
         return (() => {
           window.innerHeight = Height

@@ -12,10 +12,9 @@
           </div>
           <div class="optiondetail">
             <div class="item" @click="$router.push({name:'Transmit',params:{name:'Nike'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Nike</div>
-            <div class="item" @click="$router.push({name:'Transmit',params:{name:'通用'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 通用</div>
             <div class="item" @click="$router.push({name:'Transmit',params:{name:'Adidas'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Adidas</div>
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> 记录/状态</div>
             <div class="item" @click="$router.push({name:'Transmit',params:{name:'JD'}})"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
+            <div class="item" @click="$router.push({name:'Transmit',params:{name:'通用'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 通用</div>
           </div>
         </div>
         <div class="option">
@@ -24,9 +23,8 @@
             <div class="name">仓库</div>
           </div>
           <div class="optiondetail">
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> 普通出库</div>
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> 记录/状态</div>
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> 退税出库</div>
+            <div class="item"  @click="$router.push({name:'Output',params:{name:'普通'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 普通出库</div>
+            <div class="item"  @click="$router.push({name:'Output',params:{name:'退税'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 退税出库</div>
           </div>
         </div>
       </div>
@@ -39,34 +37,33 @@
         <div class="option">
           <div class="optionheader">
             <div class="icon"><img src="~/assets/images/application/biaodan.png" alt=""></div>
-            <div class="name">申请</div>
+            <div class="name">申报</div>
           </div>
           <div class="optiondetail">
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> Nike</div>
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> Adidas</div>
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
+            <div class="item" @click="$router.push({name:'Transmit',params:{name:'Nike'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Nike</div>
+            <div class="item" @click="$router.push({name:'Transmit',params:{name:'Adidas'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Adidas</div>
+            <div class="item" @click="$router.push({name:'Transmit',params:{name:'JD'}})"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
+            <div class="item" @click="$router.push({name:'Transmit',params:{name:'通用'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 通用</div>
           </div>
         </div>
         <div class="option">
           <div class="optionheader">
-            <div class="icon"><img src="~/assets/images/application/youhuiquan.png" alt=""></div>
-            <div class="name">礼品卡</div>
+            <div class="icon"><img src="~/assets/images/application/kucun.png" alt=""></div>
+            <div class="name">仓库</div>
           </div>
           <div class="optiondetail">
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> Nike</div>
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> Adidas</div>
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
+            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> 普通出库</div>
+            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> 退税出库</div>
           </div>
         </div>
         <div class="option">
           <div class="optionheader">
-            <div class="icon"><img src="~/assets/images/application/fenlei.png" alt=""></div>
-            <div class="name">订单</div>
+            <div class="icon"><img src="~/assets/images/application/kucun.png" alt=""></div>
+            <div class="name">仓库</div>
           </div>
           <div class="optiondetail">
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> Nike</div>
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> Adidas</div>
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
+            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> 普通出库</div>
+            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> 退税出库</div>
           </div>
         </div>
       </div>
@@ -125,7 +122,6 @@
   .formCard {
     width: 90vw;
     margin-top: 5vh;
-    height: 25vh;
     margin-left: 5vw;
     border-radius: 20px;
     box-shadow: 0 0 10px #999;
@@ -134,7 +130,7 @@
   .formCard .header {
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
-    height: 40%;
+    height: 10vh;
   }
   #header1 {background: url('../../assets/backimage/bg1.jpg');background-size:100% auto;background-position:center;}
   #header2 {background: url('../../assets/backimage/bg2.jpg');background-size:100% auto;background-position:center;}
@@ -150,12 +146,13 @@
     margin-right: 1vw;
   }
   .optionheader .name {
-    color: #333;
-    font-size: 16px;
+    color: #666;
+    font-weight: bold;
+    font-size: 14px;
   }
   .item {
     font-size: 12px;
-    text-decoration: underline;
+    color: #333;
   }
   .item img {
     width: 15px;
@@ -163,58 +160,51 @@
     margin-right: 1vw;
   }
   .formCard .options {
-    height: 60%;
-    display: flex;
-  }
-  .formCard .options .option {
-    flex: 1;
-    border-right: 1px solid #ccc;
-    padding-top: 5px;
-  }
-  .formCard .options .option:last-child {
-    border-right: none;
-  }
-  .formCard .options .optionheader {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  #options1 .optiondetail {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    width: 44vw;
-    height: calc(100% - 40px);
-  }
-  #options2 .optiondetail {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: calc(100% - 40px);
   }
-  #options1 .item,
-  #options2 .item {
-    width: 22vw;
-    padding-left: 2vw;
-    line-height: 20px;
+  .formCard .options .option {
+    height: 7.5vh;
     display: flex;
-    align-items: center;
-  }
-  #options3 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     flex-direction: row;
-    width: 90vw;
+    border-bottom: 1px solid #888;
+  }
+  .formCard .options .option:last-child {
+    border-bottom: none;
+  }
+  .formCard .options .option .optionheader {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    width: 25%;
+  }
+  .formCard .options .option .optiondetail {
+    width: 70%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  .optiondetail .item {
+    display: flex;
+    margin-left: 2vw;
+    border-bottom: 1px solid #999;
+    padding: 1px 0;
+  }
+  .item span {
+    font-size: 30px;
+    font-weight: bold;
+    color: var(--color-all);
+    text-decoration: none;
+    margin-right: 5px;
   }
   #options3 .option {
-    width: 90vw;
-    border-right: none;
     display: flex;
-    align-items: center;
-    justify-content: space-around;
+    flex-direction: row;
+  }
+  #options3 .optionheader {
+    flex: 1;
+    display: flex;
     flex-direction: row;
   }
 </style>

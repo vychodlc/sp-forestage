@@ -29,28 +29,15 @@
         </div>
         <div class="text">上传资料</div>
       </div>
-    </div>
-    <div class="formbox">
-      <div>
-        <table>
-          <thead><tr><th style="width:60vw;font-size:18px">快递单号</th><th style="width:40vw;font-size:18px">邮箱地址</th></tr></thead>
-        </table>
-      </div>
-      <div class="table">
-        <table>
-          <tbody>
-            <tr v-for="(item,index) in 40" :key="index">
-              <td><input style="width: 59vw" type="text" name="" value="" id=""></td>
-              <td><input style="width: 40vw" type="text" name="" value="" id=""></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="option">
-        <div class="btn" id="addmany">批量导入</div>
-        <div class="btn" id="addone">+</div>
+      <div class="step step-not" id="step3">
+        <div>
+          <img class="step-icon" src="~/assets/images/form/checked.png" alt="">
+          <div class="step-index">3</div>
+        </div>
+        <div class="text">上传资料</div>
       </div>
     </div>
+    <div class="formbox"></div>
     <div class="footer">
       <div class="btnbox" @click="changeStep(0)">
         <div class="btn" v-if="currentStep==1">取消</div>
@@ -71,7 +58,7 @@
       return {
         kind: this.$route.params.name?this.$route.params.name:'Nike',
         currentStep: 1,
-        stepNum: 3,
+        stepNum: 4,
       }
     },
     methods:{
@@ -81,22 +68,22 @@
         } else if(this.currentStep==1&&direction==1){
           document.getElementById('step1').className = 'step step-ed'
           document.getElementById('step2').className = 'step step-ing'
-          document.getElementsByClassName('line')[0].className = 'line line-ed'
+          document.getElementById('line1').className = 'line line-ed'
           this.currentStep+=1
         } else if(this.currentStep==2&&direction==0){
           document.getElementById('step1').className = 'step step-ing'
           document.getElementById('step2').className = 'step step-not'
-          document.getElementsByClassName('line')[0].className = 'line line-not'
+          document.getElementById('line1').className = 'line line-not'
           this.currentStep-=1
         } else if(this.currentStep==2&&direction==1){
           document.getElementById('step2').className = 'step step-ed'
           document.getElementById('step3').className = 'step step-ing'
-          document.getElementsByClassName('line')[1].className = 'line line-ed'
+          document.getElementById('line2').className = 'line line-ed'
           this.currentStep+=1
         } else if(this.currentStep==3&&direction==0){
           document.getElementById('step2').className = 'step step-ing'
           document.getElementById('step3').className = 'step step-not'
-          document.getElementsByClassName('line')[1].className = 'line line-not'
+          document.getElementById('line2').className = 'line line-not'
           this.currentStep-=1
         } else if(this.currentStep==3&&direction==1){
           document.getElementById('step3').className = 'step step-ed';
@@ -113,8 +100,7 @@
       document.getElementsByClassName('step')[0].className = 'step step-ing'
       document.getElementsByClassName('step')[1].className = 'step step-not'
       document.getElementsByClassName('step')[2].className = 'step step-not'
-      document.getElementsByClassName('line')[0].className = 'line line-not'
-      document.getElementsByClassName('line')[1].className = 'line line-not'
+      document.getElementsByClassName('line').className = 'line line-not'
       this.currentStep=1;
     }
   }
@@ -223,55 +209,7 @@
   .formbox {
     width: 100vw;
     height: calc(100vh - 10vh - 60px - 80px);
-    /* border: 2px solid #000; */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .formbox input {
-    background-color: var(--color-background);
-    border: 1px solid #777;
-    height: 30px;
-    font-size: 16px;
-  }
-  .table {
-    max-height: 50vh;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    border: 1px solid #777;
-    margin-top: 10px;
-  }
-  .table table th {
-    table-layout: fixed;
-    font-size: 19px;
-    padding: 5px 0;
-  }
-  .formbox .option {
-    width: 100vw;
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
-    flex-direction: row;
-  }
-  #addone {
-    font-size: 30px;
-    color: #fff;
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-    text-align: center;
-    border-radius: 50%;
-    background-color: var(--color-all);
-  }
-  #addmany {
-    font-size: 18px;
-    height: 30px;
-    line-height: 30px;
-    text-align: center;
-    border: 1px solid var(--color-all);
-    color: var(--color-all);
-    padding: 0 8px;
-    border-radius: 10px;
+    border: 2px solid #000;
   }
 
   .footer {
@@ -306,5 +244,4 @@
     background-color: var(--color-all);
     color: #fff;
   }
-
 </style>

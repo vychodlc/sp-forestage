@@ -29,6 +29,7 @@ const routes = [
   //   ]
   // },
   { path: '/form/transmit',name: 'Transmit',component: () => import('../views/form/transmit.vue')},
+  { path: '/form/output',name: 'Output',component: () => import('../views/form/output.vue')},
   { path: '/form/purchase',name: 'Purchase',component: () => import('../views/form/purchase.vue')},
   { path: '/pay',name: 'Pay',component: () => import('../views/pay/index.vue') },
   { path: '/post_detail',name: 'PostDetail',component: () => import('../views/home/post_detail.vue')},
