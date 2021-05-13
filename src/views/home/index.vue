@@ -77,7 +77,7 @@
     color: var(--color-all);
   }
   .icon img {
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
   }
 </style>

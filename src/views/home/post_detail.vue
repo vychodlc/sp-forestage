@@ -11,6 +11,7 @@
     <div class="content">
       <div v-html="data.post_content">{{data.post_content}}</div>
     </div>
+    <div class="bottom">--文章已经到底啦--</div>
   </div>
 </template>
 
@@ -99,5 +100,12 @@
     color: #555;
     padding: 10px;
     border-bottom: 1px solid #555;
+  }
+  .bottom {
+    height: 50px;
+    line-height: 50px;
+    margin-top: 20px;
+    text-align: center;
+    color: #999;
   }
 </style>

@@ -5,7 +5,7 @@
         {{data.post_title}}
       </div>
       <div class="tags" v-if="post_tags!=null">
-        <div class="tag" v-for="(item,index) in post_tags.slice(0,3)" :key="index">
+        <div class="tag" v-for="(item,index) in post_tags.slice(0,2)" :key="index">
           <div v-if="tags!=null&&tags[item]">
             <span style="color:red">#</span>
             {{tags[item]}}
@@ -16,6 +16,7 @@
     <div class="card-right">
       <div class="cover">
         <img :src="data.cover_img" alt="">
+        <div class="menu">{{data.menu}}</div>
       </div>
       <div class="time">
         <div>{{timeShow}}</div>
@@ -86,7 +87,7 @@
     margin-bottom: 30px;
   }
   .card-left {
-    width: calc(60vw - 20px);
+    width: calc(60vw - 40px);
     height: 100%;
     margin-left: 20px;
     border-bottom: 1px solid var(--color-all);
@@ -97,7 +98,7 @@
     padding-right: 10px;
     line-height: 25px;
     font-weight: bold;
-    width: calc(60vw - 20px);
+    width: calc(60vw - 40px);
     height: 12vh;
     word-wrap:break-word;
     text-align: left;
@@ -115,10 +116,12 @@
   }
   .card-right {
     width: 40%;
+    margin-right: 20px;
     height: 100%;
   }
   .card-right .cover {
     height: 12vh;
+    position: relative;
   }
   .card-right .cover img {
     width: 100%;
@@ -130,5 +133,14 @@
     line-height: 3vh;
     color: #444;
     transform: translateY(50%);
+  }
+  .menu {
+    position: absolute;
+    top: 4px;
+    right: 1px;
+    background-color: #555;
+    color: #ddd;
+    padding: 1px 5px;
+    border-radius: 5px;
   }
 </style>

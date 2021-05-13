@@ -115,6 +115,7 @@
               for(let item of data) {
                 this.postData[index].push(item)
               }
+              console.log(this.postData);
             }else{
               this.$store.commit('showTip', res.data.msg)
             }
@@ -271,14 +272,15 @@
   }
   .banners .swiper-container .swiper-slide span {
     position: absolute;
-    bottom: 50%;
-    transform: translateY(50%);
+    /* bottom: 50%; */
+    top: 0;
+    /* transform: translateY(50%); */
     color: #fff;
     font-size: 16px;
     padding: 10px 30px;
     text-align: left;
     line-height: 20px;
-    background-color: var(--color-all-opacity);
+    background-color: #77777777;
     left: 0;
   }
   .banners >>> .swiper-pagination-bullet-active {
@@ -295,5 +297,8 @@
   }
   .bannerSlide span {
     width: 100vw;
+  }
+  .tip {
+    color: #999
   }
 </style>
