@@ -78,3 +78,35 @@
   color: #fff;
   background-color: var(--color-all);
 }
+
+
+/* 表格页码 */
+.tableFooter {
+  width: 70vw;
+  height: 52px;
+  position: absolute;
+  left: 30vw;
+  top: 760px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.tableFooter .pageIndex {
+  flex: 1;
+  height: 52px;
+  line-height: 52px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.tableFooter .pageIndex span {
+  height: 52px;
+  line-height: 52px;
+  font-size: 14px;
+  text-align: center;
+}
+.tableFooter .pageIndex:first-child,
+.tableFooter .pageIndex:last-child {
+  font-size: 30px;
+}

@@ -12,9 +12,11 @@
       <div @click="changeTab(2)" class="navtabItem"><span :class="this.currentTab==2?'active':''">种类</span></div>
       <div @click="changeTab(3)" class="navtabItem"><span :class="this.currentTab==3?'active':''">年代</span></div>
     </div>
-    <div class="content" style="padding-top:20px">
-      <swiper :options="swiperOption1" ref="tabSwiper" style="transform: translateY(-20px);">
+    <div class="content" style="padding-top:0px">
+      <swiper :options="swiperOption1" ref="tabSwiper" style="transform: translateY(-0px);">
         <swiper-slide class="tabSlide">
+          <div class="refreshText" id="refreshText1"></div>
+          <!-- <div class="refreshDiv"></div> -->
           <div class="post-content" id="content1" @scroll="scrollBottom($event,0)">
             <div class="banners">
               <swiper v-if="bannerData.length>0" :options="swiperOption2" ref="bannerSwiper">
@@ -38,7 +40,8 @@
           </div>
         </swiper-slide>
         <swiper-slide class="tabSlide" v-for="(item,index) in 3" :key="index">
-          <div class="post-content" @scroll="scrollBottom($event,item)">
+          <div class="refreshText" :id="'refreshText'+(index+2)"></div>
+          <div class="post-content" :id="'content'+(index+2)" @scroll="scrollBottom($event,item)">
             <div class="PostCards">
               <post-card v-for="(item,index1) in postData[item]" :key="index1" :data="item"></post-card>
             </div>
@@ -97,6 +100,7 @@
         postData: [[],[],[],[]],
         hasMore: [false,false,false,false],
         loadflag: [false,false,false,false],
+        _refreshText: [],
       }
     },
     methods:{
@@ -115,7 +119,6 @@
               for(let item of data) {
                 this.postData[index].push(item)
               }
-              console.log(this.postData);
             }else{
               this.$store.commit('showTip', res.data.msg)
             }
@@ -124,6 +127,9 @@
               this._getPostList(0);
               this.bannerData = this.postData[index].slice(0,5)
             }
+            if(this._refreshText[index] &&this._refreshText[index].innerText) {
+              this._refreshText[index].innerText = '';
+            }
           })
         }else{
           const menulist = ['品牌','种类','年代'];
@@ -131,10 +137,12 @@
             if(res.data.status=="200") {
               this.currentPage[index]+=1;
               let data = res.data.data;
-              // console.log(res.data);
               this.hasMore[index] = res.data.more;
               for(let item of data) {
                 this.postData[index].push(item)
+              }
+              if(this._refreshText[index] &&this._refreshText[index].innerText) {
+                this._refreshText[index].innerText = '';
               }
             }else{
               this.$store.commit('showTip', res.data.msg)
@@ -144,14 +152,6 @@
         }
       },
       scrollBottom(e,index) {
-        // if(e.target.scrollTop==0) {
-        //   let content = document.getElementById("content1");
-        //   let h = content.offsetHeight;
-        //   console.log(content.style['padding-top']=='');
-        //   // content.style['padding-top'] = '40px';
-        // }
-
-        // console.log(document.getElementById("content1").style['padding-top']);
         let Scroll = e.target
         // 网页可见区域高：document.body.clientHeight
         // 网页正文全文高：document.body.scrollHeight
@@ -181,6 +181,53 @@
         this._getPostList(3);
       })
     },
+    mounted() {
+      var _element = [ 
+        document.getElementById('content1'),
+        document.getElementById('content2'),
+        document.getElementById('content3'),
+        document.getElementById('content4')
+      ];
+      this._refreshText = [
+        document.getElementById('refreshText1'),
+        document.getElementById('refreshText2'),
+        document.getElementById('refreshText3'),
+        document.getElementById('refreshText4'),
+      ];
+      var _startPos = [0,0,0,0];
+      var _transitionHeight = [0,0,0,0];
+
+      for(let i=0;i<4;i++) {
+        _element[i].addEventListener('touchstart', e=>{
+          _startPos[i] = e.touches[0].pageY;
+          _element[i].style.position = 'relative';
+          _element[i].style.transition = 'transform 0s';
+        }, false);
+
+        _element[i].addEventListener('touchmove', e=>{
+          _transitionHeight[i] = e.touches[0].pageY - _startPos[i];
+          if (_transitionHeight[i] > 0 && _transitionHeight[i] < 30) { 
+            this._refreshText[i].innerText = '下拉刷新'; 
+            _element[i].style.transform = 'translateY('+_transitionHeight[i]+'px)';
+            if (_transitionHeight[i] > 20) {
+              this._refreshText[i].innerText = '释放更新';
+            } else {
+            }
+          }                
+        }, false);
+
+        _element[i].addEventListener('touchend', e=>{
+          if(this._refreshText[i].innerText == '释放更新') {
+            _element[i].style.transition = 'transform 0.5s ease 1s';
+            _element[i].style.transform = 'translateY(0px)';
+            this._refreshText[i].innerText = '更新中...';
+            this.currentPage[i] = 1;
+            this.$set(this.postData,i,[])
+            this._getPostList(i);
+          }
+        }, false);
+      }
+    }
   }
 </script>
 
@@ -242,7 +289,7 @@
   }
 
   .content {
-    margin-top: 10px;
+    /* margin-top: 10px; */
   }
   .content .swiper-container{
     position: relative;
@@ -300,5 +347,16 @@
   }
   .tip {
     color: #999
+  }
+  .refreshText {
+    /* line-height: 30px; */
+  }
+  .refreshDiv {
+    width: 20px;
+    height: 30px;
+    position: absolute;
+    top: 0;
+    transform: translateY(-20px);
+    background-color: #f0f;
   }
 </style>

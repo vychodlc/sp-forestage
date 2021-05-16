@@ -16,6 +16,7 @@
             <div class="item" @click="$router.push({name:'Transmit',params:{name:'JD'}})"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
             <div class="item" @click="$router.push({name:'Transmit',params:{name:'通用'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 通用</div>
           </div>
+          <div class="more" @click="$router.push({name:'TransmitOrderlist'})"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
         </div>
         <div class="option">
           <div class="optionheader">
@@ -26,6 +27,7 @@
             <div class="item"  @click="$router.push({name:'Output',params:{name:'普通'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 普通出库</div>
             <div class="item"  @click="$router.push({name:'Output',params:{name:'退税'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 退税出库</div>
           </div>
+          <div class="more"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
         </div>
       </div>
     </div>
@@ -45,6 +47,7 @@
             <div class="item" @click="$router.push({name:'Transmit',params:{name:'JD'}})"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
             <div class="item" @click="$router.push({name:'Transmit',params:{name:'通用'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 通用</div>
           </div>
+          <div class="more"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
         </div>
         <div class="option">
           <div class="optionheader">
@@ -206,5 +209,17 @@
     flex: 1;
     display: flex;
     flex-direction: row;
+  }
+
+  .more {
+    height: 100%;
+    margin-right: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .more img {
+    width: 20px;
+    height: 20px;
   }
 </style>

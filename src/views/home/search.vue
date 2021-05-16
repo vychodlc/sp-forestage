@@ -2,7 +2,11 @@
   <div class="search">
     <div class="close" @click="$router.go(-1)"><img src="~/assets/images/close.png" alt=""></div>
     <div class="search_box">
-      <div class="input"><input v-model="search" type="text" placeholder="Search" @focus="editSearch"></div>
+      <div class="input">  
+        <form @submit.prevent>
+          <input v-model="search" @keypress="searchGoods" type="search" placeholder="Search" @focus="editSearch">
+        </form>
+      </div>
       <div class="icon" v-if="search!=''" id="input_close" @click="search='',data=[],isShow = false"><img src="~/assets/images/close-filling.png" alt=""></div>
       <div class="icon"><img src="~/assets/images/search.png" @click="_searchPost" alt=""></div>
     </div>
@@ -67,6 +71,12 @@
       editSearch() {
         this.isShow = false;
         this.data = [];
+      },
+      searchGoods(event) { 
+        if(event.keyCode == 13) {
+          event.preventDefault();
+          this._searchPost();
+        }
       }
     },
     activated() {
@@ -185,5 +195,9 @@
   }
   .result .right img {
     width: 100%;
+  }
+
+  input::-webkit-search-cancel-button {
+    display: none;
   }
 </style>

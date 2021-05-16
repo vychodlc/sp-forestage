@@ -7,25 +7,25 @@
       <div class="content" v-if="isLogin">
         <div class="formItem">
           <div class="formItemLabel"><span>邮箱</span></div>
-          <div class="formItemInput"><input v-model="loginEmail" type="text" name="email" id="email" placeholder="输入您的邮箱"></div>
+          <div class="formItemInput"><input @keypress="gogogo" v-model="loginEmail" type="text" name="email" id="email" placeholder="输入您的邮箱"></div>
         </div>
         <div class="formItem" style="margin-top: 5vh">
           <div class="formItemLabel"><span>密码</span></div>
-          <div class="formItemInput"><input v-model="loginPassword" type="password" name="password" id="password" placeholder="输入您的密码"></div>
+          <div class="formItemInput"><input @keypress="gogogo" v-model="loginPassword" type="password" name="password" id="password" placeholder="输入您的密码"></div>
         </div>
       </div>
       <div class="content" v-else>
         <div class="formItem">
           <div class="formItemLabel"><span>邮箱</span></div>
-          <div class="formItemInput"><input type="text" v-model="registerEmail" name="email" id="email" placeholder="输入您的注册邮箱"></div>
+          <div class="formItemInput"><input @keypress="gogogo" type="text" v-model="registerEmail" name="email" id="email" placeholder="输入您的注册邮箱"></div>
         </div>
         <div class="formItem" style="margin-top: 2vh">
           <div class="formItemLabel"><span>昵称</span></div>
-          <div class="formItemInput"><input type="text" v-model="registerNickname" name="nickname" id="nickname" placeholder="输入您的昵称"></div>
+          <div class="formItemInput"><input @keypress="gogogo" @input="lengthLimit(20)" type="text" v-model="registerNickname" name="nickname" id="nickname" placeholder="输入您的昵称"></div>
         </div>
         <div class="formItem" style="margin-top: 2vh">
           <div class="formItemLabel"><span>密码</span></div>
-          <div class="formItemInput"><input type="password" v-model="registerPassword" name="password" id="password" placeholder="输入您的密码"></div>
+          <div class="formItemInput"><input @keypress="gogogo" type="password" v-model="registerPassword" name="password" id="password" placeholder="输入您的密码"></div>
         </div>
       </div>
       <div class="bottom">
@@ -63,6 +63,12 @@
       }
     },
     methods:{
+      lengthLimit(len) {
+        if(this.registerNickname.length>len) {
+          this.$store.commit('showTip', '昵称最长只能'+len+'位哦！');
+          this.registerNickname = this.registerNickname.slice(0,len)
+        }
+      },
       goLogin() {
         if(this.loginEmail=='') {
           this.$store.commit('showTip', '请输入邮箱')
@@ -107,7 +113,7 @@
         } else if (this.registerNickname.length<2||this.registerNickname.length>20) {
           this.$store.commit('showTip', '昵称限长 2~20 位')
         } else if (this.flag.test(this.registerNickname)==true) {
-          this.$store.commit('showTip', '用户名为英文数字与中文，不能含有特殊字符')
+          this.$store.commit('showTip', '昵称为英文数字与中文，不能含有特殊字符')
         } else if (this.registerPassword=='') {
           this.$store.commit('showTip', '请输入密码')
         } else if (this.registerPassword.length<6||this.registerPassword.length>20) {
@@ -127,6 +133,16 @@
           })
         }
       },
+      gogogo(event) { 
+        if(event.keyCode == 13) {
+          event.preventDefault();
+          if(this.isLogin) {
+            this.goLogin();
+          } else {
+            this.goRegister()
+          }
+        }
+      }
     },
     created() {
       if((localStorage.token!='')&&(localStorage.token!=undefined)) {

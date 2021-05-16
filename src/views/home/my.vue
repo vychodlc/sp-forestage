@@ -80,7 +80,7 @@
       <div class="card">
         <div class="title">
           <span class="titlespan">退出登录</span>
-          <div class="more">
+          <div class="more" @click="logOut">
             <span>退出</span>
             <img src="~/assets/images/my/arrow-right.png" alt="">
           </div>

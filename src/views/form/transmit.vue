@@ -2,7 +2,7 @@
   <div class="transmit">
     <div class="header">
       <div class="back" @click="$router.go(-1)"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
-      <div class="title">{{kind}}出库</div>
+      <div class="title" @click="test">{{kind}}出库</div>
     </div>
     <div class="progress">
       <div class="linebox">
@@ -83,16 +83,34 @@
     <div class="formbox" v-show="currentStep==3">
       <div class="upload">
         <img v-if="loading==true" src="~assets/loading.gif" alt="">
-        <div v-else class="okbox">
-          <img src="~assets/images/ok.png" alt="">
-          <p>您所申报的单号已经上传完毕！</p>
+        <div v-else class="resultBox">
+          <div class="boxItem" v-if="resultStatus==0">
+            <div class="icon" style="background-color:var(--color-all)">✓</div>
+            <div class="text">
+              您所申报的单号已经上传完毕！
+              <!-- <div v-if="resultStatus==1" style="font-size:18px;color:#f00;margin-top:20px">但存在部分重复单号</div> -->
+            </div>
+          </div>
+          <div class="boxItem" v-if="resultStatus!=0">
+            <div class="icon" style="background-color:#fccb0d">!</div>
+            <div class="text">
+              存在以下由于重复而提交失败的单号
+            </div>
+          </div>
+          <div class="boxItem" v-if="wrongOrders.length!=0">
+            <div class="failOrders">
+              <span v-for="(item,index) in wrongOrders" :key="index" style="font-size:16px">
+                {{item}} <span v-if="index!=wrongOrders.length-1" style="color:#f00;font-size:16px;font-weight:bold">,</span>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <div class="footer">
       <div class="btnbox" @click="changeStep(0)" v-if="currentStep!=3">
         <div class="btn" v-if="currentStep==1">取消</div>
-        <div class="btn" v-else-if="currentStep==2&&wrongDataStatus==true">重新校验</div>
+        <!-- <div class="btn" v-else-if="currentStep==2&&wrongDataStatus==true">重新校验</div> -->
         <div class="btn" v-else>上一步</div>
       </div>
       <div class="btnbox" @click="changeStep(1)">
@@ -121,6 +139,7 @@
 </template>
 
 <script>
+  import {addApply} from '@/network/transship.js'
   export default {
     name: "Transmit",
     data () {
@@ -130,28 +149,19 @@
         stepNum: 3,
         orders: [
           {id:'',email:'',right:[true,true]},
-          {id: '123123', email: '12313@23', right: [true,true]},
-          {id: '123123', email: '123@13123', right: [true,true]},
-          // {id: '', email: '12313123', right: [true,true]},
-          // {id: '', email: '12313123', right: [true,true]},
-          // {id: '', email: '12313123', right: [true,true]},
-          // {id: '', email: '12313123', right: [true,true]},
-          // {id: '打球的青蛙', email: '12313123', right: [true,true]},
-          // {id: '请问请问', email: '12313@123', right: [true,true]},
-          // {id: '恶趣味', email: '12313123', right: [true,true]},
-          // {id: '123123', email: '12313@123', right: [true,true]},
-          // {id: '123123', email: '12313123', right: [true,true]}
         ],
         dialogShow: false,
         dialogText: '',
         wrongDataStatus: false,
         wrongDataNum: 0,
         loading: false,
+        resultStatus: 2,
+        wrongOrders: [],
       }
     },
     methods:{
       test() {
-        console.log('focus');
+        console.log(this.kind);
       },
       changeStep(direction) {
         if(this.currentStep==1&&direction==0) {
@@ -163,6 +173,7 @@
           for(let i=0;i<this.orders.length;i++) {
             if(this.orders[i].email!=''||this.orders[i].id!='') {
               canGo = true;
+              break;
             }
           }
           if(canGo==false) {
@@ -176,30 +187,49 @@
           }
         } else if(this.currentStep==2&&direction==0){
           // 第二步 向左
-          if(this.wrongDataStatus==true) {
-            this.checkForm();
-          } else {
-            document.getElementById('step1').className = 'step step-ing'
-            document.getElementById('step2').className = 'step step-not'
-            document.getElementsByClassName('line')[0].className = 'line line-not'
-            this.currentStep-=1
-          }
+          document.getElementById('step1').className = 'step step-ing'
+          document.getElementById('step2').className = 'step step-not'
+          document.getElementsByClassName('line')[0].className = 'line line-not'
+          this.currentStep-=1
         } else if(this.currentStep==2&&direction==1){
           // 第二步 向右
           if(this.wrongDataStatus==true) {
             this.$store.commit('showTip', '请修改或删除错误的数据项')
           } else {
             this.loading = true;
-            document.getElementById('step2').className = 'step step-ed'
-            document.getElementById('step3').className = 'step step-ing'
-            document.getElementsByClassName('line')[1].className = 'line line-ed'
-            this.currentStep+=1;
-            /*
-              上传数据的函数
-            */
-            setTimeout(() => {
-              this.loading = false
-            }, 3000);
+            let brand = '';
+            switch(this.kind){
+              case 'Nike':
+                brand = 'N';
+                break;
+              case 'Adidas':
+                brand = 'A';
+                break;
+              case 'JD':
+                brand = 'JD';
+                break;
+              case '通用':
+                brand = 'U';
+                break;
+            }
+            let order = [];
+            this.orders.map(item=>{
+              order.push({id:item.id,email:item.email})
+            });
+            addApply(brand,order).then(res=>{
+              console.log(res);
+              if(res.data.status=='200') {
+                this.resultStatus = 0;
+              } else if(res.data.status='403'){
+                this.resultStatus = 1;
+                this.wrongOrders = res.data.repeat_id.split(',')
+              }
+              document.getElementById('step2').className = 'step step-ed'
+              document.getElementById('step3').className = 'step step-ing'
+              document.getElementsByClassName('line')[1].className = 'line line-ed'
+              this.currentStep+=1;
+              this.loading = false;
+            })
           }
         } else if(this.currentStep==3&&direction==0){
           // 第三步 向左
@@ -221,7 +251,6 @@
         }
       },
       addOne() {
-        console.log(123);
         this.orders.push({id:'',email:'',right:[true,true]});
         let orderTable = document.getElementById('orderTable')
         this.$nextTick(()=>{
@@ -252,21 +281,44 @@
         })
       },
       checkForm() {
-        console.log('开始校验');
         let wrongNum = 0;
         let rightNum = 0;
+        let mailExg = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
         for(let i=this.orders.length-1;i>=0;i--) {
           let item = this.orders[i];
+          let flag = true;
           if(item.id==''&&item.email=='') {
             this.orders.splice(i,1);
-          } else if(item.email.indexOf('@')==-1) {
+          }
+          if(item.id=='') {
+            this.orders[i].right[0] = false;
+            flag = false;
+          } 
+          if(mailExg.test(item.email)==false || item.email=='') {
             this.orders[i].right[1] = false;
-            wrongNum++;
-          } else {
+            flag = false;
+          } 
+          
+          if(flag==true) {
             this.$set(this.orders,i,{id:this.orders[i].id,email:this.orders[i].email,right:[true,true]})
-            rightNum++;
           }
         }
+
+        for (let i = 0; i < this.orders.length - 1; i++) {
+          for (let j = i + 1; j < this.orders.length; j++) {
+            if (this.orders[i].id === this.orders[j].id) {
+              this.orders[i].right[0] = false;
+              this.orders[j].right[0] = false;
+            }
+          }
+        }
+        rightNum = this.orders.length;
+        this.orders.map(item=>{
+          if(item.right[0]==false||item.right[1]==false) {
+            wrongNum++;
+            rightNum--;
+          }
+        })
         this.wrongDataNum = wrongNum;
         if(wrongNum==0) {
           this.wrongDataStatus = false;
@@ -275,11 +327,11 @@
           this.wrongDataStatus = true;
           document.getElementById('tableTip').className = 'wrong'
         }
-        console.log(wrongNum,rightNum);
       }
     },
     activated() {
       this.kind = this.$route.params.name?this.$route.params.name:'Nike';
+      this.orders = [{id:'',email:'',right:[true,true]}],
       document.getElementsByClassName('footer')[0].style.display = '';
       document.getElementsByClassName('step')[0].className = 'step step-ing'
       document.getElementsByClassName('step')[1].className = 'step step-not'
@@ -529,14 +581,42 @@
     justify-content: center;
     align-items: center;
   }
-  .formbox .upload .okbox {
+  .formbox .upload .resultBox {
     display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    height: 80%;
+  }
+  .formbox .upload .boxItem {
+    width: 100vw;
+    position: relative;
+    display: flex;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
   }
-  .formbox .upload p {
+  .formbox .upload .boxItem .icon {
+    height: 100px;
+    width: 100px;
+    line-height: 100px;
     text-align: center;
+    color: #fff;
+    background-color: #999;
+    border-radius: 50%;
+    font-size: 80px;
+    font-weight: bolder;
+    margin-right: 20px;
+  }
+  .formbox .upload .text {
+    width: 60%;
     font-size: 20px;
-    line-height: 50px;
+  }
+  .failOrders {
+    width: 90vw;
+    height: 20vh;
+    padding: 5px;
+    overflow-y: scroll;
+    border: 1px solid #999;
   }
 </style>
