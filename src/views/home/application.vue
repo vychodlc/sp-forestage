@@ -24,10 +24,11 @@
             <div class="name">仓库</div>
           </div>
           <div class="optiondetail">
-            <div class="item"  @click="$router.push({name:'Output',params:{name:'普通'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 普通出库</div>
-            <div class="item"  @click="$router.push({name:'Output',params:{name:'退税'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 退税出库</div>
+            <div class="item" @click="$router.push({name:'StorageOrderlist'})"><img src="~/assets/images/application/fenlei.png" alt=""> 库存</div>
+            <div class="item" @click="$router.push({name:'Output',params:{name:'普通'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 普通出库</div>
+            <div class="item" @click="$router.push({name:'Outputtax',params:{name:'退税'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 退税出库</div>
           </div>
-          <div class="more"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
+          <div class="more" @click="$router.push({name:'OutputOrderlist'})"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
         </div>
       </div>
     </div>

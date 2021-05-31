@@ -11,6 +11,7 @@ Vue.use(VueRouter)
 
 const routes = [
   { path: '/', name: 'Root',redirect: '/login'},
+  { path: '/test', name: 'Test',component: () => import('../views/test.vue') },
   { path: '/login',name: 'Login',component: () => import('../views/login/index.vue') },
   {
     path: '/home',name: 'Home',redirect: '/post',component: () => import('../views/home/index.vue'),
@@ -30,9 +31,12 @@ const routes = [
   // },
   { path: '/form/transmit',name: 'Transmit',component: () => import('../views/form/transmit.vue')},
   { path: '/form/output',name: 'Output',component: () => import('../views/form/output.vue')},
+  { path: '/form/outputtax',name: 'Outputtax',component: () => import('../views/form/outputtax.vue')},
   { path: '/form/purchase',name: 'Purchase',component: () => import('../views/form/purchase.vue')},
   
   { path: '/orderlist/transmit',name: 'TransmitOrderlist',component: () => import('../views/orderlist/transmit.vue')},
+  { path: '/orderlist/storage',name: 'StorageOrderlist',component: () => import('../views/orderlist/storage.vue')},
+  { path: '/orderlist/output',name: 'OutputOrderlist',component: () => import('../views/orderlist/output.vue')},
 
   { path: '/pay',name: 'Pay',component: () => import('../views/pay/index.vue') },
   { path: '/post_detail',name: 'PostDetail',component: () => import('../views/home/post_detail.vue')},

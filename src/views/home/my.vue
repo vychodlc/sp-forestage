@@ -7,7 +7,7 @@
         <div class="info" id="nickname">{{$store.state.user.nickname}}</div>
         <div class="info" id="uuid">UUID:{{$store.state.user.id}}</div>
       </div>
-      <div class="icon"><img src="~/assets/images/my/setting.png" alt=""></div>
+      <div class="icon" @click="test()"><img src="~/assets/images/my/setting.png" alt=""></div>
     </div>
     <div class="content">
       <div class="card">
@@ -19,11 +19,11 @@
           </div>
         </div>
         <div class="btns">
-          <div class="btn">
+          <div class="btn" @click="$store.commit('handlePay',{price:100,success:false,state:true,show:true})">
             <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
             <div class="btnName"><span>余额</span></div>
           </div>
-          <div class="btn">
+          <div class="btn" @click="$store.commit('handlePay',{price:200,success:false,state:true,show:true})">
             <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
             <div class="btnName"><span>充值</span></div>
           </div>
@@ -59,7 +59,7 @@
       <div class="card">
         <div class="title">
           <span class="titlespan">地址管理</span>
-          <div class="more">
+          <div class="more" @click="goAddress">
             <span>管理地址</span>
             <img src="~/assets/images/my/arrow-right.png" alt="">
           </div>
@@ -68,13 +68,17 @@
           <div class="addr-icon">
             <img src="~/assets/images/application/dizhi.png" alt="">
           </div>
-          <div class="addr-text">
+          <div class="addr-text" v-if="$store.state.address.default!=null">
             <span id="addr-title">默认地址：</span>
-            <span id="address">北京市海淀区西土城10号北京邮电大学</span>
+            <span id="name">{{$store.state.address.default[0].user_name}}<span id="phone">{{$store.state.address.default[0].phone}}</span></span>
+            <span id="address">{{$store.state.address.default[0].addr}}</span>
           </div>
-          <div class="addr-change">
+          <div class="addr-text" v-else>
+            <span id="address">未设置默认地址</span>
+          </div>
+          <!-- <div class="addr-change">
             <span>修改</span>
-          </div>
+          </div> -->
         </div>
       </div>
       <div class="card">
@@ -91,19 +95,40 @@
 </template>
 
 <script>
+
+  import {getAddress} from '@/network/address'
   export default {
     name: "My",
     data () {
-      return {}
+      return {
+      }
     },
+    components: {},
     methods:{
+      test() {
+        console.log(this.$store.state)
+      },
+      goAddress() {
+        getAddress().then(res=>{
+          console.log(res);
+          this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
+          this.$store.commit('changeShow',{name:'showAddr',value:true});
+        })
+      },
       logOut() {
         this.$store.commit('rmToken');
         this.$router.replace('/login')
       }
     },
     activated() {
-      console.log(this.$store.state.user);
+      getAddress().then(res=>{
+        this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
+      })
+      this.$bus.$on("addrChange",()=>{
+        getAddress().then(res=>{
+          this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
+        })
+      });
     }
   }
 </script>
@@ -113,6 +138,7 @@
     width: 100vw;
     height: calc(100vh - 50px);
     background-color: var(--color-all);
+    position: relative;
   }
   .header {
     padding: 2vw;
@@ -234,10 +260,20 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    line-height: 20px;
   }
   #addr-title {
     font-size: 12px;
     color: #999;
+  }
+  .addr-text #name {
+    color: var(--color-all);
+    font-size: 14px;
+  }
+  .addr-text #phone {
+    font-size: 14px;
+    color: #777;
+    margin-left: 10px;
   }
   #address {
     font-size: 14px;

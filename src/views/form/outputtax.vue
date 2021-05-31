@@ -2,7 +2,7 @@
   <div class="transmit">
     <div class="header">
       <div class="back" @click="$router.go(-1)"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
-      <div class="title">{{kind}}出库</div>
+      <div class="title">退税出库</div>
     </div>
     <!-- <iframe id="payment" src="" frameborder="0"></iframe> -->
     <div class="progress">
@@ -21,12 +21,19 @@
           <img class="step-icon" src="~/assets/images/form/checked.png" alt="">
           <div class="step-index">2</div>
         </div>
-        <div class="text">信息确认</div>
+        <div class="text">上传资料</div>
       </div>
       <div class="step step-not" id="step3">
         <div>
           <img class="step-icon" src="~/assets/images/form/checked.png" alt="">
           <div class="step-index">3</div>
+        </div>
+        <div class="text">信息确认</div>
+      </div>
+      <div class="step step-not" id="step4">
+        <div>
+          <img class="step-icon" src="~/assets/images/form/checked.png" alt="">
+          <div class="step-index">4</div>
         </div>
         <div class="text">提交表单</div>
       </div>
@@ -85,22 +92,29 @@
         </div>
       </div>
     </div>
-    <div class="formbox" v-show="currentStep==2">
+    <div class="formbox" id="formboxUpload" v-show="currentStep==2">
+      <input type="file" ref="uploadImg" accept="image/*" multiple="multiple" @change="uploadImg" style="display:none">
+      <span>上传图片</span><div class="uploadBtn" @click="$refs.uploadImg.click()">+</div>
+      <span>上传列表</span>
+      <div class="uploadList" v-if="$refs.uploadImg">
+        <div v-for="(item,index) in uploadList" :key="index" class="uploadListItem">
+          <!-- <img src="https://img1.baidu.com/it/u=2869661283,3188552792&fm=26&fmt=auto&gp=0.jpg" alt=""> -->
+          <span style="margin-left:20px">{{item.name}}</span>
+          <span style="position:absolute;right:20px" @click="delImg(index)">×</span>
+        </div>
+      </div>
+    </div>
+    <div class="formbox" id="infoBox" v-show="currentStep==3">
       <div class="addressbox">
         <div class="content">
           <div class="text" v-if="$store.state.address.default==null&&selectAddr==null">
             <span style="line-height:20vw;text-align:center;font-size:20px">未设置默认地址</span>
           </div>
-          <!-- <div class="text" v-else-if="selectAddr==null">
+          <div class="text" v-else-if="selectAddr==null">
             <span class="name">{{$store.state.address.default[0].user_name}}</span>
             <span class="phone">{{$store.state.address.default[0].phone}}</span>
             <div class="address">{{$store.state.address.default[0].addr}}</div>
           </div>
-          <div class="text" v-else-if="selectAddr!=null">
-            <span class="name">{{selectAddr.user_name}}</span>
-            <span class="phone">{{selectAddr.phone}}</span>
-            <div class="address">{{selectAddr.addr}}</div>
-          </div> -->
           <div class="text" v-else-if="selectAddr!=null">
             <span class="name">{{selectAddr.user_name}}</span>
             <span class="phone">{{selectAddr.phone}}</span>
@@ -111,7 +125,7 @@
       </div>
       <div class="addressbox">
         <div class="goodsCard" v-for="(item,index) in selectList" :key="index">
-          <div class="goodsImg"><img :src="item.pic" alt=""></div>
+          <div class="goodsImg"><img src="http://api.bupt404.cn/sp/cover/1621229640858-dragon.jpg" alt=""></div>
           <div class="content">
             <div class="name">库存编号：{{item.storage_ID}}</div>
             <div class="info">
@@ -123,28 +137,35 @@
       </div>
       <div class="addressbox">
         <div class="text">
+          <span class="name">退税材料</span>
+        </div>
+        <div class="material">
+          <img v-for="(item,index) in materialList" :key="index" :src='item' alt="">
+        </div>
+      </div>
+      <div class="addressbox">
+        <div class="text">
           <span class="name">金额</span>
-          <span class="money" style="color:#000;margin-left:10px;font-size:18px">￡{{parseFloat(price/100).toFixed(2)}}</span>
+          <span class="money" style="color:#000;margin-left:10px;font-size:18px">￥{{price}}</span>
         </div>
       </div>
       <div class="addressbox">
         <div class="text">
           <span class="name">支付方式</span>
+          <!-- <span class="money" style="color:#000;margin-left:10px;font-size:18px">￥3030.22</span> -->
           <div class="method">
-            <input type="radio" v-model="paymethod" value="0" id="method0" v-if='price<money'/>
-            <input type="radio" v-model="useBalance" value="1" id="0" v-else disabled/>
-            <label for="method0">余额支付
-              <span>余额:￡{{parseFloat(money/100).toFixed(2)}}</span>
-              <!-- <span id="nomoney" style="font-size:14px">余额不足(￡{{parseFloat(money/100).toFixed(2)}})</span> -->
+            <input type="radio" v-model="paymethod" value="0" id="0"/><label for="0">余额支付
+              <span>余额：￡{{parseFloat(money/100).toFixed(2)}}</span>
+              <!-- <span id="nomoney">余额不足(${{money}})</span> -->
             </label>
           </div>
           <div class="method">          
-            <input type="radio" v-model="paymethod" value="1" id="method1"/><label for="method1">聚合支付</label>
+            <!-- <input type="radio" v-model="paymethod" value="1" id="1"/><label for="1">聚合支付</label> -->
           </div>
         </div>
       </div>
     </div>
-    <div class="formbox" v-show="currentStep==3">
+    <div class="formbox" v-show="currentStep==4">
       <div class="resultBox">
         <div class="icon" style="background-color:var(--color-all)">✓</div>
         <div class="text">
@@ -153,7 +174,7 @@
       </div>
     </div>
     <div class="footer">
-      <div class="btnbox" @click="changeStep(0)" v-if="currentStep!=3">
+      <div class="btnbox" @click="changeStep(0)" v-if="currentStep!=4">
         <div class="btn" v-if="currentStep==1">取消</div>
         <div class="btn" v-else>上一步</div>
       </div>
@@ -167,9 +188,9 @@
         <div class="close" @click="showDialog=false">×</div>
         <div class="addrCard" v-for="(item,index) in 20" :key="index">
           <div class="text" @click="showDialog=false;addrIndex=index">
-            <span class="name"></span>
-            <span class="phone"></span>
-            <div class="address"></div>
+            <span class="name">某人</span>
+            <span class="phone">18828282828</span>
+            <div class="address">北京市海淀区西土城十号北京邮电大学北京市海淀区西土城十号北京邮电大学</div>
           </div>
           <div class="edit" @click="goEdit">编辑</div>
         </div>
@@ -192,7 +213,7 @@
 </template>
 
 <script>
-  import {getStorageList,filterStorageList,addOutput} from '@/network/transship.js'
+  import {getStorageList,filterStorageList,addOutput,addImg} from '@/network/transship.js'
   import {putOrder,paymentBalance} from '@/network/payment.js'
   import {getBalance} from '@/network/user.js'
 
@@ -202,7 +223,7 @@
       return {
         kind: this.$route.params.name?this.$route.params.name:'普通',
         currentStep: 1,
-        stepNum: 3,
+        stepNum: 4,
         storageList: [],
         storageNum: null,
         pageIndex: 1,
@@ -211,12 +232,13 @@
         showDialog: false,
         addrIndex: 0,
         showEdit: false,
-        editform: {name: '',phone: '',address: ''},
+        editform: {name: '某人',phone: '12312312312',address: '按市场库哈斯客户大厦是肯定哈里斯电话啦'},
+        uploadList: [],
+        materialList: [],
         selectAddr: null,
         paymethod: 0,
-        useBalance: 0,
         money: 122,
-        price: 0
+        price: 1000
       }
     },
     computed: {
@@ -232,31 +254,13 @@
           if(this.selectList.length==0) {
             this.$store.commit('showTip', '请选择出库商品')
           } else {
-            let weight = 0;
-            this.selectList.map(item=>weight+=parseFloat(item.weight));
-            weight = parseInt(weight/0.5);
-            if(weight>59) {
-              this.price = 11800;
-              this.price = 1000000;
-            } else {
-              this.price = this.$store.state.expressPrice[weight]*100;
-              this.price = 1;
-            }
+            document.getElementById('step1').className = 'step step-ed'
+            document.getElementById('step2').className = 'step step-ing'
+            document.getElementsByClassName('line')[0].className = 'line line-ed'
+            this.currentStep+=1;
             getBalance().then(res=>{
+              console.log(res.data);
               this.money = parseInt(res.data.balance);
-              if(this.money<this.price) {
-                this.useBalance = 1;
-                this.paymethod = 1;
-              }
-              if(this.$store.state.address.default!=null) {
-                this.selectAddr = this.$store.state.address.default[0]
-              } else if(this.$store.state.address.list.length>0){
-                this.selectAddr = this.$store.state.address.list[0]
-              }
-              document.getElementById('step1').className = 'step step-ed'
-              document.getElementById('step2').className = 'step step-ing'
-              document.getElementsByClassName('line')[0].className = 'line line-ed'
-              this.currentStep+=1;
             })
           }
         } else if(this.currentStep==2&&direction==0){
@@ -265,23 +269,53 @@
           document.getElementsByClassName('line')[0].className = 'line line-not'
           this.currentStep-=1
         } else if(this.currentStep==2&&direction==1){
+          if(this.uploadList.length==0) {
+            this.$store.commit('showTip', '请上传退税相关材料')
+          } else {
+            this.$store.commit('showLoading',true);
+            this.materialList = [];
+            let imgNum = this.uploadList.length;
+            while(this.uploadList!=0) {
+              let file = this.uploadList.pop();
+              let fileName = new Date().getTime() + '-' +file.name;
+              let uploadFile = new File([file], fileName, {type: file.type});
+              addImg(uploadFile).then(res=>{
+                if(res.data.status=='201') {
+                  this.materialList.push(res.data.img_url)
+                  if(this.materialList.length==imgNum) {          
+                    this.$store.commit('showLoading',false);
+                    document.getElementById('step2').className = 'step step-ed'
+                    document.getElementById('step3').className = 'step step-ing'
+                    document.getElementsByClassName('line')[1].className = 'line line-ed'
+                    this.currentStep+=1
+                  }
+                }
+              })
+            }
+          }
+        } else if(this.currentStep==3&&direction==0){
+          document.getElementById('step1').className = 'step step-ing'
+          document.getElementById('step2').className = 'step step-not'
+          document.getElementsByClassName('line')[0].className = 'line line-not'
+          this.currentStep-=1
+        } else if(this.currentStep==3&&direction==1){
           if(this.selectAddr==null) {
             this.$store.commit('showTip','请选择收货地址')
           } else {
             this.$store.commit('showLoading',true);
             addOutput({
               storage_nums:this.selectList.map(item=>(item.storage_ID)),
-              outbound_type:'0',
-              material:'',
+              outbound_type:'1',
+              material:this.materialList.join(','),
               address:this.selectAddr.addr,
               price: this.price,
             }).then(res=>{
+              console.log(res);
               if(res.data.status=='200') {
                 this.$store.commit('handlePay',{order_type:'o',price:this.price,id:res.data.outbound_id});
                 let info = {
                   order_type: 'o',
                   id: res.data.outbound_id,
-                  price: this.price,
                 }
                 if(this.paymethod=='0') {
                   console.log('余额');
@@ -289,10 +323,10 @@
                   this.$store.commit('showLoading',false);
                 } else {
                   console.log('聚合');
-                  putOrder(info).then(res=>{
-                    let url = res.data.RedirectUrl;
-                    window.location.replace(url);
-                  })
+                  // putOrder(info).then(res=>{
+                  //   let url = res.data.RedirectUrl;
+                  //   window.location.replace(url);
+                  // })
                 }
                 // putOrder(info).then(res=>{
                 //   // document.getElementById('payment').src = res.data.RedirectUrl;
@@ -311,7 +345,7 @@
           // document.getElementById('step3').className = 'step step-not'
           // document.getElementsByClassName('line')[1].className = 'line line-not'
           // this.currentStep-=1
-        } else if(this.currentStep==3&&direction==1){
+        } else if(this.currentStep==4&&direction==1){
           document.getElementById('step3').className = 'step step-ed';
           document.getElementsByClassName('footer')[0].style.display = 'none';
           setTimeout(() => {
@@ -364,6 +398,14 @@
         }
         // console.log(this.selectList);
       },
+      uploadImg(e) {
+        for(let item of this.$refs.uploadImg.files) {
+          this.uploadList.push(item)
+        }
+      },
+      delImg(index) {
+        this.uploadList.splice(index,1);
+      },
       goEdit() {
         this.showEdit = true;
       },
@@ -381,14 +423,19 @@
       document.getElementsByClassName('line')[0].className = 'line line-not'
       document.getElementsByClassName('line')[1].className = 'line line-not'
       this.currentStep=1;
-      this.storageList = [],
-      this.storageNum = null,
-      this.pageIndex = 1,
-      this.selectList = [],
+      this.storageList = [];
+      this.uploadList = [];
+      this.materialList = [];
+      this.storageNum = null;
+      this.pageIndex = 1;
+      this.selectList = [];
       this.$store.commit('showLoading', true);
       
+      // document.getElementById('payment').contentWindow.location.reload(true);
       this._getStorageList();
-      
+      // window.open("http://www.baidu.com")
+
+      // console.log(this.$store.state.address);
       if(this.$store.state.address.default!=null) {
         this.selectAddr = this.$store.state.address.default[0];
       } else {
@@ -415,8 +462,6 @@
           }
         }
       })
-
-      console.log(this.$store.state);
     }
   }
 </script>
@@ -636,7 +681,8 @@
     margin-bottom: 20px;
   }
   .addressbox:nth-child(2) {
-    max-height: 200px;
+    max-height: 330px;
+    height: 100px;
     overflow-y: scroll;
   }
   .addressbox .content {
@@ -833,5 +879,60 @@
     background-color: #f07000;
     padding: 3px;
     background-clip: content-box;
+  }
+
+  
+  #formboxUpload {
+    padding: 20px;
+  }
+  #formboxUpload .uploadBtn {
+    font-size: 80px;
+    width: 80px;
+    height: 80px;
+    color: var(--color-all);
+    border-radius: 10px;
+    border: 3px solid var(--color-all);
+    text-align: center;
+    line-height: 80px;
+    margin-left: 30px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+  }
+  #formboxUpload span {
+    font-size: 18px;
+  }
+  .uploadList {
+    max-height: 400px;
+    overflow-y: scroll;
+  }
+  #formboxUpload .uploadListItem {
+    margin-top: 10px;
+    /* width: 100%;
+    height: 60px;
+    border: 1px solid var(--color-all);
+    border-radius: 10px;
+    margin-top: 10px; */
+  }
+  #formboxUpload .uploadListItem img {
+    width: 40px;
+    height: 40px;
+  }
+
+  #infoBox {
+    overflow-y: hidden;
+    /* background-color: red; */
+  }
+  .addressbox:nth-child(3) {
+  }
+
+  .material {
+    height: 120px;
+    overflow-y: scroll;
+  }
+
+  .material img {
+    width: 20vw;
+    margin-left: 20px;
+    margin-top: 10px;
   }
 </style>

@@ -14,12 +14,30 @@
     <div class="messageTip" v-show="$store.state.message.tip.show">
       {{$store.state.message.tip.text}}
     </div>
+    <div class="bigImg" v-if="$store.state.bigImg.show" @click="$store.commit('showImg',['',false])">
+      <img :src="$store.state.bigImg.url" alt="">
+    </div>
+    <Pay v-if="$store.state.pay.show"></Pay>
+    <AddrManage v-if="$store.state.show.showAddr"></AddrManage>
+    <AddrEdit v-if="$store.state.show.addrEdit"></AddrEdit>
+    <AddrAdd v-if="$store.state.show.addrAdd"></AddrAdd>
   </div>
 </template>
 
 <script>
+  import {spider} from '@/utils/spider'
+  import Pay from '@/components/Pay'
+  import AddrManage from "@/components/AddrManage"
+  import AddrEdit from "@/components/AddrEdit"
+  import AddrAdd from "@/components/AddrAdd"
+
+  import {getAddress} from '@/network/address'
+  import {getUserInfo} from '@/network/user'
+  import axios from 'axios'
+
   export default({
     name: 'App',
+    components: {Pay,AddrManage,AddrEdit,AddrAdd},
     data() {
       return {
         transitionName:''
@@ -33,6 +51,24 @@
           window.innerHeight = Height
         })()
       }
+    },
+    methods: {
+      gogogo() {
+        console.log('gogogo');
+      }
+    },
+    mounted() {
+      getUserInfo().then(res=>{
+        if(res.data.status=='200') {
+          this.$store.commit('setBalance',res.data.data.balance)
+          localStorage.balance = res.data.data.balance
+        }
+      })
+      getAddress().then(res=>{
+        this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
+      })
+      
+      document.addEventListener('plusready', function(){})
     },
     watch: {
       $route(to, from) {
@@ -108,7 +144,7 @@
   }
   
   .messageTip {
-    z-index: 1000;
+    z-index: 3000;
     position: fixed;
     left: 50%;
     transform: translateX(-50%);
@@ -118,6 +154,22 @@
     font-size: 16px;
     border-radius: 10px;
     padding: 10px 10px;
+  }
+
+  .bigImg {
+    z-index: 3000;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #444444ee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bigImg img {
+    width: 100vw;
   }
 
   /* 路由切换动画 */

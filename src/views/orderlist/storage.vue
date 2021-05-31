@@ -1,16 +1,16 @@
 <template>
-  <div class="transmit">
+  <div class="Storage">
     <div class="header">
       <div class="back" @click="$router.go(-1)"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
-      <div class="title">入库订单</div>
+      <div class="title">库存信息</div>
     </div>
     <div class="tableSearch">
       <span>
         <select id="group" v-model="filter">
-          <option value="expressid">单号</option>
-          <option value="email">邮箱</option>
-          <option value="apply_status">状态</option>
-          <option value="brand">品牌</option>
+          <option value="storage_ID">编号</option>
+          <option value="size">尺寸</option>
+          <option value="weight">重量</option>
+          <option value="storage_status">状态</option>
         </select>
       </span>
       <input type="search" v-model="search">
@@ -18,104 +18,33 @@
       <span class="cancle" @click="goBack" v-if="isSearch">×</span>
     </div>
     <div class="tableBox">
-      <div class="tableItem">
-        <table>
-          <thead>
-            <tr>
-              <th>单号</th>
-              <th>订单</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item,index) in tableData" :key="index">        
-              <td>{{item.apply_ID}}</td>
-              <td>{{item.expressid}}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="tableItem">
-        <table>
-          <thead>
-            <tr>
-              <th>时间</th>
-              <!-- <th>订单</th> -->
-              <th>邮箱</th>
-              <th>客户</th>
-              <th>价格</th>
-              <th>礼品卡</th>
-              <th>样式</th>
-              <th>尺寸</th>
-              <th>数量</th>
-              <th>状态</th>
-              <th>快递</th>
-              <th>邮编</th>
-              <th>地址一</th>
-              <th>地址二</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item,index) in tableData" :key="index">
-              <td>{{item.op_date}}</td>
-              <!-- <td>{{item.expressid}}</td> -->
-              <td>{{item.email}}</td>
-              <td></td>
-              <td>￡{{item.price}}</td>
-              <td>{{item.gift}}</td>
-              <td>{{item.style}}</td>
-              <td>{{item.size}}</td>
-              <td>{{item.apply_ID}}</td>
-              <td>{{item.rolledUpStatus}}</td>
-              <td>{{item.apply_ID}}</td>
-              <td>{{item.apply_ID}}</td>
-              <td>{{item.first_address}}</td>
-              <td>{{item.second_address}}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <!-- <div class="tableItem">
-        <table>
-          <thead>
-            <th v-for="(item,index) in 20" :key="index">{{item}}</th>
-          </thead>
-          <tbody>
-            <td v-for="(item,index) in 20" :key="index">{{item}}</td>
-          </tbody>
-        </table>
-      </div> -->
-      <!-- <table v-if="tableData.length>0">
+      <table v-if="tableData.length>0">
         <thead>
           <tr>
-            <th style="width:10vw;font-size:18px">申报<br>单号</th>
-            <th style="width:20vw;font-size:18px">单号</th>
-            <th style="width:20vw;font-size:18px">邮箱</th>
-            <th style="width:10vw;font-size:18px">品牌</th>
-            <th style="width:20vw;font-size:18px">提交<br>时间</th>
+            <th style="width:10vw;font-size:18px">库存<br>编号</th>
+            <th style="width:20vw;font-size:18px">图片</th>
+            <th style="width:20vw;font-size:18px">尺寸</th>
+            <th style="width:10vw;font-size:18px">重量</th>
+            <th style="width:20vw;font-size:18px">入库<br>时间</th>
             <th style="width:10vw;font-size:18px">状态</th>
           </tr>
         </thead>
         <tbody id="tbody">
           <tr v-for="(item,index) in tableData" :key="index">
-            <td>{{item.apply_ID}}</td>
-            <td>{{item.expressid}}</td>
-            <td>{{item.email}}</td>
+            <td>{{item.storage_ID}}</td>
+            <td @click="$store.commit('showImg',[item.pic,true])"><img :src="item.pic" alt="" style="width:20vw"></td>
+            <td>{{item.size}}</td>
+            <td>{{item.weight}}</td>
+            <td>{{item.storage_time}}</td>
             <td>
-              <span v-if="item.brand=='N'">Nike</span>
-              <span v-else-if="item.brand=='A'">Adidas</span>
-              <span v-else-if="item.brand=='JD'">JD</span>
-              <span v-else-if="item.brand=='U'">通用</span>
+              <span v-if="item.storage_status==0">库存中</span>
+              <span v-else-if="item.storage_status==1">已出库</span>
             </td>
-            <td>{{item.apply_time}}</td>
-            <td>
-              <span v-if="item.apply_status==0">未入库</span>
-              <span v-else-if="item.apply_status==1">已入库</span>
-              <span v-else-if="item.apply_status==2">已驳回</span>
-            </td>
+            <!-- <td><div class="delete" v-if='tableData.length!=1' @click="delItem(index)">×</div></td> -->
           </tr>
         </tbody>
       </table>
-      <div v-else style="font-size:20px;line-height:642px;text-align:center;">查询无果</div> -->
+      <div v-else style="font-size:20px;line-height:642px;text-align:center;">查询无果</div>
     </div>
     <div class="tableFooter" v-if="pageNum>1">
       <div class="pageIndex" @click="changePage(-1)" :style="{'color':(currentIndex==1)?'#aaa':'var(--color-all)'}">◂</div>
@@ -146,13 +75,13 @@
 </template>
 
 <script>
-  import {getApplyList,filterApplyList} from '@/network/transship.js'
+  import {getStorageList,filterStorageList} from '@/network/transship.js'
   export default {
-    name: "TransmitOrderlist",
+    name: "StorageList",
     data () {
       return {
         isSearch: false,
-        filter: 'expressid',
+        filter: 'storage_ID',
         search: '',
         tableData: [],
         currentIndex: 1,
@@ -160,26 +89,21 @@
       }
     },
     methods:{
-      _getApplyList() {
+      _getStorageList() {
         if(this.isSearch==false) {
-          getApplyList(this.currentIndex).then(res=>{
+          getStorageList(this.currentIndex).then(res=>{
             console.log(res);
             if(res.data.status=='200') {
               this.tableData = res.data.data;
-              this.tableData.map(data=>{
-                if(typeof(data.op_date)=='string') {
-                  data.op_date = data.op_date.split(',')[0]
-                }
-              })
-              this.pageNum = Math.ceil(res.data.applications_num/10);
+              this.pageNum = Math.ceil(res.data.storages_num/10);
               this.$store.commit('showLoading',false);
             }
           })
         } else {
-          filterApplyList(this.filter,this.search,this.currentIndex).then(res=>{
+          filterStorageList(this.filter,this.search,this.currentIndex).then(res=>{
             if(res.data.status=='200') {
               this.tableData = res.data.data;
-              this.pageNum = Math.ceil(res.data.applications_num/10);
+              this.pageNum = Math.ceil(res.data.storages_num/10);
               this.$store.commit('showLoading',false);
             }
           })
@@ -189,15 +113,15 @@
         if(index==-1&&this.currentIndex!=1) {
           this.$store.commit('showLoading',true);
           this.currentIndex--;
-          this._getApplyList();
+          this._getStorageList();
         } else if(index==0&&this.currentIndex!=this.pageNum) {
           this.$store.commit('showLoading',true);
           this.currentIndex++;
-          this._getApplyList();
+          this._getStorageList();
         } else if(index!=0&&index!=-1) {
           this.$store.commit('showLoading',true);
           this.currentIndex = index;
-          this._getApplyList();
+          this._getStorageList();
         }
       },
       goSearch() {
@@ -207,22 +131,25 @@
           this.$store.commit('showLoading',true);
           this.isSearch = true;
           this.currentIndex = 1;
-          this._getApplyList();
+          this._getStorageList();
         }
       },
       goBack() {
         this.$store.commit('showLoading',true);
         this.isSearch = false;
         this.search = '';
-        this.filter = 'expressid';
+        this.filter = 'storage_ID';
         this.currentIndex = 1;
-        this._getApplyList();
+        this._getStorageList();
+      },
+      showImg(url) {
+        console.log(url);
       }
     },
     activated() {
       this.$store.commit('showLoading',true);
       this.currentIndex = 1;
-      this._getApplyList();
+      this._getStorageList();
     },
   }
 </script>
@@ -293,66 +220,21 @@
     line-height: 30px;
     margin-left: 10px;
   }
-  /* .tableBox {
+  .tableBox {
     width: 100vw;
     height: 642px;
+    /* display: flex;
+    align-items: center;
+    justify-content: center; */
+    /* border: 3px solid #000; */
   }
+  table {table-layout:fixed;}
   td {word-break:break-all;}
   tbody tr {
     height: 60px;
   }
 
-  table {font-size:11px;color:#333333;border-collapse: collapse;}
-  table th {background-color: #dedede;}
-  table td {border-bottom: 1px solid #999;background-color: #ffffff;text-align:center;} */
-
-  .tableBox {
-    width: 100vw;
-    height: 642px;
-    display: flex;
-    flex-direction: row;
-  }
-  
-  table {font-size:11px;color:#333333;border-collapse: collapse;}
-  
-  .tableBox thead th,
-  .tableBox tbody tr {
-    white-space: nowrap;
-    height: 60px;
-    border-bottom: 1px solid #999;
-    text-align:center;
-  }
-  .tableBox thead th {
-    background-color: #dedede;
-    padding: 0 3px;
-    height: 40px;
-  }
-
-  .tableBox .tableItem:nth-child(1) {
-    width: 30vw;
-    height: 100%;
-    overflow-x: scroll;
-    overflow-y: hidden;
-  }
-  .tableBox .tableItem:nth-child(1) td {
-    width: 20vw;
-  }
-  .tableBox .tableItem:nth-child(2) {
-    width: 70vw;
-    height: 100%;
-    overflow-x: scroll;
-    overflow-y: hidden;
-  }
-  .tableBox .tableItem:nth-child(2) td {
-    padding: 0 3px;
-  }
-  .tableBox .tableItem:nth-child(3) {
-    width: 10vw;
-    height: 100%;
-    overflow-x: scroll;
-    overflow-y: hidden;
-  }
-  .tableBox .tableItem:nth-child(3) yd {
-    width: 10vw;
-  }
+  table {font-size:11px;color:#333333;border-width: 1px;border-color: #666666;border-collapse: collapse;}
+  table th {border: 1px solid #666666;background-color: #dedede;}
+  table td {border: 1px solid #666666;background-color: #ffffff;text-align:center;}
 </style>

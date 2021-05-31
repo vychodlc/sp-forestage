@@ -12,12 +12,9 @@ export function auth(token) {
   })
 }
 
-export function getUserInfo(id) {
+export function getUserInfo() {
   return request({
     url: '/get_user_info.php',
-    params: {
-      uuid: id
-    }
   })
 }
 
@@ -84,5 +81,11 @@ export function setUserRight(id,newRight) {
     method: 'POST',
     url: '/set_user_right.php',
     data: form
+  })
+}
+
+export function getBalance() {
+  return request({
+    url: '/get_balance.php'
   })
 }

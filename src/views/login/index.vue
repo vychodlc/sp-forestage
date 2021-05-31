@@ -83,17 +83,19 @@
               let token = res.data.token;
               this.$store.commit('setToken', token);
               auth(token).then(res=>{
-                let id = res.data.data.sub;
-                getUserInfo(id).then(res=>{
+                let uuid = res.data.data.sub;
+                getUserInfo(uuid).then(res=>{
+                  console.log('res',res);
                   let data = res.data.data;
-                  localStorage.id = data.uuid;
+                  localStorage.uuid = data.uuid;
+                  localStorage.balance = data.balance;
+                  localStorage.ID = data.ID;
                   localStorage.nickname = data.user_nickname;
                   localStorage.right = data.user_right;
-                  this.$store.commit('setUser', [data.uuid, data.user_nickname,data.user_right]);
-                  console.log(this.$store.state);
+                  this.$store.commit('setUser', [data.ID, data.user_nickname,data.user_right,data.balance]);
                   this.$store.commit('showLoading',false);
                   this.$store.commit('showTip', '登陆成功');
-                  this.$router.replace('/home')
+                  this.$router.replace('/home');
                 })
               })
             } else {
