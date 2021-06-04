@@ -3,6 +3,8 @@
     <div class="header">
       <div class="back" @click="$router.go(-1)"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
       <div class="title">入库订单</div>
+      <div v-if="inCD==false" :class="isRefresh?'refreshTrue refresh':'refresh'" @click="refresh"><img src="~/assets/images/refresh.png" alt=""></div>
+      <div v-else class="refresh" @click="$store.commit('showTip','刷新冷却时间还未结束')">{{CDTime}}s</div>
     </div>
     <div class="tableSearch">
       <span>
@@ -38,9 +40,9 @@
         <table>
           <thead>
             <tr>
+              <th>邮箱</th>
               <th>时间</th>
               <!-- <th>订单</th> -->
-              <th>邮箱</th>
               <th>客户</th>
               <th>价格</th>
               <th>礼品卡</th>
@@ -56,18 +58,18 @@
           </thead>
           <tbody>
             <tr v-for="(item,index) in tableData" :key="index">
+              <td>{{item.email}}</td>
               <td>{{item.op_date}}</td>
               <!-- <td>{{item.expressid}}</td> -->
-              <td>{{item.email}}</td>
               <td></td>
               <td>￡{{item.price}}</td>
               <td>{{item.gift}}</td>
               <td>{{item.style}}</td>
               <td>{{item.size}}</td>
-              <td>{{item.apply_ID}}</td>
+              <td>{{item.op_quantity}}</td>
               <td>{{item.rolledUpStatus}}</td>
-              <td>{{item.apply_ID}}</td>
-              <td>{{item.apply_ID}}</td>
+              <td>{{item.tracker}}</td>
+              <td>{{item.postal}}</td>
               <td>{{item.first_address}}</td>
               <td>{{item.second_address}}</td>
             </tr>
@@ -157,6 +159,9 @@
         tableData: [],
         currentIndex: 1,
         pageNum: null,
+        isRefresh: false,
+        inCD: false,
+        CDTime: 0,
       }
     },
     methods:{
@@ -217,7 +222,148 @@
         this.filter = 'expressid';
         this.currentIndex = 1;
         this._getApplyList();
-      }
+      },
+      guid() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+          let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      },
+      refresh() {
+        if(this.isRefresh==false) {
+          this.isRefresh = true;
+          getApplyList(0).then(res=>{
+            let Alldata = res.data.data;
+            let Handledata = Alldata.filter(item=>{return item.apply_status=='0'&&item.op_date!=null})
+            let handleTimes = 0;
+
+            Handledata.map(item=>{
+              let returnItem = {
+                order_time: [],
+                price: [],
+                maxOrderLineStatus:[],
+                minOrderLineStatus:[],
+                rolledUpStatus:[],
+                size:[],
+                style:[],
+                op_date:[],
+                op_description:[],
+                op_quantity:[],
+                first_address:[],
+                second_address:[],
+                city:[],
+                postal:[],
+                country:[],
+                gift:[],
+                tracker:[],
+              }
+              for(let key in returnItem) {
+                let value = this.tableData.filter(tableItem=>{return tableItem.apply_ID==item.apply_ID})[0];
+                if(value[key]) {
+                  value[key] = 'pending'
+                }
+              }
+              if(item.brand=='N') {
+                console.log(item.expressid);
+                let id = item.expressid;
+                let email = item.email;
+                let headers = {
+                  "Content-Type": "application/x-www-form-urlencoded;",
+                  "accept":"application/json",
+                  "accept-language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,ja-JP;q=0.6,ja;q=0.5",
+                  "appid":"orders",
+                  "x-nike-visitid":"1",
+                  "x-nike-visitorid":this.guid(),
+                }
+                let url1 = "https://api.nike.com/order_mgmt/user_order_details/v2/" + id + "?filter=email(" + email + ")";
+                let url2 = "https://api.nike.com/ship/user_shipments/v1?locale=en_us&filter=orderNumber(" + id +")&filter=email("+email+")";
+                
+                this.$axios.all([
+                  this.$axios.get(url1, {
+                    headers: headers,
+                  }),
+                  this.$axios.get(url2, {
+                    headers: headers,
+                  })
+                ]).then(this.$axios.spread((res1,res2)=>{
+
+                  handleTimes++;
+
+                  let data = res1.data;
+                  returnItem.order_time.push(data.orderCreateDate?data.orderCreateDate:'');
+                  returnItem.price.push(data.totalAmount?data.totalAmount:'');
+                  data.orderLines.map(orderline=>{
+                    returnItem.maxOrderLineStatus.push(orderline.maxOrderLineStatus?orderline.maxOrderLineStatus:'');
+                    returnItem.minOrderLineStatus.push(orderline.minOrderLineStatus?orderline.minOrderLineStatus:'');
+                    returnItem.rolledUpStatus.push(orderline.rolledUpStatus?orderline.rolledUpStatus:'');
+                    returnItem.size.push(orderline.displaySize?orderline.displaySize:'');
+                    returnItem.style.push(orderline.styleNumber?orderline.styleNumber+'-'+orderline.colorCode:'');
+                    if(orderline.statuses) {
+                      orderline.statuses.map(status=>{
+                        returnItem.op_date.push(status.date?status.date:'');
+                        returnItem.op_description.push(status.description?status.description:'');
+                        returnItem.op_quantity.push(status.quantity?status.quantity:'');
+                      });
+                    }
+                    if(orderline.shipTo&&orderline.shipTo.address) {
+                      returnItem.first_address.push(orderline.shipTo.address.address1?orderline.shipTo.address.address1:'');
+                      returnItem.second_address.push(orderline.shipTo.address.address2?orderline.shipTo.address.address2:'');
+                      returnItem.city.push(orderline.shipTo.address.city?orderline.shipTo.address.city:'');
+                      returnItem.postal.push(orderline.shipTo.address.zipCode?orderline.shipTo.address.zipCode:'');
+                      returnItem.country.push(orderline.shipTo.address.country?orderline.shipTo.address.country:'');
+                    }
+                  });
+                  if(data.paymentMethods) {
+                    data.paymentMethods.map(paymentMethod=>{
+                      returnItem.gift.push(paymentMethod.displayGiftCardNumber?paymentMethod.displayGiftCardNumber:'');
+                    });
+                  }
+                  data = res2.data;
+                  if(data.objects) {
+                    data.objects.map(object=>{
+                      if(object.containers) {
+                        object.containers.map(container=>{
+                          returnItem.tracker.push(container.trackingNumber?container.trackingNumber:'')
+                        })
+                      }
+                    })
+                  }
+                  for(let key in returnItem) {
+                    this.tableData.filter(tableItem=>{return tableItem.apply_ID==item.apply_ID})[0][key] = returnItem[key].join(',')
+                  }
+                  if(handleTimes==Handledata.length) {
+                    this.isRefresh = false;
+                    this.inCD = true;
+                    this.CDTime = 10;
+                    this.refreshCD();
+                  }
+                  console.log('ok');
+                }))
+              } else if(item.brand=='A') {
+                
+                  handleTimes++;
+              
+              } else if(item.brand=='JD') {
+
+                  handleTimes++;
+
+              }
+            })
+          })
+        } else {
+          this.$store.commit('showTip','请稍后，正在刷新');
+        }
+      },
+      refreshCD() {
+        if(this.CDTime>0) {
+          this.CDTime--;
+          setTimeout(() => {          
+            this.refreshCD();
+          }, 1000);
+        } else {
+          this.inCD = false
+        }
+      },
     },
     activated() {
       this.$store.commit('showLoading',true);
@@ -228,6 +374,15 @@
 </script>
 
 <style scoped>
+  @keyframes iconRotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   .transmit {
     width: 100vw;
     height: 100vh;
@@ -236,7 +391,7 @@
   .header {
     z-index: 1000;
   }
-  .back, .link {
+  .back, .refresh {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -247,6 +402,10 @@
     position: fixed;
   }
   .back {top: 10px;left: 10px;}
+  .refresh {top: 10px;right: 10px;}
+  .refreshTrue {
+    animation: iconRotate infinite 2s linear;
+  }
   .header img {
     width: 30px;
     height: 30px;

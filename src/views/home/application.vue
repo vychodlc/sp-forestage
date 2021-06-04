@@ -40,35 +40,14 @@
         <div class="option">
           <div class="optionheader">
             <div class="icon"><img src="~/assets/images/application/biaodan.png" alt=""></div>
-            <div class="name">申报</div>
+            <div class="name">下单</div>
           </div>
           <div class="optiondetail">
-            <div class="item" @click="$router.push({name:'Transmit',params:{name:'Nike'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Nike</div>
-            <div class="item" @click="$router.push({name:'Transmit',params:{name:'Adidas'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Adidas</div>
-            <div class="item" @click="$router.push({name:'Transmit',params:{name:'JD'}})"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
-            <div class="item" @click="$router.push({name:'Transmit',params:{name:'通用'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 通用</div>
+            <div class="item" @click="$router.push({name:'Agency',params:{name:'Nike'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Nike</div>
+            <div class="item" @click="$router.push({name:'Agency',params:{name:'Adidas'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Adidas</div>
+            <div class="item" @click="$router.push({name:'Agency',params:{name:'JD'}})"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
           </div>
-          <div class="more"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
-        </div>
-        <div class="option">
-          <div class="optionheader">
-            <div class="icon"><img src="~/assets/images/application/kucun.png" alt=""></div>
-            <div class="name">仓库</div>
-          </div>
-          <div class="optiondetail">
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> 普通出库</div>
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> 退税出库</div>
-          </div>
-        </div>
-        <div class="option">
-          <div class="optionheader">
-            <div class="icon"><img src="~/assets/images/application/kucun.png" alt=""></div>
-            <div class="name">仓库</div>
-          </div>
-          <div class="optiondetail">
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> 普通出库</div>
-            <div class="item"><img src="~/assets/images/application/fenlei.png" alt=""> 退税出库</div>
-          </div>
+          <div class="more" @click="$router.push({name:'AgencyOrderlist'})"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
         </div>
       </div>
     </div>
@@ -192,7 +171,7 @@
   .optiondetail .item {
     display: flex;
     margin-left: 2vw;
-    border-bottom: 1px solid #999;
+    border-bottom: 1px solid #ccc;
     padding: 1px 0;
   }
   .item span {
