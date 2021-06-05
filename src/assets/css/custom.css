@@ -12,7 +12,7 @@
 }
 .dialogBox {
   width: 350px;
-  height: 70vh;
+  /* height: 70vh; */
   background-color: #fff;
   border-radius: 10px;
   padding: 10px 20px;

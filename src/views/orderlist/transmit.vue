@@ -20,7 +20,7 @@
       <span class="cancle" @click="goBack" v-if="isSearch">×</span>
     </div>
     <div class="tableBox">
-      <div class="tableItem">
+      <div class="tableItem" v-if="tableData.length>0">
         <table>
           <thead>
             <tr>
@@ -36,7 +36,7 @@
           </tbody>
         </table>
       </div>
-      <div class="tableItem">
+      <div class="tableItem" v-if="tableData.length>0">
         <table>
           <thead>
             <tr>
@@ -76,48 +76,7 @@
           </tbody>
         </table>
       </div>
-      <!-- <div class="tableItem">
-        <table>
-          <thead>
-            <th v-for="(item,index) in 20" :key="index">{{item}}</th>
-          </thead>
-          <tbody>
-            <td v-for="(item,index) in 20" :key="index">{{item}}</td>
-          </tbody>
-        </table>
-      </div> -->
-      <!-- <table v-if="tableData.length>0">
-        <thead>
-          <tr>
-            <th style="width:10vw;font-size:18px">申报<br>单号</th>
-            <th style="width:20vw;font-size:18px">单号</th>
-            <th style="width:20vw;font-size:18px">邮箱</th>
-            <th style="width:10vw;font-size:18px">品牌</th>
-            <th style="width:20vw;font-size:18px">提交<br>时间</th>
-            <th style="width:10vw;font-size:18px">状态</th>
-          </tr>
-        </thead>
-        <tbody id="tbody">
-          <tr v-for="(item,index) in tableData" :key="index">
-            <td>{{item.apply_ID}}</td>
-            <td>{{item.expressid}}</td>
-            <td>{{item.email}}</td>
-            <td>
-              <span v-if="item.brand=='N'">Nike</span>
-              <span v-else-if="item.brand=='A'">Adidas</span>
-              <span v-else-if="item.brand=='JD'">JD</span>
-              <span v-else-if="item.brand=='U'">通用</span>
-            </td>
-            <td>{{item.apply_time}}</td>
-            <td>
-              <span v-if="item.apply_status==0">未入库</span>
-              <span v-else-if="item.apply_status==1">已入库</span>
-              <span v-else-if="item.apply_status==2">已驳回</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div v-else style="font-size:20px;line-height:642px;text-align:center;">查询无果</div> -->
+      <div v-if="tableData.length==0" style="font-size:20px;line-height:642px;text-align:center;width:100vw;">查询无果</div>
     </div>
     <div class="tableFooter" v-if="pageNum>1">
       <div class="pageIndex" @click="changePage(-1)" :style="{'color':(currentIndex==1)?'#aaa':'var(--color-all)'}">◂</div>
@@ -487,31 +446,23 @@
     height: 40px;
   }
 
+  
   .tableBox .tableItem:nth-child(1) {
-    width: 30vw;
+    width: 40vw;
     height: 100%;
     overflow-x: scroll;
     overflow-y: hidden;
-  }
-  .tableBox .tableItem:nth-child(1) td {
-    width: 20vw;
+    box-shadow:5px 0 10px -5px #ccc;
   }
   .tableBox .tableItem:nth-child(2) {
-    width: 70vw;
+    width: 60vw;
     height: 100%;
     overflow-x: scroll;
     overflow-y: hidden;
   }
+  .tableBox .tableItem:nth-child(1) td,
   .tableBox .tableItem:nth-child(2) td {
-    padding: 0 3px;
-  }
-  .tableBox .tableItem:nth-child(3) {
-    width: 10vw;
-    height: 100%;
-    overflow-x: scroll;
-    overflow-y: hidden;
-  }
-  .tableBox .tableItem:nth-child(3) yd {
-    width: 10vw;
+    width: 30vw;
+    padding: 0 8px;
   }
 </style>

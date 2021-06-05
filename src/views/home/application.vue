@@ -91,7 +91,6 @@
     },
     methods:{},
     created() {
-      console.log('application');
     }
   }
 </script>
@@ -101,6 +100,9 @@
     width: 100%;
     height: calc(100vh - 50px);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
   }
   .formCard {
     width: 90vw;
@@ -164,9 +166,11 @@
   }
   .formCard .options .option .optiondetail {
     width: 70%;
+    padding-right: 10px;
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-around;
   }
   .optiondetail .item {
     display: flex;

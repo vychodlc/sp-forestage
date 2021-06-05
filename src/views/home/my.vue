@@ -36,24 +36,28 @@
       <div class="card">
         <div class="title">
           <span class="titlespan">订单管理</span>
-          <div class="more">
+          <!-- <div class="more">
             <span>全部订单</span>
             <img src="~/assets/images/my/arrow-right.png" alt="">
-          </div>
+          </div> -->
         </div>
         <div class="btns">
-          <div class="btn">
+          <div class="btn" @click="$router.push({name:'TransmitOrderlist'})">
             <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
-            <div class="btnName"><span>转运订单</span></div>
+            <div class="btnName"><span>入库订单</span></div>
           </div>
-          <div class="btn">
+          <div class="btn" @click="$router.push({name:'OutputOrderlist'})">
+            <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
+            <div class="btnName"><span>出库订单</span></div>
+          </div>
+          <div class="btn" @click="$router.push({name:'AgencyOrderlist'})">
             <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
             <div class="btnName"><span>代购订单</span></div>
           </div>
-          <div class="btn">
+          <!-- <div class="btn" @click="$router.push({name:'OutputOrderlist'})">
             <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
             <div class="btnName"><span>退税订单</span></div>
-          </div>
+          </div> -->
         </div>
       </div>
       <div class="card">
@@ -110,7 +114,6 @@
       },
       goAddress() {
         getAddress().then(res=>{
-          console.log(res);
           this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
           this.$store.commit('changeShow',{name:'showAddr',value:true});
         })
@@ -214,8 +217,8 @@
     flex: 1;
   }
   .btnImage img {
-    width: 20vw;
-    height: 20vw;
+    width: 15vw;
+    height: 15vw;
   }
   .btnName span {
     font-size: 16px;

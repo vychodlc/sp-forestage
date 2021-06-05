@@ -1,141 +1,109 @@
 <template>
-  <div class="transmit">
+  <div class="agency">
     <div class="header">
       <div class="back" @click="$router.go(-1)"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
-      <div class="title" @click="test">{{kind}}出库</div>
+      <div class="title" @click="test">{{kind}}代购</div>
     </div>
-    <div class="progress">
-      <div class="linebox">
-        <div class="line line-not" v-for="(item,index) in stepNum-1" :key="index"></div>
+    <div class="formbox">
+      <div class="formItem">
+        <div class="name">商品链接</div>
+        <input type="text" id="storage_link" v-model="newItem.storage_link">
       </div>
-      <div class="step step-ing" id="step1">
-        <div>
-          <img class="step-icon" src="~/assets/images/form/checked.png" alt="">
-          <div class="step-index">1</div>
-        </div>
-        <div class="text">填写单号</div>
-      </div>
-      <div class="step step-not" id="step2">
-        <div>
-          <img class="step-icon" src="~/assets/images/form/checked.png" alt="">
-          <div class="step-index">2</div>
-        </div>
-        <div class="text">资料审核</div>
-      </div>
-      <div class="step step-not" id="step3">
-        <div>
-          <img class="step-icon" src="~/assets/images/form/checked.png" alt="">
-          <div class="step-index">3</div>
-        </div>
-        <div class="text">上传资料</div>
-      </div>
-    </div>
-    <div class="formbox" v-show="currentStep==1">
-      <div>
-        <table>
-          <thead><tr><th style="width:48vw;font-size:18px">快递单号</th><th style="width:40vw;font-size:18px">邮箱地址</th></tr></thead>
-        </table>
-      </div>
-      <div class="table" id="orderTable">
-        <table>
-          <tbody id="tbody">
-            <tr v-for="(item,index) in orders" :key="index">
-              <td><input style="width: 100%" type="text" name="" v-model='item.id' :id="index+'-id'"></td>
-              <td><input style="width: 100%" type="text" name="" v-model='item.email' :id="index+'-email'"></td>
-              <td><div class="delete" v-if='orders.length!=1' @click="delItem(index)">×</div></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="option">
-        <div class="btn" id="addmany" @click="dialogShow=true">批量导入</div>
-        <div class="btn" id="addone" @click="addOne">+</div>
-      </div>
-    </div>
-    <div class="formbox" v-show="currentStep==2">
-      <div>
-        <table>
-          <thead><tr><th style="width:48vw;font-size:18px">快递单号</th><th style="width:40vw;font-size:18px">邮箱地址</th></tr></thead>
-        </table>
-      </div>
-      <div class="table">
-        <table>
-          <tbody id="tbody">
-            <tr v-for="(item,index) in orders" :key="index">
-              <td><input type="text" 
-              :disabled='item.right'
-              :style="{border:(item.right==true?'1px solid var(--color-all)':'1px solid #f00')}"
-              v-model='item.id' :id="index+'-1id'"></td>
-              <td><input type="text" 
-              :disabled='item.right'
-              :style="{border:(item.right==true?'1px solid var(--color-all)':'1px solid #f00')}"
-              v-model='item.email' :id="index+'-1email'"></td>
-              <td><div class="delete" v-if='orders.length!=1&&item.right==false' @click="delItem(index)">×</div></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="tableTip">
-        <div class="ok" id="tableTip">
-          <div class="title">校验数据</div>
-          <div class="info">
-            <span>共导入数据{{orders.length}}条，其中有</span>
-            <span id="number" :style="{color:(wrongDataStatus==true?'#f00':'#000')}">{{wrongDataNum}}</span>
-            <span>条错误</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="formbox" v-show="currentStep==3">
-      <div class="upload">
-        <img v-if="loading==true" src="~assets/loading.gif" alt="">
-        <div v-else class="resultBox">
-          <div class="boxItem" v-if="wrongOrders.length==0">
-            <div class="icon" style="background-color:var(--color-all)">✓</div>
-            <div class="text">
-              您所申报的单号已经上传完毕！
-              <!-- <div v-if="resultStatus==1" style="font-size:18px;color:#f00;margin-top:20px">但存在部分重复单号</div> -->
-            </div>
-          </div>
-          <div class="boxItem" v-if="wrongOrders.length!=0">
-            <div class="icon" style="background-color:#fccb0d">!</div>
-            <div class="text">
-              存在以下由于重复而提交失败的单号
-            </div>
-          </div>
-          <div class="boxItem" v-if="wrongOrders.length!=0">
-            <div class="failOrders">
-              <span v-for="(item,index) in wrongOrders" :key="index" style="font-size:16px">
-                {{item}} <span v-if="index!=wrongOrders.length-1" style="color:#f00;font-size:16px;font-weight:bold">,</span>
-              </span>
+      <div class="formItem">
+        <div class="name">尺码</div>
+        <div class="inputBox">
+          <div class="inputContent">
+            <div class="checkboxItem"><input type="checkbox" v-model="checkall" value="true" id="checkall" @input="checkAll()"><span>全选</span></div>
+            <div class="checkboxItem" v-for="(item,index) in sizeList" :key="index">
+              <input type="checkbox" v-model="newItem.size" :value="item" :id="'size-'+item"><span>{{item}}</span>
             </div>
           </div>
         </div>
       </div>
+      <div class="formItem">
+        <div class="name">礼品卡</div>
+        <div class="inputBox">
+          <div class="inputContent" id="giftcardBox">
+            <input type="radio" v-model="newItem.giftcard_type" value="0" id="giftcard1"><span style="margin-right:10px">不使用</span>
+            <input type="radio" v-model="newItem.giftcard_type" value="1" id="giftcard2"><span style="margin-right:10px">平台提供</span>
+            <input type="radio" v-model="newItem.giftcard_type" value="2" id="giftcard3"><span style="margin-right:10px">自行提供
+              <span @click="dialogShow=true" style="color:var(--color-all);margin-left:3px">导入</span>
+            </span>
+            <div v-if="newItem.giftcard_type=='2'">
+              <table class="giftcardTable">
+                <thead>
+                  <tr>
+                    <th>卡号</th>
+                    <th>PIN</th>
+                    <th>品牌</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item,index) in newItem.giftcards" :key="index">
+                    <td>{{item.card_num}}</td>
+                    <td>{{item.pin}}</td>
+                    <td>{{item.brand}}</td>
+                    <!-- <td>{{item.right==true?'ok':'×'}}</td> -->
+                    <td v-if="item.right==true"><div style="color:#fff;background-color:var(--color-all);width:12px;height:12px;border-radius:5px;texa-align:center;line-height:12px">✔</div></td>
+                    <td v-else><div @click="delGiftcard(index)" style="color:#fff;background-color:#f56c6c;width:12px;height:12px;border-radius:5px;texa-align:center;line-height:12px">×</div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="formItem">
+        <div class="name">折扣码</div>
+        <div class="inputBox">
+          <div class="inputContent" id="discountBox">
+            <span class="discountRadio"><input type="radio" v-model="newItem.discount_type" value="0" id="discount1">不使用</span>
+            <span class="discountRadio"><input type="radio" v-model="newItem.discount_type" value="1" id="discount2">平台提供</span>
+            <span class="discountRadio"><input type="radio" v-model="newItem.discount_type" value="2" id="discount3" placeholder="输入单次码，用逗号隔开">单次码</span>
+            <span class="discountRadio"><input type="radio" v-model="newItem.discount_type" value="3" id="discount4" placeholder="输入复用码">复用码</span>
+            <div v-if="['2','3'].indexOf(newItem.discount_type)!=-1">            
+              <input type="text" v-model="newItem.discount_code" style="border: 1px solid #ccc;margin-top:5px" id="giftcard2">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="formItem">
+        <div class="name">购物账号</div>
+        <div class="inputBox">
+          <div class="inputContent" id="accountBox">
+            <span class="accountRadio"><input type="radio" v-model="newItem.account_type" value="0" id="account1">不使用</span>
+            <span class="accountRadio"><input type="radio" v-model="newItem.account_type" value="1" id="account2">普通账号</span>
+            <span class="accountRadio"><input type="radio" v-model="newItem.account_type" value="2" id="account3">生日账号</span>
+          </div>
+        </div>
+      </div>
+      <!-- 
+      <div class="formItem">折扣码</div>
+      <div class="formItem">购物账号</div> -->
+      <div class="formItem">
+        <div class="name">单数</div>
+        <input type="text" id="order_num" v-model="newItem.order_num"></div>
+      <div class="formItem">
+        <div class="name">时限</div>
+        <input type="text" id="interval" v-model="newItem.interval"></div>
     </div>
     <div class="footer">
-      <div class="btnbox" @click="changeStep(0)" v-if="currentStep==1">
-        <div class="btn">取消</div>
-      </div>
-      <div class="btnbox" @click="changeStep(0)" v-if="currentStep==2&&wrongDataStatus==true">
-        <div class="btn">重新校验</div>
-      </div>
-      <div v-if="currentStep==2&&wrongDataStatus==true"></div>
-      <div class="btnbox" @click="changeStep(1)" v-else>
-        <div class="btn" v-if="currentStep==stepNum">完成</div>
-        <div class="btn" v-else>下一步</div>
+      <div class="btnbox">
+        <div class="btn" @click="submit()">下一步</div>
       </div>
     </div>
 
     <div class="dialog" v-if="dialogShow">
       <div class="dialogBox">
         <div class="dialogHeader">
-          <div class="title">批量导入单号</div>
+          <div class="title">批量导入礼品卡</div>
           <div class="cancel" @click="dialogShow=false">×</div>
-          <div class="information">请注意导入格式，否则你的批量导入可能会失败，同一个订单的快递单号和邮箱号请间隔一个空格；不同订单请换行</div>
         </div>
         <div class="dialogContent">
-          <textarea name="inputMany" id="inputMany" v-model="dialogText"></textarea>
+          <textarea name="inputMany" id="dialogText" v-model="dialogText" placeholder="xxxx xxxx xxxx
+xxxx xxxx xxxx
+卡号 PIN 品牌"></textarea>
         </div>
         <div class="dialogBtns">
           <div class="btn" @click="dialogShow=false"><span>取消</span></div>
@@ -147,18 +115,37 @@
 </template>
 
 <script>
-  import {addApply} from '@/network/transship.js'
+  import { addAgency } from '@/network/agency.js'
   export default {
-    name: "Transmit",
+    name: "Agency",
     data () {
       return {
         kind: this.$route.params.name?this.$route.params.name:'Nike',
         brand: '',
-        currentStep: 1,
-        stepNum: 3,
-        orders: [
-          {id:'',email:'',right:false},
-        ],
+        newItem: {
+          user_email: '1@1.com',
+          user_id: '',
+          brand: '',
+          storage_link: 'www.baidu.com',
+          price: '123',
+          size: [],
+          account_type: '',
+          discount_type: '',
+          discount_code: '',
+          giftcard_type: '2',
+          giftcards: [
+            {'card_num':123,'pin':213,'brand':'Nike','right':true},
+            {'card_num':123,'pin':213,'brand':'Nike','right':true},
+            {'card_num':123,'pin':213,'brand':'Nike','right':false},
+            {'card_num':123,'pin':213,'brand':'Nike','right':false},
+            {'card_num':123,'pin':213,'brand':'Nike','right':true},
+          ],
+          order_num: '',
+          interval: '',
+        },
+        checkall: false,
+        sizeList: ['30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48'],
+
         dialogShow: false,
         dialogText: '',
         wrongDataStatus: true,
@@ -173,455 +160,70 @@
     },
     methods:{
       test() {
-        console.log(this.brand);
       },
-      changeStep(direction) {
-        if(this.currentStep==1&&direction==0) {
-          // 第一步 向左
-          this.$router.go(-1)
-        } else if(this.currentStep==1&&direction==1){
-          // 第一步 向右
-          let canGo = false;
-          for(let i=0;i<this.orders.length;i++) {
-            if(this.orders[i].email!=''||this.orders[i].id!='') {
-              canGo = true;
-              break;
-            }
-          }
-          if(canGo==false) {
-            this.$store.commit('showTip', '请输入申报信息')
-          } else {
-            this.$store.commit('showLoading', true);
-            this.checkOrder();
-          }
-        } else if(this.currentStep==2&&direction==0){
-          // 第二步 向左
-          // 重新校验
-          this.checkOrder();
-        } else if(this.currentStep==2&&direction==1){
-          // 第二步 向右
-          if(this.wrongDataStatus==true) {
-            this.$store.commit('showTip', '请修改或删除错误的数据项')
-          } else {            
-            this.loading = true;
-            document.getElementById('step2').className = 'step step-ed'
-            document.getElementById('step3').className = 'step step-ing'
-            document.getElementsByClassName('line')[1].className = 'line line-ed'
-            this.currentStep+=1;
-            addApply(this.brand,this.okOrders).then(res=>{
-              console.log(res);
-              if(res.data.status=='200') {
-                this.loading = false
-              } else {
-                this.wrongOrders = res.data.repeat_id.split(',')
-                this.loading=false;
-              }
-            })
-          }
-        } else if(this.currentStep==3&&direction==0){
-          // 第三步 向左
-          document.getElementById('step2').className = 'step step-ing'
-          document.getElementById('step3').className = 'step step-not'
-          document.getElementsByClassName('line')[1].className = 'line line-not'
-          this.currentStep-=1
-        } else if(this.currentStep==3&&direction==1){
-          // 第三步 向右
-          if(this.loading==true) {
-            this.$store.commit('showTip', '数据还未上传完毕，请等待')
-          } else {
-            document.getElementById('step3').className = 'step step-ed';
-            document.getElementsByClassName('footer')[0].style.display = 'none';
-            setTimeout(() => {
-              this.$router.go(-1);
-            }, 1000);
-          }
+      checkAll() {
+        this.checkall = !this.checkall;
+        if(this.checkall==true) {
+          this.newItem.size = this.sizeList
+        } else {
+          this.newItem.size = [];
         }
-      },
-      guid() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-          let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
-      },
-      addOne() {
-        this.orders.push({id:'',email:'',right:false});
-        let orderTable = document.getElementById('orderTable')
-        this.$nextTick(()=>{
-          orderTable.scrollTo(0,orderTable.scrollHeight)
-        })
-      },
-      delItem(index) {
-        this.orders.splice(index,1);
       },
       enterOrder() {
-        let rows = this.dialogText.split('\n');
-        let input = [];
-        for(let i=0;i<rows.length;i++) {
-          let splitRow = rows[i].split(' ').filter(item=>item==''?false:true);
-          if(splitRow.length>2) {
-            input.push(splitRow.slice(0,2))
-          }else if(splitRow.length==2) {
-            input.push(splitRow)
-          }
-        }
-        for(let i=0;i<input.length;i++) {
-          this.orders.push({id: input[i][0], email: input[i][1]});
-        }
-        this.dialogShow = false;
-        this.dialogText = '';
-        this.$nextTick(()=>{
-          orderTable.scrollTo(0,orderTable.scrollHeight)
-        })
-      },
-      checkOrder() {
-        let falseList = [];
-        let trueList = [];
-        this.handleTimes = 0;
-        for(let i=0;i<this.orders.length;i++) {
-          if(this.orders[i].right==false) {
-            falseList.push(this.orders[i])
-          } else {
-            trueList.push(this.orders[i])
-          }
-        }
-        if(falseList.length==0) {
-          this.wrongDataStatus = false;
-          this.wrongDataNum = 0;
-        }
-        if(this.brand=='N') {
-          falseList.map(order=>{
-            let id = order.id;
-            let email = order.email;
-            let headers = {
-              "Content-Type": "application/x-www-form-urlencoded;",
-              "accept":"application/json",
-              "accept-language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,ja-JP;q=0.6,ja;q=0.5",
-              "appid":"orders",
-              "x-nike-visitid":"1",
-              "x-nike-visitorid":this.guid(),
-            }
-            let returnItem = {
-              order_time: [],
-              price: [],
-              maxOrderLineStatus:[],
-              minOrderLineStatus:[],
-              rolledUpStatus:[],
-              size:[],
-              style:[],
-              op_date:[],
-              op_description:[],
-              op_quantity:[],
-              first_address:[],
-              second_address:[],
-              city:[],
-              postal:[],
-              country:[],
-              gift:[],
-              tracker:[],
-            }
-            let url1 = "https://api.nike.com/order_mgmt/user_order_details/v2/" + id + "?filter=email(" + email + ")";
-            let url2 = "https://api.nike.com/ship/user_shipments/v1?locale=en_us&filter=orderNumber(" + id +")&filter=email("+email+")";
-            
-            this.$axios.all([
-              this.$axios.get(url1, {
-                headers: headers,
-              }).catch(e=>{
-                order.right = false;
-                this.handleTimes++;
-                this.wrongDataNum = this.orders.filter(item=>item.right==false).length;
-                
-                if(this.handleTimes==this.orders.length) {
-                  this.$store.commit('showLoading', false);
-                  document.getElementById('step1').className = 'step step-ed'
-                  document.getElementById('step2').className = 'step step-ing'
-                  document.getElementsByClassName('line')[0].className = 'line line-ed'
-                  if(this.orders.filter(item=>item.right==true).length==this.orders.length) {
-                    this.wrongDataStatus = false
-                    console.log('all ok');
-                  }
-                  if(this.currentStep==1) {
-                    this.currentStep+=1;
-                  }
-                }
-              }),
-              this.$axios.get(url2, {
-                headers: headers,
-              })
-            ]).then(this.$axios.spread((res1,res2)=>{
-              order.right = true;
-              this.handleTimes++;
-              this.wrongDataNum = this.orders.filter(item=>item.right==false).length;
-              if(this.handleTimes==this.orders.length) {
-                this.$store.commit('showLoading', false);
-                document.getElementById('step1').className = 'step step-ed'
-                document.getElementById('step2').className = 'step step-ing'
-                document.getElementsByClassName('line')[0].className = 'line line-ed'
-                if(this.orders.filter(item=>item.right==true).length==this.orders.length) {
-                  this.wrongDataStatus = false
-                  console.log('all ok');
-                }
-                if(this.currentStep==1) {
-                  this.currentStep+=1;
-                }
-              }
-
-              let data = res1.data;
-              returnItem.order_time.push(data.orderCreateDate?data.orderCreateDate:'');
-              returnItem.price.push(data.totalAmount?data.totalAmount:'');
-              data.orderLines.map(orderline=>{
-                returnItem.maxOrderLineStatus.push(orderline.maxOrderLineStatus?orderline.maxOrderLineStatus:'');
-                returnItem.minOrderLineStatus.push(orderline.minOrderLineStatus?orderline.minOrderLineStatus:'');
-                returnItem.rolledUpStatus.push(orderline.rolledUpStatus?orderline.rolledUpStatus:'');
-                returnItem.size.push(orderline.displaySize?orderline.displaySize:'');
-                returnItem.style.push(orderline.styleNumber?orderline.styleNumber+'-'+orderline.colorCode:'');
-                if(orderline.statuses) {
-                  orderline.statuses.map(status=>{
-                    returnItem.op_date.push(status.date?status.date:'');
-                    returnItem.op_description.push(status.description?status.description:'');
-                    returnItem.op_quantity.push(status.quantity?status.quantity:'');
-                  });
-                }
-                if(orderline.shipTo&&orderline.shipTo.address) {
-                  returnItem.first_address.push(orderline.shipTo.address.address1?orderline.shipTo.address.address1:'');
-                  returnItem.second_address.push(orderline.shipTo.address.address2?orderline.shipTo.address.address2:'');
-                  returnItem.city.push(orderline.shipTo.address.city?orderline.shipTo.address.city:'');
-                  returnItem.postal.push(orderline.shipTo.address.zipCode?orderline.shipTo.address.zipCode:'');
-                  returnItem.country.push(orderline.shipTo.address.country?orderline.shipTo.address.country:'');
-                }
-              });
-              if(data.paymentMethods) {
-                data.paymentMethods.map(paymentMethod=>{
-                  returnItem.gift.push(paymentMethod.displayGiftCardNumber?paymentMethod.displayGiftCardNumber:'');
-                });
-              }
-              data = res2.data;
-              if(data.objects) {
-                data.objects.map(object=>{
-                  if(object.containers) {
-                    object.containers.map(container=>{
-                      returnItem.tracker.push(container.trackingNumber?container.trackingNumber:'')
-                    })
-                  }
-                })
-              }
-              for(let item in returnItem) {
-                returnItem[item] = returnItem[item].join(',')
-              }
-              returnItem.id = order.id;
-              returnItem.email = order.email;
-              this.okOrders.push(returnItem)
-            }))
-          })
-        } else if(this.brand=='JD') {
-          falseList.map(order=>{
-            let id = order.id;
-            let email = order.email;
-            let returnItem = {
-              order_time: [],
-              price: [],
-              maxOrderLineStatus:[],
-              minOrderLineStatus:[],
-              rolledUpStatus:[],
-              size:[],
-              style:[],
-              op_date:[],
-              op_description:[],
-              op_quantity:[],
-              first_address:[],
-              second_address:[],
-              city:[],
-              postal:[],
-              country:[],
-              gift:[],
-              tracker:[],
-            }
-            let url = "https://data.smartagent.io/v1/jdsports/track-my-order?orderNumber=" + id + "&facia=jdsportsuk&emailAddress=" + email;
-
-            this.$axios.get(url).catch(e=>{
-              order.right = false;
-              this.handleTimes++;
-              this.wrongDataNum = this.orders.filter(item=>item.right==false).length;
-              
-              if(this.handleTimes==this.orders.length) {
-                this.$store.commit('showLoading', false);
-                document.getElementById('step1').className = 'step step-ed'
-                document.getElementById('step2').className = 'step step-ing'
-                document.getElementsByClassName('line')[0].className = 'line line-ed'
-                if(this.orders.filter(item=>item.right==true).length==this.orders.length) {
-                  this.wrongDataStatus = false
-                  console.log('all ok');
-                }
-                if(this.currentStep==1) {
-                  this.currentStep+=1;
-                }
-              }
-            }).then(res=>{
-              if(res!=undefined) {
-                order.right = true;
-                this.handleTimes++;
-                this.wrongDataNum = this.orders.filter(item=>item.right==false).length;
-                if(this.handleTimes==this.orders.length) {
-                  this.$store.commit('showLoading', false);
-                  document.getElementById('step1').className = 'step step-ed'
-                  document.getElementById('step2').className = 'step step-ing'
-                  document.getElementsByClassName('line')[0].className = 'line line-ed'
-                  if(this.orders.filter(item=>item.right==true).length==this.orders.length) {
-                    this.wrongDataStatus = false
-                    console.log('all ok');
-                  }
-                  if(this.currentStep==1) {
-                    this.currentStep+=1;
-                  }
-                }
-                
-                let data = res.data;
-                returnItem.order_time.push(data.date?data.date.toString():'');
-                returnItem.price.push(data.totals?data.totals.total.amount.toString():'');
-                if(data.status&&data.status.full) {
-                  data.status.full.map(fullItem=>{
-                    if(fullItem.state=='done') {
-                      returnItem.op_description.push(fullItem.description?fullItem.description:fullItem.title);
-                      returnItem.op_date.push(fullItem.date?fullItem.date.toString():'')
-                    }
-                  })
-                }
-                if(data.vendors&&data.vendors[0]&&data.vendors[0].items) {
-                  data.vendors[0].items.map(item=>{
-                    returnItem.op_quantity.push(item.qty?item.qty.toString():'')
-                    returnItem.size.push(item.size?item.size.toString():'')
-                    returnItem.style.push(item.sku?item.sku.toString():'')
-                    returnItem.rolledUpStatus.push(item.status?item.status.toString():'')
-                  })
-                }
-                if(data.addresses&&data.addresses.billing) {
-                  returnItem.first_address.push(data.addresses.billing.address1)
-                  returnItem.second_address.push(data.addresses.billing.address2)
-                  returnItem.city.push(data.addresses.billing.town)
-                  returnItem.postal.push(data.addresses.billing.postcode)
-                  returnItem.country.push(data.addresses.billing.locale)
-                }
-                if(data.delivery) {
-                  returnItem.tracker.push(data.delivery.trackingURL?data.delivery.trackingURL.toString():'');
-                }
-                if(data.payment&&data.payment.giftCard) {
-                  returnItem.gift.push(data.payment.giftCard.cardNumber?data.payment.giftCard.cardNumber.toString():'');
-                }
-                for(let item in returnItem) {
-                  returnItem[item] = returnItem[item].join(',')
-                }
-                
-                returnItem.id = order.id;
-                returnItem.email = order.email;
-                this.okOrders.push(returnItem)
-              }
-            })
-          })
-        } else if(this.brand=='A') {
-          falseList.map(order=>{
-            let id = order.id;
-            let email = order.email;
-            let returnItem = {
-              order_time: [],
-              price: [],
-              maxOrderLineStatus:[],
-              minOrderLineStatus:[],
-              rolledUpStatus:[],
-              size:[],
-              style:[],
-              op_date:[],
-              op_description:[],
-              op_quantity:[],
-              first_address:[],
-              second_address:[],
-              city:[],
-              postal:[],
-              country:[],
-              gift:[],
-              tracker:[],
-            }
-            let url = "https://data.smartagent.io/v1/jdsports/track-my-order?orderNumber=" + id + "&facia=jdsportsuk&emailAddress=" + email;
-
-            this.$axios.get(url).catch(e=>{
-              order.right = false;
-              this.handleTimes++;
-              this.wrongDataNum = this.orders.filter(item=>item.right==false).length;
-              
-              if(this.handleTimes==this.orders.length) {
-                this.$store.commit('showLoading', false);
-                document.getElementById('step1').className = 'step step-ed'
-                document.getElementById('step2').className = 'step step-ing'
-                document.getElementsByClassName('line')[0].className = 'line line-ed'
-                if(this.orders.filter(item=>item.right==true).length==this.orders.length) {
-                  this.wrongDataStatus = false
-                  console.log('all ok');
-                }
-                if(this.currentStep==1) {
-                  this.currentStep+=1;
-                }
-              }
-            }).then(res=>{
-              if(res!=undefined) {
-                order.right = true;
-                this.handleTimes++;
-                this.wrongDataNum = this.orders.filter(item=>item.right==false).length;
-                if(this.handleTimes==this.orders.length) {
-                  this.$store.commit('showLoading', false);
-                  document.getElementById('step1').className = 'step step-ed'
-                  document.getElementById('step2').className = 'step step-ing'
-                  document.getElementsByClassName('line')[0].className = 'line line-ed'
-                  if(this.orders.filter(item=>item.right==true).length==this.orders.length) {
-                    this.wrongDataStatus = false
-                    console.log('all ok');
-                  }
-                  if(this.currentStep==1) {
-                    this.currentStep+=1;
-                  }
-                }
-                
-                let data = res.data;
-                returnItem.order_time.push(data.creationDate?data.creationDate:'');
-                returnItem.price.push(data.totalAmount?data.totalAmount:'');
-                if(data.productLineItems) {
-                  data.productLineItems.map(productLineItem=>{
-                    returnItem.op_description.push(productLineItem.productName?productLineItem.productName:'');
-                    returnItem.op_date.push(productLineItem.statusDate?productLineItem.statusDate:'')
-                    returnItem.style.push((productLineItem.articleNumber&&productLineItem.color)?(productLineItem.articleNumber+productLineItem.color):'')
-                    returnItem.size.push(productLineItem.literalSize?productLineItem.literalSize:'')
-                    returnItem.rolledUpStatus.push(productLineItem.status?productLineItem.status:'')
-                  })
-                }
-                if(data.paymentMethods) {
-                  data.paymentMethods.map(paymentMethod=>{
-                    returnItem.gift.push(paymentMethod.giftCardNumber)
-                  })
-                }
-                if(data.shipping&&data.shipping.shippingAddress) {
-                  returnItem.first_address.push(data.shipping.shippingAddress.addressLine1?data.shipping.shippingAddress.addressLine1:'')
-                  returnItem.second_address.push(data.shipping.shippingAddress.addressLine2?data.shipping.shippingAddress.addressLine2:'')
-                  returnItem.city.push(data.shipping.shippingAddress.city?data.shipping.shippingAddress.city:'')
-                  returnItem.country.push(data.shipping.shippingAddress.country?data.shipping.shippingAddress.country:'')
-                  returnItem.postal.push(data.shipping.shippingAddress.postalCode?data.shipping.shippingAddress.postalCode:'')
-                }
-                if(data.shipments) {
-                  data.shipments.map(shipment=>{
-                    returnItem.tracker.push(shipment.trackingNo?shipment.trackingNo:'')
-                  })
-                }
-                for(let item in returnItem) {
-                  returnItem[item] = returnItem[item].join(',')
-                }
-                
-                returnItem.id = order.id;
-                returnItem.email = order.email;
-                this.okOrders.push(returnItem)
-              }
-            })
-          })
+        if(this.dialogText=='') {
+          this.$store.commit('showTip','请输入礼品卡信息')
         } else {
-          this.$store.commit('showTip','当前仅支持 Nike 和 JD 申报');
-          this.$store.commit('showLoading',false);
+          let rows = this.dialogText.split('\n');
+          rows.map(row=>{
+            if(row!='') {
+              let rowData = row.split(' ').filter(iii=>{return iii!=''&&iii!=' '});
+              this._addGiftcard({card_num:rowData[0],pin:rowData[1],brand:rowData[2],right:false});
+              this.dialogShow = false;
+            }
+          })
+          this.dialogText = '';
         }
       },
+      _addGiftcard(card) {
+        this.newItem.giftcards.push({card_num:card.card_num,pin:card.pin,brand:card.brand,right:card.right})
+      },
+      delGiftcard(index) {
+        this.newItem.giftcards.splice(index,1);
+      },
+      submit() {
+        if(this.newItem.storage_link=='') {
+          this.$store.commit('showTip','请填写商品链接')
+        } else if(this.newItem.size.length==0) {
+          this.$store.commit('showTip','请选择尺寸')
+        } else if(this.newItem.giftcard_type=='') {
+          this.$store.commit('showTip','请选择礼品卡类别')
+        } else if(this.newItem.giftcard_type=='2'&&this.newItem.giftcards.length==0) {
+          this.$store.commit('showTip','请添加礼品卡信息')
+        } else if(this.newItem.discount_type=='') {
+          this.$store.commit('showTip','请选择折扣码类别')
+        } else if(this.newItem.discount_type=='2'&&this.newItem.discount_code=='') {
+          this.$store.commit('showTip','请填写单次礼品卡')
+        } else if(this.newItem.discount_type=='3'&&this.newItem.discount_code=='') {
+          this.$store.commit('showTip','请填写复用礼品卡')
+        } else if(this.newItem.account_type=='') {
+          this.$store.commit('showTip','请选择购物账号类别')
+        } else if(this.newItem.order_num=='') {
+          this.$store.commit('showTip','请选择单数')
+        } else if(this.newItem.interval=='') {
+          this.$store.commit('showTip','请选择代购时限')
+        } else {
+          this.newItem.brand = this.brand;
+          addAgency(this.newItem).then(res=>{
+            if(res.data.status=='200') {
+              this.dialogAddVisible = false;
+              this.$router.replace({name:'Application'});
+              this.$router.push({name:'AgencyOrderlist'});
+            }
+          })
+          
+        }
+      }
+      
     },
     activated() {
       this.kind = this.$route.params.name?this.$route.params.name:'Nike';
@@ -639,26 +241,12 @@
           this.brand = 'U';
           break;
       }
-      this.orders = [
-        {id:'C00622025833',email:'huang.xi.ng77888877@gmail.com',right:false},
-        {id:'C00627066000',email:'di.nglingguan.gdangdang@gmail.com',right:false},
-        {id:'478003919',email:'d.nkasj.ndondsk@gmail.com',right:false},
-        {id:'12322',email:'123@123.com',right:false},
-      ]
-      this.okOrders = [];
-      document.getElementsByClassName('footer')[0].style.display = '';
-      document.getElementsByClassName('step')[0].className = 'step step-ing'
-      document.getElementsByClassName('step')[1].className = 'step step-not'
-      document.getElementsByClassName('step')[2].className = 'step step-not'
-      document.getElementsByClassName('line')[0].className = 'line line-not'
-      document.getElementsByClassName('line')[1].className = 'line line-not'
-      this.currentStep=1;
     }
   }
 </script>
 
 <style scoped>
-  .transmit {
+  .agency {
     width: 100vw;
     height: 100vh;
     position: relative;
@@ -688,138 +276,78 @@
     line-height: 60px;
     text-align: center;
   }
-  .progress {
-    width: 100vw;
-    height: 10vh;
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-  }
-  .progress .linebox {
-    position: absolute;
-    width: 100%;
-    height: 50%;
-    display: flex;
-  }
-  .progress .linebox .line {
-    flex: 1;
-  }
-  .line-ed {border-bottom: 2px solid var(--color-all);}
-  .line-not {border-bottom: 2px solid #999;}
-  .progress .step {
-    width: 18vw;
-    height: 10vh;
-    margin-right: 9.5vw;
-    background-color: var(--color-background);
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  .progress .step:last-child {
-    margin-right: 0;
-  }
-  .step img {
-    width: 30px;
-    height: 30px;
-  }
-  .step .text {
-    padding-top: 5px;
-    font-weight: bold;
-  }
-  .step-index {
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    font-weight: bold;
-    line-height: 30px;
-    text-align: center;
-    font-size: 16px;
-  }
-  .step-ed .step-index {
-    display: none;
-  }
-  .step-ing .step-index {
-    background-color: #ff9800;
-    color: #fff;
-  }
-  .step-not {
-    color: #999;
-  }
-  .step-not .step-index {
-    border: 2px solid #999;
-    color: #999;
-  }
-  .step-ing .step-icon,
-  .step-not .step-icon {
-    display: none;
-  }
 
   .formbox {
     width: 100vw;
-    height: calc(100vh - 10vh - 60px - 80px);
+    height: calc(100vh - 60px - 80px);
+    overflow-y: scroll;
     display: flex;
     flex-direction: column;
+    padding: 0 20px;
   }
-  .formbox input {
-    background-color: var(--color-background);
-    border: 1px solid #777;
-    height: 30px;
+
+  .formbox .formItem {
     font-size: 16px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    padding: 10px 5px;
+    border-radius: 10px;
   }
-  .table {
-    /* max-height: 50vh; */
-    height: calc(100vh - 10vh - 80px - 60px - 100px);
+  .formbox .formItem .name {
+    width: 80px;
+    font-size: 16px;
+    display: inline-block;
+    padding-right: 10px;
+    /* border: 1px solid #9d9; */
+    text-align: right;
+    color: #999;
+  }
+  .formbox .formItem input[type="text"] {
+    font-size: 14px;
+    width: calc(100vw - 40px - 80px - 10px);
+    background: none;
+    border: none;
+    border-bottom: 1px solid #999;
+    outline: none;
+    padding: 2px 10px;
+  }
+  .formbox .formItem input:focus {
+    border-bottom: 1px solid var(--color-all);
+  }
+  .formItem .inputBox {
+    display: inline-block;
+    width: calc(100vw - 40px - 80px - 10px);
+  }
+  .formItem .inputBox .inputContent {
+    width: 100%;
+    display: flex;
+    flex-flow: wrap;
+  }
+  .inputContent .checkboxItem {
+    width: 12vw;
+  }
+  .formItem .inputBox #giftcardBox,
+  .formItem .inputBox #discountBox,
+  .formItem .inputBox #accountBox {
+    justify-content: space-around;
+  }
+
+  .giftcardTable {
+    width: calc(100vw - 40px - 80px - 10px);
+    max-height: 100px;
     overflow-y: scroll;
-    overflow-x: hidden;
-    border: 1px solid #777;
-    margin-top: 10px;
-  }
-  .table table th {
-    font-size: 19px;
+    /* border-top: 1px dotted #999; */
+    /* border-bottom: 1px dotted #999; */
     padding: 5px 0;
   }
-  tbody input {
-    width: 100%;
+  .giftcardTable thead tr th {
+    padding: 10px 0;
   }
-  tbody .delete {
-    font-size: 30px;
-    color: #fff;
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
+  .giftcardTable tbody {
     text-align: center;
-    border-radius: 10px;
-    background-color: var(--color-all);
   }
-  .formbox .option {
-    width: 100vw;
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
-    flex-direction: row;
-  }
-  #addone {
-    font-size: 30px;
-    color: #fff;
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-    text-align: center;
-    border-radius: 50%;
-    background-color: var(--color-all);
-  }
-  #addmany {
-    font-size: 18px;
-    height: 30px;
-    line-height: 30px;
-    text-align: center;
-    border: 1px solid var(--color-all);
-    color: var(--color-all);
-    padding: 0 8px;
-    border-radius: 10px;
-  }
+
+
 
   .footer {
     width: 100vw;
@@ -852,85 +380,5 @@
   .footer .btnbox:last-child .btn {
     background-color: var(--color-all);
     color: #fff;
-  }
-
-  .tableTip {
-    width: 100vw;
-    height: 70px;
-    padding: 5px;
-    display: flex;
-    align-items: center;
-  }
-  .tableTip .ok {
-    width: 100%;
-    border: 1px solid var(--color-all);
-    padding: 5px 20px;
-    background-color: #f5fcf6;
-    border-radius: 5px;
-  }
-  .tableTip .wrong {
-    width: 100%;
-    border: 1px solid red;
-    padding: 5px 20px;
-    background-color: #fff5f4;
-    border-radius: 5px;
-  }
-  .tableTip .title {
-    font-size: 16px;
-    line-height: 20px;
-    font-weight: bold;
-  }
-  .tableTip .info {
-    font-size: 14px;
-  }
-  .tableTip #number {
-    font-weight: bold;
-    padding: 0 5px;
-  }
-
-  .formbox .upload {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .formbox .upload .resultBox {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    height: 80%;
-  }
-  .formbox .upload .boxItem {
-    width: 100vw;
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-  }
-  .formbox .upload .boxItem .icon {
-    height: 100px;
-    width: 100px;
-    line-height: 100px;
-    text-align: center;
-    color: #fff;
-    background-color: #999;
-    border-radius: 50%;
-    font-size: 80px;
-    font-weight: bolder;
-    margin-right: 20px;
-  }
-  .formbox .upload .text {
-    width: 60%;
-    font-size: 20px;
-  }
-  .failOrders {
-    width: 90vw;
-    height: 20vh;
-    padding: 5px;
-    overflow-y: scroll;
-    border: 1px solid #999;
   }
 </style>

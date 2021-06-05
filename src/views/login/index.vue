@@ -148,7 +148,9 @@
     },
     created() {
       if((localStorage.token!='')&&(localStorage.token!=undefined)) {
-        this.$router.replace('/home')
+        if(this.$route.path!='/home') {
+          this.$router.replace('/home');
+        }
       }
     }
   }

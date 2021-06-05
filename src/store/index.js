@@ -93,23 +93,25 @@ export default new Vuex.Store({
       if(info.name=='updateList') {
         let data = info.value;
         let index = null;
-        for(let i=0;i<data.length;i++) {
-          if(data[i].default=='1') {
-            index = i
+        if(data) {
+          for(let i=0;i<data.length;i++) {
+            if(data[i].default=='1') {
+              index = i
+            }
           }
-        }
-        if(index!=null) {
-          let _default = data.splice(index,1);
-          if(_default.length==0) {
-            state.address.default = null;
+          if(index!=null) {
+            let _default = data.splice(index,1);
+            if(_default.length==0) {
+              state.address.default = null;
+            } else {
+              state.address.default = _default;
+            }
+            data = _default.concat(data);
           } else {
-            state.address.default = _default;
+            state.address.default = null;
           }
-          data = _default.concat(data);
-        } else {
-          state.address.default = null;
+          state.address.list = data;
         }
-        state.address.list = data;
       } else if(info.name=='clearNew') {
         state.address.new = {name: '',phone: '',address: ''}
       } else if(info.name=='clearEdit') {

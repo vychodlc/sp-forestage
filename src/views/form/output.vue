@@ -111,7 +111,7 @@
       </div>
       <div class="addressbox">
         <div class="goodsCard" v-for="(item,index) in selectList" :key="index">
-          <div class="goodsImg"><img :src="item.pic" alt=""></div>
+          <div class="goodsImg"><img :src="item.pic" alt="" @click="$store.commit('showImg',[item.pic,true])"></div>
           <div class="content">
             <div class="name">库存编号：{{item.storage_ID}}</div>
             <div class="info">
@@ -215,7 +215,7 @@
         selectAddr: null,
         paymethod: 0,
         useBalance: 0,
-        money: 122,
+        money: 0,
         price: 0
       }
     },
@@ -237,10 +237,8 @@
             weight = parseInt(weight/0.5);
             if(weight>59) {
               this.price = 11800;
-              this.price = 1000000;
             } else {
               this.price = this.$store.state.expressPrice[weight]*100;
-              this.price = 1;
             }
             getBalance().then(res=>{
               this.money = parseInt(res.data.balance);
@@ -289,10 +287,11 @@
                   this.$store.commit('showLoading',false);
                 } else {
                   console.log('聚合');
-                  putOrder(info).then(res=>{
-                    let url = res.data.RedirectUrl;
-                    window.location.replace(url);
-                  })
+                  this.$store.commit('showTip','聚合支付还没做！')
+                  // putOrder(info).then(res=>{
+                  //   let url = res.data.RedirectUrl;
+                  //   window.location.replace(url);
+                  // })
                 }
                 // putOrder(info).then(res=>{
                 //   // document.getElementById('payment').src = res.data.RedirectUrl;
@@ -336,7 +335,6 @@
         //   this.storageNum = res.data.storages_num;
         //   if(this.storageNum==this.storageList.length) {
         //     this.$store.commit('showLoading', false);
-        //     console.log(this.storageList);
         //     for(let i=this.storageList.length-1;i>-1;i--) {
         //       if(this.storageList[i].storage_status=='1') {
         //         this.storageList.splice(i,1)
@@ -346,9 +344,6 @@
         //     this._getStorageList();
         //   }
         // })
-      },
-      checkAll() {
-        console.log(123);
       },
       clickCheckbox(item) {
         let index = -1;
@@ -362,7 +357,6 @@
         } else {
           this.selectList.splice(index,1)
         }
-        // console.log(this.selectList);
       },
       goEdit() {
         this.showEdit = true;
@@ -415,8 +409,6 @@
           }
         }
       })
-
-      console.log(this.$store.state);
     }
   }
 </script>

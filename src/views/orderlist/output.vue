@@ -1,7 +1,7 @@
 <template>
   <div class="transmit">
     <div class="header">
-      <div class="back" @click="$router.push({name:'Application'})"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
+      <div class="back" @click="$router.go(-1)"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
       <div class="title">出库订单</div>
     </div>
     <div class="tableSearch">
@@ -17,48 +17,83 @@
       <span class="cancle" @click="goBack" v-if="isSearch">×</span>
     </div>
     <div class="tableBox">
-      <table v-if="tableData.length>0">
-        <thead>
-          <tr>
-            <th style="width:10vw;font-size:18px">出库<br>单号</th>
-            <th style="width:20vw;font-size:18px">货物<br>编号</th>
-            <th style="width:20vw;font-size:18px">地址</th>
-            <th style="width:10vw;font-size:18px">材料</th>
-            <th style="width:10vw;font-size:18px">种类</th>
-            <th style="width:20vw;font-size:18px">提交<br>时间</th>
-            <th style="width:10vw;font-size:18px">状态</th>
-          </tr>
-        </thead>
-        <tbody id="tbody">
-          <tr v-for="(item,index) in tableData" :key="index">
-            <td style="width:10vw;">{{item.outbound_ID}}</td>
-            <td style="width:20vw;">{{item.storage_nums}}</td>
-            <td style="width:20vw;">{{item.address}}</td>
-            <td style="width:10vw;">
-              <img class="material" v-for="(i,index2) in item.material.slice(0,1)" 
-               @click="$store.commit('showImg',[i,true])"
-              :key="index2" :src="i" alt="">
-            </td>
-            <td style="width:10vw;">
-              <span v-if="item.outbound_type=='0'">普通</span>
-              <span v-else-if="item.outbound_type=='1'">退税</span>
-            </td>
-            <td style="width:20vw;">{{item.outbound_apply_time}}</td>
-            <td style="width:10vw;">
-              <span v-if="item.outbound_status==0">待付款
+      <div class="tableItem" v-if="tableData.length>0">
+        <table>
+          <thead>
+            <tr>
+              <th>单号</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item,index) in tableData" :key="index">        
+              <td>{{item.outbound_ID}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tableItem" v-if="tableData.length>0">
+        <table>
+          <thead>
+            <tr>
+              <th>货物编号</th>
+              <th>地址</th>
+              <th>种类</th>
+              <th>材料</th>
+              <th>价格</th>
+              <th>支付方式</th>
+              <th>提交时间</th>
+              <th>出库时间</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item,index) in tableData" :key="index">
+              <td>{{item.storage_nums}}</td>
+              <td>{{item.address}}</td>
+              <td>
+                <span v-if="item.outbound_type=='0'">普通</span>
+                <span v-if="item.outbound_type=='1'">退税</span>
+              </td>
+              <td style="width:10vw;">
+                <img class="material" v-for="(i,index2) in item.material.slice(0,1)" 
+                @click="$store.commit('showImg',[i,true])"
+                :key="index2" :src="i" alt="">
+              </td>
+              <td>{{item.price}}</td>
+              <td>
+                <span v-if="item.pay_type=='balance'">余额</span>
+                <span v-else>聚合</span>
+              </td>
+              <td>{{item.outbound_apply_time}}</td>
+              <td>{{item.outbound_time}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tableItem" v-if="tableData.length>0">
+        <table>
+          <thead>
+            <tr>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item,index) in tableData" :key="index">
+              <td>
+                <span v-if="item.outbound_status=='0'">待支付
                 <div style="margin-top:5px" @click="goPay(item)">
                   <span style="background-color:var(--color-all);color:#fff;padding:3px">付款</span>
-                </div>
-              </span>
-              <span v-else-if="item.outbound_status==1">待审核</span>
-              <span v-else-if="item.outbound_status==2">已驳回</span>
-              <span v-else-if="item.outbound_status==3">已取消</span>
-              <span v-else-if="item.outbound_status==4">运输中</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div v-else style="font-size:20px;line-height:642px;text-align:center;">查询无果</div>
+                </div></span>
+                <span v-if="item.outbound_status=='1'">待审核</span>
+                <span v-if="item.outbound_status=='2'">已驳回</span>
+                <span v-if="item.outbound_status=='3'">已取消</span>
+                <span v-if="item.outbound_status=='4'">运输中</span>
+                <span v-if="item.outbound_status=='5'">已完成</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-if="tableData.length==0" style="font-size:20px;line-height:642px;text-align:center;width:100vw">查询无果</div>
     </div>
     <div class="tableFooter" v-if="pageNum>1">
       <div class="pageIndex" @click="changePage(-1)" :style="{'color':(currentIndex==1)?'#aaa':'var(--color-all)'}">◂</div>
@@ -274,21 +309,52 @@
   .tableBox {
     width: 100vw;
     height: 642px;
-    /* display: flex;
-    align-items: center;
-    justify-content: center; */
-    /* border: 3px solid #000; */
+    display: flex;
+    flex-direction: row;
   }
-  td {word-break:break-all;}
-  tbody tr {
-    height: 60px;
-  }
-
+  
   table {font-size:11px;color:#333333;border-collapse: collapse;}
-  table th {background-color: #dedede;}
-  table td {border-bottom: 1px solid #999;background-color: #ffffff;text-align:center;}
+  
+  .tableBox thead th,
+  .tableBox tbody tr {
+    white-space: nowrap;
+    height: 60px;
+    border-bottom: 1px solid #999;
+    text-align:center;
+  }
+  .tableBox thead th {
+    background-color: #dedede;
+    padding: 0 3px;
+    height: 40px;
+  }
 
+  .tableBox .tableItem:nth-child(1) {
+    width: 15vw;
+    height: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    box-shadow:5px 0 10px -5px #ccc;
+  }
+  .tableBox .tableItem:nth-child(2) {
+    width: 70vw;
+    height: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+  }
+  .tableBox .tableItem:nth-child(3) {
+    width: 15vw;
+    height: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    box-shadow:-5px 0 10px -5px #ccc;
+  }
+  .tableBox .tableItem:nth-child(1) td,
+  .tableBox .tableItem:nth-child(2) td,
+  .tableBox .tableItem:nth-child(3) td {
+    width: 15vw;
+    padding: 0 8px;
+  }
   .material {
-    width: 10vw;
+    width: 15vw;
   }
 </style>

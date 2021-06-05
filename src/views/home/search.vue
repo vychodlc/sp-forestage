@@ -57,13 +57,11 @@
       _searchPost() {
         if(this.search!='') {
           searchPost(this.search,this.currentPage).then(res=>{
-            // console.log(res);
             if(res.data.status=='200') {
               this.hasMore = res.data.more;
               this.data = res.data.data;
               this.search_number = res.data.posts_num;
               this.isShow = true;
-              // console.log(this.data);
             }
           }) 
         }
@@ -85,7 +83,6 @@
       // this.search_number = null;
       // this.isShow = false;
       // this.search = '';
-      console.log(this.$route);
     }
   }
 </script>

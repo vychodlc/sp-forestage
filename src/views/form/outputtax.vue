@@ -50,7 +50,6 @@
               <th style="width:20vw;font-size:18px">图片</th>
               <th style="width:20vw;font-size:18px">入库时间</th>
               <th style="width:10vw;font-size:18px">
-                <!-- <input class="checkbox" type="checkbox" @click="checkAll()"> -->
               </th>
             </tr>
           </thead>
@@ -125,7 +124,7 @@
       </div>
       <div class="addressbox">
         <div class="goodsCard" v-for="(item,index) in selectList" :key="index">
-          <div class="goodsImg"><img src="http://api.bupt404.cn/sp/cover/1621229640858-dragon.jpg" alt=""></div>
+          <div class="goodsImg"><img :src="item.pic" alt="" @click="$store.commit('showImg',[item.pic,true])"></div>
           <div class="content">
             <div class="name">库存编号：{{item.storage_ID}}</div>
             <div class="info">
@@ -140,13 +139,13 @@
           <span class="name">退税材料</span>
         </div>
         <div class="material">
-          <img v-for="(item,index) in materialList" :key="index" :src='item' alt="">
+          <img v-for="(item,index) in materialList" :key="index" :src='item' alt="" @click="$store.commit('showImg',[item,true])">
         </div>
       </div>
       <div class="addressbox">
         <div class="text">
           <span class="name">金额</span>
-          <span class="money" style="color:#000;margin-left:10px;font-size:18px">￥{{price}}</span>
+          <span class="money" style="color:#000;margin-left:10px;font-size:18px">￡{{parseFloat(price/100).toFixed(2)}}</span>
         </div>
       </div>
       <div class="addressbox">
@@ -237,8 +236,9 @@
         materialList: [],
         selectAddr: null,
         paymethod: 0,
-        money: 122,
-        price: 1000
+        useBalance: 0,
+        money: 0,
+        price: 0
       }
     },
     computed: {
@@ -258,10 +258,6 @@
             document.getElementById('step2').className = 'step step-ing'
             document.getElementsByClassName('line')[0].className = 'line line-ed'
             this.currentStep+=1;
-            getBalance().then(res=>{
-              console.log(res.data);
-              this.money = parseInt(res.data.balance);
-            })
           }
         } else if(this.currentStep==2&&direction==0){
           document.getElementById('step1').className = 'step step-ing'
@@ -282,12 +278,32 @@
               addImg(uploadFile).then(res=>{
                 if(res.data.status=='201') {
                   this.materialList.push(res.data.img_url)
-                  if(this.materialList.length==imgNum) {          
-                    this.$store.commit('showLoading',false);
-                    document.getElementById('step2').className = 'step step-ed'
-                    document.getElementById('step3').className = 'step step-ing'
-                    document.getElementsByClassName('line')[1].className = 'line line-ed'
-                    this.currentStep+=1
+                  if(this.materialList.length==imgNum) {
+                    let weight = 0;
+                    this.selectList.map(item=>weight+=parseFloat(item.weight));
+                    weight = parseInt(weight/0.5);
+                    if(weight>59) {
+                      this.price = 11800;
+                    } else {
+                      this.price = this.$store.state.expressPrice[weight]*100;
+                    }
+                    getBalance().then(res=>{
+                      this.money = parseInt(res.data.balance);
+                      if(this.money<this.price) {
+                        this.useBalance = 1;
+                        this.paymethod = 1;
+                      }
+                      if(this.$store.state.address.default!=null) {
+                        this.selectAddr = this.$store.state.address.default[0]
+                      } else if(this.$store.state.address.list.length>0){
+                        this.selectAddr = this.$store.state.address.list[0]
+                      }         
+                      this.$store.commit('showLoading',false);
+                      document.getElementById('step2').className = 'step step-ed'
+                      document.getElementById('step3').className = 'step step-ing'
+                      document.getElementsByClassName('line')[1].className = 'line line-ed'
+                      this.currentStep+=1
+                    })
                   }
                 }
               })
@@ -310,7 +326,6 @@
               address:this.selectAddr.addr,
               price: this.price,
             }).then(res=>{
-              console.log(res);
               if(res.data.status=='200') {
                 this.$store.commit('handlePay',{order_type:'o',price:this.price,id:res.data.outbound_id});
                 let info = {
@@ -323,6 +338,7 @@
                   this.$store.commit('showLoading',false);
                 } else {
                   console.log('聚合');
+                  this.$store.commit('showTip','聚合支付还没做！')
                   // putOrder(info).then(res=>{
                   //   let url = res.data.RedirectUrl;
                   //   window.location.replace(url);
@@ -340,7 +356,7 @@
               }
             })
           }
-        } else if(this.currentStep==3&&direction==0){
+        } else if(this.currentStep==4&&direction==0){
           // document.getElementById('step2').className = 'step step-ing'
           // document.getElementById('step3').className = 'step step-not'
           // document.getElementsByClassName('line')[1].className = 'line line-not'
@@ -370,7 +386,6 @@
         //   this.storageNum = res.data.storages_num;
         //   if(this.storageNum==this.storageList.length) {
         //     this.$store.commit('showLoading', false);
-        //     console.log(this.storageList);
         //     for(let i=this.storageList.length-1;i>-1;i--) {
         //       if(this.storageList[i].storage_status=='1') {
         //         this.storageList.splice(i,1)
@@ -380,9 +395,6 @@
         //     this._getStorageList();
         //   }
         // })
-      },
-      checkAll() {
-        console.log(123);
       },
       clickCheckbox(item) {
         let index = -1;
@@ -396,7 +408,6 @@
         } else {
           this.selectList.splice(index,1)
         }
-        // console.log(this.selectList);
       },
       uploadImg(e) {
         for(let item of this.$refs.uploadImg.files) {
@@ -435,7 +446,6 @@
       this._getStorageList();
       // window.open("http://www.baidu.com")
 
-      // console.log(this.$store.state.address);
       if(this.$store.state.address.default!=null) {
         this.selectAddr = this.$store.state.address.default[0];
       } else {
@@ -443,7 +453,7 @@
       }
       
       this.$bus.$on('selectAddress',(item)=>{
-        if(this.$route.name=='Output') {
+        if(this.$route.name=='Outputtax') {
           this.selectAddr = item;
           this.$store.commit('changeShow',{name:'showAddr',value:false});
         }
@@ -451,9 +461,9 @@
       this.$bus.$on('paystatus', (info)=>{
         if(info.order_type=='o') {
           if(info.status=='ok') {
-            document.getElementById('step2').className = 'step step-ed'
-            document.getElementById('step3').className = 'step step-ing'
-            document.getElementsByClassName('line')[1].className = 'line line-ed'
+            document.getElementById('step3').className = 'step step-ed'
+            document.getElementById('step4').className = 'step step-ing'
+            document.getElementsByClassName('line')[2].className = 'line line-ed'
             this.currentStep+=1;
             this.$store.commit('showTip', '支付成功')
           } else {

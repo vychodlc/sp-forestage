@@ -1,10 +1,10 @@
 <template>
-  <div class="Agency">
+  <div class="agency">
     <div class="header">
       <div class="back" @click="$router.go(-1)"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
       <div class="title">代购订单</div>
     </div>
-    <div class="tableSearch">
+    <!-- <div class="tableSearch">
       <span>
         <select id="group" v-model="filter">
           <option value="storage_ID">编号</option>
@@ -16,35 +16,93 @@
       <input type="search" v-model="search">
       <span><img src="~/assets/images/search.png" alt="" @click="goSearch"></span>
       <span class="cancle" @click="goBack" v-if="isSearch">×</span>
-    </div>
+    </div> -->
     <div class="tableBox">
-      <table v-if="tableData.length>0">
-        <thead>
-          <tr>
-            <th style="width:10vw;font-size:18px">库存<br>编号</th>
-            <th style="width:20vw;font-size:18px">图片</th>
-            <th style="width:20vw;font-size:18px">尺寸</th>
-            <th style="width:10vw;font-size:18px">重量</th>
-            <th style="width:20vw;font-size:18px">入库<br>时间</th>
-            <th style="width:10vw;font-size:18px">状态</th>
-          </tr>
-        </thead>
-        <tbody id="tbody">
-          <tr v-for="(item,index) in tableData" :key="index">
-            <td>{{item.storage_ID}}</td>
-            <td @click="$store.commit('showImg',[item.pic,true])"><img :src="item.pic" alt="" style="width:20vw"></td>
-            <td>{{item.size}}</td>
-            <td>{{item.weight}}</td>
-            <td>{{item.storage_time}}</td>
-            <td>
-              <span v-if="item.storage_status==0">库存中</span>
-              <span v-else-if="item.storage_status==1">已出库</span>
-            </td>
-            <!-- <td><div class="delete" v-if='tableData.length!=1' @click="delItem(index)">×</div></td> -->
-          </tr>
-        </tbody>
-      </table>
-      <div v-else style="font-size:20px;line-height:642px;text-align:center;">查询无果</div>
+      <div class="tableItem" v-if="tableData.length>0">
+        <table>
+          <thead>
+            <tr>
+              <th>单号</th>
+              <th>订单</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item,index) in tableData" :key="index">        
+              <td>{{item.agency_ID}}</td>
+              <td>{{item.storage_link}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tableItem" v-if="tableData.length>0">
+        <table>
+          <thead>
+            <tr>
+              <th>价格</th>
+              <th>数量</th>
+              <th>尺寸</th>
+              <th>品牌</th>
+              <th>礼品卡</th>
+              <th>购物账号</th>
+              <th>折扣码</th>
+              <th>添加时间</th>
+              <th>采购时间</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item,index) in tableData" :key="index">
+              <td>￡{{item.price}}</td>
+              <td>{{item.order_num}}</td>
+              <td>{{item.size}}</td>
+              <td>
+                <span v-if="item.brand=='N'">Nike</span>
+                <span v-if="item.brand=='A'">Adidas</span>
+                <span v-if="item.brand=='JD'">JD</span>
+              </td>
+              <td>
+                <span v-if="item.giftcard_type=='0'">无</span>
+                <span v-if="item.giftcard_type=='1'">平台提供</span>
+                <span v-if="item.giftcard_type=='2'">自行提供</span>
+              </td>
+              <td>
+                <span v-if="item.account_type=='0'">无</span>
+                <span v-if="item.account_type=='1'">普通账号</span>
+                <span v-if="item.account_type=='2'">生日账号</span>
+              </td>
+              <td>
+                <span v-if="item.discount_type=='0'">无</span>
+                <span v-if="item.discount_type=='1'">平台提供</span>
+                <span v-if="item.discount_type=='2'">单次码</span>
+                <span v-if="item.discount_type=='3'">复用码</span>
+              </td>
+              <td>{{item.apply_time}}</td>
+              <td>{{item.interval}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tableItem" v-if="tableData.length>0">
+        <table>
+          <thead>
+            <tr>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item,index) in tableData" :key="index">
+              <td>
+                <span v-if="item.agency_status=='0'">待支付</span>
+                <span v-if="item.agency_status=='1'">待受理</span>
+                <span v-if="item.agency_status=='2'">支付取消</span>
+                <span v-if="item.agency_status=='3'">已驳回</span>
+                <span v-if="item.agency_status=='4'">进行中</span>
+                <span v-if="item.agency_status=='5'">已完成</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-if="tableData.length==0" style="font-size:20px;line-height:642px;text-align:center;width:100vw;">查询无果</div>
     </div>
     <div class="tableFooter" v-if="pageNum>1">
       <div class="pageIndex" @click="changePage(-1)" :style="{'color':(currentIndex==1)?'#aaa':'var(--color-all)'}">◂</div>
@@ -75,7 +133,7 @@
 </template>
 
 <script>
-  import {getStorageList,filterStorageList} from '@/network/transship.js'
+  import {getAgency} from '@/network/agency.js'
   export default {
     name: "StorageList",
     data () {
@@ -89,39 +147,39 @@
       }
     },
     methods:{
-      _getStorageList() {
+      _getList() {
         if(this.isSearch==false) {
-          getStorageList(this.currentIndex).then(res=>{
+          getAgency(this.currentIndex).then(res=>{
             console.log(res);
             if(res.data.status=='200') {
               this.tableData = res.data.data;
-              this.pageNum = Math.ceil(res.data.storages_num/10);
+              this.pageNum = Math.ceil(res.data.agencys_num/10);
               this.$store.commit('showLoading',false);
             }
           })
         } else {
-          filterStorageList(this.filter,this.search,this.currentIndex).then(res=>{
-            if(res.data.status=='200') {
-              this.tableData = res.data.data;
-              this.pageNum = Math.ceil(res.data.storages_num/10);
-              this.$store.commit('showLoading',false);
-            }
-          })
+          // filterStorageList(this.filter,this.search,this.currentIndex).then(res=>{
+          //   if(res.data.status=='200') {
+          //     this.tableData = res.data.data;
+          //     this.pageNum = Math.ceil(res.data.agencys_num/10);
+          //     this.$store.commit('showLoading',false);
+          //   }
+          // })
         }
       },
       changePage(index) {
         if(index==-1&&this.currentIndex!=1) {
           this.$store.commit('showLoading',true);
           this.currentIndex--;
-          this._getStorageList();
+          this._getList();
         } else if(index==0&&this.currentIndex!=this.pageNum) {
           this.$store.commit('showLoading',true);
           this.currentIndex++;
-          this._getStorageList();
+          this._getList();
         } else if(index!=0&&index!=-1) {
           this.$store.commit('showLoading',true);
           this.currentIndex = index;
-          this._getStorageList();
+          this._getList();
         }
       },
       goSearch() {
@@ -131,7 +189,7 @@
           this.$store.commit('showLoading',true);
           this.isSearch = true;
           this.currentIndex = 1;
-          this._getStorageList();
+          this._getList();
         }
       },
       goBack() {
@@ -140,7 +198,7 @@
         this.search = '';
         this.filter = 'storage_ID';
         this.currentIndex = 1;
-        this._getStorageList();
+        this._getList();
       },
       showImg(url) {
         console.log(url);
@@ -149,13 +207,13 @@
     activated() {
       this.$store.commit('showLoading',true);
       this.currentIndex = 1;
-      this._getStorageList();
+      this._getList();
     },
   }
 </script>
 
 <style scoped>
-  .transmit {
+  .agency {
     width: 100vw;
     height: 100vh;
     position: relative;
@@ -220,21 +278,54 @@
     line-height: 30px;
     margin-left: 10px;
   }
+  
+  
   .tableBox {
     width: 100vw;
-    height: 642px;
-    /* display: flex;
-    align-items: center;
-    justify-content: center; */
-    /* border: 3px solid #000; */
+    height: 700px;
+    display: flex;
+    flex-direction: row;
   }
-  table {table-layout:fixed;}
-  td {word-break:break-all;}
-  tbody tr {
+  
+  table {font-size:11px;color:#333333;border-collapse: collapse;}
+  
+  .tableBox thead th,
+  .tableBox tbody tr {
+    white-space: nowrap;
     height: 60px;
+    border-bottom: 1px solid #999;
+    text-align:center;
+  }
+  .tableBox thead th {
+    background-color: #dedede;
+    padding: 0 3px;
+    height: 40px;
   }
 
-  table {font-size:11px;color:#333333;border-width: 1px;border-color: #666666;border-collapse: collapse;}
-  table th {border: 1px solid #666666;background-color: #dedede;}
-  table td {border: 1px solid #666666;background-color: #ffffff;text-align:center;}
+  .tableBox .tableItem:nth-child(1) {
+    width: 25vw;
+    height: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    box-shadow:5px 0 10px -5px #ccc;
+  }
+  .tableBox .tableItem:nth-child(2) {
+    width: 60vw;
+    height: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+  }
+  .tableBox .tableItem:nth-child(3) {
+    width: 15vw;
+    height: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    box-shadow:-5px 0 10px -5px #ccc;
+  }
+  .tableBox .tableItem:nth-child(1) td,
+  .tableBox .tableItem:nth-child(2) td,
+  .tableBox .tableItem:nth-child(3) td {
+    width: 20vw;
+    padding: 0 8px;
+  }
 </style>

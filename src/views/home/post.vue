@@ -113,7 +113,6 @@
           getPostList(this.currentPage[index]).then(res=>{
             if(res.data.status=="200") {
               this.currentPage[index]+=1;
-              // console.log(this.currentPage);
               let data = res.data.data;
               this.hasMore[index] = res.data.more;
               for(let item of data) {

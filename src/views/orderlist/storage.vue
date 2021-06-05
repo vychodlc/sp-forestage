@@ -17,34 +17,66 @@
       <span><img src="~/assets/images/search.png" alt="" @click="goSearch"></span>
       <span class="cancle" @click="goBack" v-if="isSearch">×</span>
     </div>
+    
     <div class="tableBox">
-      <table v-if="tableData.length>0">
-        <thead>
-          <tr>
-            <th style="width:10vw;font-size:18px">库存<br>编号</th>
-            <th style="width:20vw;font-size:18px">图片</th>
-            <th style="width:20vw;font-size:18px">尺寸</th>
-            <th style="width:10vw;font-size:18px">重量</th>
-            <th style="width:20vw;font-size:18px">入库<br>时间</th>
-            <th style="width:10vw;font-size:18px">状态</th>
-          </tr>
-        </thead>
-        <tbody id="tbody">
-          <tr v-for="(item,index) in tableData" :key="index">
-            <td>{{item.storage_ID}}</td>
-            <td @click="$store.commit('showImg',[item.pic,true])"><img :src="item.pic" alt="" style="width:20vw"></td>
-            <td>{{item.size}}</td>
-            <td>{{item.weight}}</td>
-            <td>{{item.storage_time}}</td>
-            <td>
-              <span v-if="item.storage_status==0">库存中</span>
-              <span v-else-if="item.storage_status==1">已出库</span>
-            </td>
-            <!-- <td><div class="delete" v-if='tableData.length!=1' @click="delItem(index)">×</div></td> -->
-          </tr>
-        </tbody>
-      </table>
-      <div v-else style="font-size:20px;line-height:642px;text-align:center;">查询无果</div>
+      <div class="tableItem" v-if="tableData.length>0">
+        <table>
+          <thead>
+            <tr>
+              <th>库存编号</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item,index) in tableData" :key="index">        
+              <td>{{item.storage_ID}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tableItem" v-if="tableData.length>0">
+        <table>
+          <thead>
+            <tr>
+              <th>图片</th>
+              <th>描述</th>
+              <th>尺寸</th>
+              <th>重量</th>
+              <th>入库时间</th>
+              <th>申报编号</th>
+              <th>出库编号</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item,index) in tableData" :key="index">
+              <td @click="$store.commit('showImg',[item.pic,true])"><img :src="item.pic" alt="" style="width:20vw"></td>
+              <td>{{item.description}}</td>
+              <td>{{item.size}}</td>
+              <td>{{item.weight}}</td>
+              <td>{{item.storage_time}}</td>
+              <td>{{item.apply_id}}</td>
+              <td>{{item.outbound_id}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tableItem" v-if="tableData.length>0">
+        <table>
+          <thead>
+            <tr>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item,index) in tableData" :key="index">
+              <td>
+                <span v-if="item.storage_status=='0'">库存中</span>
+                <span v-if="item.storage_status=='1'">已出库</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-if="tableData.length==0" style="font-size:20px;line-height:642px;text-align:center;width:100vw;">查询无果</div>
     </div>
     <div class="tableFooter" v-if="pageNum>1">
       <div class="pageIndex" @click="changePage(-1)" :style="{'color':(currentIndex==1)?'#aaa':'var(--color-all)'}">◂</div>
@@ -223,18 +255,48 @@
   .tableBox {
     width: 100vw;
     height: 642px;
-    /* display: flex;
-    align-items: center;
-    justify-content: center; */
-    /* border: 3px solid #000; */
+    display: flex;
+    flex-direction: row;
   }
-  table {table-layout:fixed;}
-  td {word-break:break-all;}
-  tbody tr {
+  table {font-size:11px;color:#333333;border-collapse: collapse;}
+  
+  .tableBox thead th,
+  .tableBox tbody tr {
+    white-space: nowrap;
     height: 60px;
+    border-bottom: 1px solid #999;
+    text-align:center;
+  }
+  .tableBox thead th {
+    background-color: #dedede;
+    padding: 0 3px;
+    height: 40px;
   }
 
-  table {font-size:11px;color:#333333;border-width: 1px;border-color: #666666;border-collapse: collapse;}
-  table th {border: 1px solid #666666;background-color: #dedede;}
-  table td {border: 1px solid #666666;background-color: #ffffff;text-align:center;}
+  .tableBox .tableItem:nth-child(1) {
+    width: 15vw;
+    height: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    box-shadow:5px 0 10px -5px #ccc;
+  }
+  .tableBox .tableItem:nth-child(2) {
+    width: 70vw;
+    height: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+  }
+  .tableBox .tableItem:nth-child(3) {
+    width: 15vw;
+    height: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    box-shadow:-5px 0 10px -5px #ccc;
+  }
+  .tableBox .tableItem:nth-child(1) td,
+  .tableBox .tableItem:nth-child(2) td,
+  .tableBox .tableItem:nth-child(3) td {
+    width: 15vw;
+    padding: 0 8px;
+  }
 </style>

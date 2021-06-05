@@ -54,7 +54,6 @@ export function filterOutputList(filter,value,p) {
 }
 
 export function addOutput(info) {
-  console.log(info);
   let formData = new FormData();
   formData.append('storage_nums',info.storage_nums.map(item=>('"'+item+'"')).join(','));
   formData.append('outbound_type',info.outbound_type);
@@ -69,7 +68,6 @@ export function addOutput(info) {
 }
 
 export function addImg(file) {
-  console.log(file);
   let formData = new FormData();
   formData.append('img',file);
   return request({
