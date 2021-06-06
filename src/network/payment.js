@@ -1,10 +1,11 @@
 import {request} from './request'
 
 export function putOrder(info) {
+  console.log(info);
   let formData = new FormData();
   formData.append('order_type',info.order_type);
   formData.append('id',info.id);
-  formData.append('price',info.price);
+  formData.append('pay_type',info.pay_type);
   return request({
     method: 'POST',
     url: '/put_order.php',
@@ -40,6 +41,16 @@ export function getOrder(info) {
     params: {
       order_type: info.order_type,
       id: info.id,
+    }
+  })
+}
+
+export function checkPayment(info) {
+  return request({
+    url: '/check_payment.php',
+    params: {
+      order_type: info.order_type,
+      id: info.id
     }
   })
 }

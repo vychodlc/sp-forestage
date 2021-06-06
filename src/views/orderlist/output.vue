@@ -80,7 +80,7 @@
             <tr v-for="(item,index) in tableData" :key="index">
               <td>
                 <span v-if="item.outbound_status=='0'">待支付
-                <div style="margin-top:5px" @click="goPay(item)">
+                <div style="margin-top:5px" @click="handlePay(item)">
                   <span style="background-color:var(--color-all);color:#fff;padding:3px">付款</span>
                 </div></span>
                 <span v-if="item.outbound_status=='1'">待审核</span>
@@ -120,12 +120,25 @@
       </div>
       <div class="pageIndex" @click="changePage(0)" :style="{'color':(currentIndex==pageNum)?'#aaa':'var(--color-all)'}">▸</div>
     </div>
+    <div class="dialogChangePay" v-if="showChangePay">
+      <div class="content">
+        <div class="title">是否为未支付订单继续支付</div>
+        <div class="text" style="width:100%;text-align:center;">
+          <div class="textItem" style="font-size:16px">订单编号：{{pay302.order_id}}</div>
+        </div>
+        <div class="option">
+          <div class="btn" @click="showChangePay=false">否</div>
+          <div class="btn" @click="goPay()">是</div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
   import {getOutputList,filterOutputList} from '@/network/transship.js'
-  import {getOrder} from '@/network/payment.js'
+  import {getOrder,checkPayment} from '@/network/payment.js'
+  import {getBalance} from '@/network/user.js'
   export default {
     name: "TransmitOrderlist",
     data () {
@@ -136,6 +149,8 @@
         tableData: [],
         currentIndex: 1,
         pageNum: null,
+        showChangePay: false,
+        pay302: null,
       }
     },
     methods:{
@@ -144,12 +159,11 @@
           getOutputList(this.currentIndex).then(res=>{
             if(res.data.status=='200') {
               this.tableData = res.data.data;
-              console.log(res);
               this.tableData.map(item=>{
                 item.material = item.material.split(',')
               })
               this.pageNum = Math.ceil(res.data.outbounds_num/10);
-              // console.log(this.tableData);
+              console.log(this.tableData);
               this.$store.commit('showLoading',false);
             }
           })
@@ -200,32 +214,63 @@
         this.currentIndex = 1;
         this._getOutputList();
       },
-      goPay(item) {
-        if(item.pay_type=="balance") {
-          this.$store.commit('handlePay',{
-            order_type:'o',
-            price:item.price,
-            id:item.outbound_ID,
-            success:false,
-            state:true,
-            show:true
-          });
-        } else if(item.pay_type=="Globepay") {
-          getOrder({
-            order_type: 'o',
-            id: item.outbound_ID
-          }).then(res=>{
-            let url = res.data.RedirectUrl;
-            window.location.replace(url);
-          })
-        }
-      }
+      handlePay(item) {
+        this.$store.commit('showLoading',true);
+        checkPayment({
+          order_type: 'o',
+          id: item.outbound_ID
+        }).then(res=>{
+          if(res.data.status=='302') {
+            this.pay302 = res.data;
+            this.showChangePay = true;
+            this.$store.commit('handlePay',{price:res.data.price,order_type:res.data.order_type,id:res.data.order_id});
+            getBalance().then(res=>{
+              this.$store.commit('handleUser',{balance:res.data.balance})
+              this.$store.commit('showLoading',false);
+              console.log(this.$store.state);
+            })
+          } else if(res.data.status=='200') {
+            this.$store.commit('handlePay',{price:item.price,order_type:'o',id:item.outbound_ID,show:true,method:true});
+            getBalance().then(res=>{
+              this.$store.commit('handleUser',{balance:res.data.balance})
+              this.$store.commit('showLoading',false);
+            })
+          }
+        })
+      },
+      goPay() {
+        this.showChangePay = false;
+        console.log(this.pay302);
+        this.$store.commit('handlePay',{show:true,method:true});
+        // if(item.pay_type=="balance") {
+        //   this.$store.commit('handlePay',{
+        //     order_type:'o',
+        //     price:item.price,
+        //     id:item.outbound_ID,
+        //     success:false,
+        //     state:true,
+        //     show:true
+        //   });
+        // } else if(item.pay_type=="Globepay") {
+        //   getOrder({
+        //     order_type: 'o',
+        //     id: item.outbound_ID
+        //   }).then(res=>{
+        //     let url = res.data.RedirectUrl;
+        //     window.location.replace(url);
+        //   })
+        // }
+      },
     },
     activated() {
       this.$store.commit('showLoading',true);
       this.currentIndex = 1;
       this._getOutputList();
       
+      getBalance().then(res=>{
+        console.log(res);
+      })
+
       this.$bus.$on('paystatus', (info)=>{
         if(info.order_type=='o') {
           if(info.status=='ok') {
@@ -356,5 +401,54 @@
   }
   .material {
     width: 15vw;
+  }
+
+  .dialogChangePay {
+    width: 100vw;
+    height: 100%;
+    background-color: #b3b3b488;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dialogChangePay .content {
+    width: 80vw;
+    height: 200px;
+    background-color: #fff;
+    border-radius: 5px;
+  }
+  .dialogChangePay .content .title {
+    width: 100%;
+    height: 100px;
+    line-height: 100px;
+    font-size: 20px;
+    text-align: center;
+  }
+  .dialogChangePay .option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+  .dialogChangePay .option .btn {
+    width: 40%;
+    margin-top: 30px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 20px;
+  }
+  .dialogChangePay .option .btn:first-child {
+    color: var(--color-all);
+    border: 1px solid var(--color-all);
+  }
+  .dialogChangePay .option .btn:last-child {
+    background-color: var(--color-all);
+    color: #fff;
   }
 </style>

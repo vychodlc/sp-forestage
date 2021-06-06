@@ -223,7 +223,6 @@
                 }
               }
               if(item.brand=='N') {
-                console.log(item.expressid);
                 let id = item.expressid;
                 let email = item.email;
                 let headers = {
@@ -240,6 +239,8 @@
                 this.$axios.all([
                   this.$axios.get(url1, {
                     headers: headers,
+                  }).catch(e=>{                  
+                    handleTimes++;
                   }),
                   this.$axios.get(url2, {
                     headers: headers,
@@ -298,14 +299,62 @@
                   }
                   console.log('ok');
                 }))
-              } else if(item.brand=='A') {
-                
-                  handleTimes++;
-              
               } else if(item.brand=='JD') {
+                let id = item.expressid;
+                let email = item.email;
+                let url = "https://data.smartagent.io/v1/jdsports/track-my-order?orderNumber=" + id + "&facia=jdsportsuk&emailAddress=" + email;
 
+                this.$axios.get(url).catch(e=>{
                   handleTimes++;
-
+                }).then(res=>{
+                  if(res!=undefined) {
+                    handleTimes++;
+                    let data = res.data;
+                    returnItem.order_time.push(data.date?data.date.toString():'');
+                    returnItem.price.push(data.totals?data.totals.total.amount.toString():'');
+                    if(data.status&&data.status.full) {
+                      data.status.full.map(fullItem=>{
+                        if(fullItem.state=='done') {
+                          returnItem.op_description.push(fullItem.description?fullItem.description:fullItem.title);
+                          returnItem.op_date.push(fullItem.date?fullItem.date.toString():'')
+                        }
+                      })
+                    }
+                    if(data.vendors&&data.vendors[0]&&data.vendors[0].items) {
+                      data.vendors[0].items.map(item=>{
+                        returnItem.op_quantity.push(item.qty?item.qty.toString():'')
+                        returnItem.size.push(item.size?item.size.toString():'')
+                        returnItem.style.push(item.sku?item.sku.toString():'')
+                        returnItem.rolledUpStatus.push(item.status?item.status.toString():'')
+                      })
+                    }
+                    if(data.addresses&&data.addresses.billing) {
+                      returnItem.first_address.push(data.addresses.billing.address1)
+                      returnItem.second_address.push(data.addresses.billing.address2)
+                      returnItem.city.push(data.addresses.billing.town)
+                      returnItem.postal.push(data.addresses.billing.postcode)
+                      returnItem.country.push(data.addresses.billing.locale)
+                    }
+                    if(data.delivery) {
+                      returnItem.tracker.push(data.delivery.trackingURL?data.delivery.trackingURL.toString():'');
+                    }
+                    if(data.payment&&data.payment.giftCard) {
+                      returnItem.gift.push(data.payment.giftCard.cardNumber?data.payment.giftCard.cardNumber.toString():'');
+                    }
+                    for(let key in returnItem) {
+                      this.tableData.filter(tableItem=>{return tableItem.apply_ID==item.apply_ID})[0][key] = returnItem[key].join(',')
+                    }
+                    if(handleTimes==Handledata.length) {
+                      this.isRefresh = false;
+                      this.inCD = true;
+                      this.CDTime = 10;
+                      this.refreshCD();
+                    }
+                    console.log('ok');
+                  }
+                })
+              } else if(item.brand=='A') {
+                  handleTimes++;
               }
             })
           })

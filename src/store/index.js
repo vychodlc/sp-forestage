@@ -19,7 +19,7 @@ export default new Vuex.Store({
     },
     tags: null,
     show: {showAddr:false,addrEdit:false,addrAdd:false,},
-    pay: {show: false,state: false,success: false,price: 0,id:null,order_type:null},
+    pay: {show: false,state: false,success: false,price: 0,id:null,order_type:null,pay_type:null,method:false},
     address: {
       list: [],
       default: null,
@@ -58,6 +58,11 @@ export default new Vuex.Store({
       // state.user.id = data.id
       // state.user.right = data.right
     },
+    handleUser(state,info) {
+      for (let key in info) {
+        if(key=='balance'){state.user.balance=info[key]}
+      }
+    },
     setBalance(state,balance) {
       state.user.balance = balance
     },
@@ -86,8 +91,10 @@ export default new Vuex.Store({
         if(key=='price'){state.pay.price=info[key]}
         if(key=='id'){state.pay.id=info[key]}
         if(key=='order_type'){state.pay.order_type=info[key]}
+        if(key=='method'){state.pay.method=info[key]}
+        if(key=='pay_type'){state.pay.pay_type=info[key]}
       }
-      console.log(state.pay.success);
+      console.log(state.pay);
     },
     handleAddress(state,info) {
       if(info.name=='updateList') {
