@@ -27,3 +27,14 @@ export function addAgency(info) {
     data: formData
   })
 }
+
+export function crawlerGiftcard(info) {
+  return request({
+    url: '/get_crawler_giftcard.php',
+    params: {
+      brand: info.brand,
+      card_num: info.card_num,
+      pin: info.pin,
+    }
+  })
+}

@@ -26,7 +26,7 @@
       <div class="formItem" v-if="isCommit">
         <div class="name">有效性</div>
         <span class="cardStatus1" v-if="!isValid">无效</span>
-        <span class="cardStatus2" v-else>有效：余额 {{money}}</span>
+        <span class="cardStatus2" v-else>有效：余额 ￡{{money}}</span>
       </div>
     </div>
     <div class="footer">
@@ -38,6 +38,7 @@
 </template>
 
 <script>
+  import { crawlerGiftcard } from '@/network/agency.js'
   export default {
     name: "Query",
     data () {
@@ -75,13 +76,24 @@
         } else if(this.cardInfo.pin=='') {
           this.$store.commit('showTip','请输入礼品卡PIN码')
         } else {
-          this.isCommit = true;
-          console.log(this.cardInfo.card_num,this.cardInfo.pin,this.cardInfo.card_num==this.cardInfo.pin);
-          if(this.cardInfo.card_num==this.cardInfo.pin) {
-            this.isValid = false;
+          this.$store.commit('showLoading',true)
+          if(this.cardInfo.brand=='JD') {
+            crawlerGiftcard(this.cardInfo).then(res=>{
+              console.log(res);
+              this.isCommit = true;
+              if(res.data.status=='503') {
+                this.isValid = false
+              } else if(res.data.status=='200') {
+                this.isValid = true;
+                this.money = res.data.balance;
+              } else if(res.data.status=='501') {
+                console.log('eeee');
+              }
+              this.$store.commit('showLoading',false)
+            })
           } else {
-            this.money = 1333;
-            this.isValid = true;
+            this.$store.commit('showTip','当前仅支持JD查询')
+            this.$store.commit('showLoading',false)
           }
         }
       },
