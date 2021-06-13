@@ -78,7 +78,7 @@
       </div>
       <div v-if="tableData.length==0" style="font-size:20px;line-height:642px;text-align:center;width:100vw;">查询无果</div>
     </div>
-    <div class="tableFooter" v-if="pageNum>1">
+    <div class="tableFooter" v-if="pageNum>0">
       <div class="pageIndex" @click="changePage(-1)" :style="{'color':(currentIndex==1)?'#aaa':'var(--color-all)'}">◂</div>
       <div class="pageIndex" v-for="(item,index) in pageNum" :key="index"
         @click="changePage(item)"

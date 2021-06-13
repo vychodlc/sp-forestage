@@ -49,6 +49,18 @@
           </div>
           <div class="more" @click="$router.push({name:'AgencyOrderlist'})"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
         </div>
+        <div class="option">
+          <div class="optionheader">
+            <div class="icon"><img src="~/assets/images/application/biaodan.png" alt=""></div>
+            <div class="name">服务</div>
+          </div>
+          <div class="optiondetail">
+            <div class="item" @click="$router.push({name:'Query'})"><img src="~/assets/images/application/fenlei.png" alt=""> 礼品卡查询</div>
+            <!-- <div class="item" @click="$router.push({name:'Agency',params:{name:'Adidas'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Adidas</div>
+            <div class="item" @click="$router.push({name:'Agency',params:{name:'JD'}})"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div> -->
+          </div>
+          <!-- <div class="more" @click="$router.push({name:'AgencyOrderlist'})"><img src="~/assets/images/application/arrow-right.png" alt=""></div> -->
+        </div>
       </div>
     </div>
     <div class="formCard">

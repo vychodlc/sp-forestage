@@ -13,9 +13,9 @@
         <div class="name">尺码</div>
         <div class="inputBox">
           <div class="inputContent">
-            <div class="checkboxItem"><input type="checkbox" v-model="checkall" value="true" id="checkall" @input="checkAll()"><span>全选</span></div>
-            <div class="checkboxItem" v-for="(item,index) in sizeList" :key="index">
-              <input type="checkbox" v-model="newItem.size" :value="item" :id="'size-'+item"><span>{{item}}</span>
+            <div class="checkboxItem" @click="checkAll()"><div id="sizeAll" :class="checkall?'checkboxContentActive':'checkboxContent'">全选</div></div>
+            <div class="checkboxItem" v-for="(item,index) in sizeList" :key="index" @click="checkOne(item)">
+              <div class="checkboxContent" :id="'size-'+item">{{item}}</div>
             </div>
           </div>
         </div>
@@ -24,11 +24,12 @@
         <div class="name">礼品卡</div>
         <div class="inputBox">
           <div class="inputContent" id="giftcardBox">
-            <input type="radio" v-model="newItem.giftcard_type" value="0" id="giftcard1"><span style="margin-right:10px">不使用</span>
-            <input type="radio" v-model="newItem.giftcard_type" value="1" id="giftcard2"><span style="margin-right:10px">平台提供</span>
-            <input type="radio" v-model="newItem.giftcard_type" value="2" id="giftcard3"><span style="margin-right:10px">自行提供
-              <span @click="dialogShow=true" style="color:var(--color-all);margin-left:3px">导入</span>
-            </span>
+            <div :class="newItem.giftcard_type=='0'?'radioItemActive':'radioItem'" @click="changeRadio('giftcard_type',0)">不使用</div>
+            <div :class="newItem.giftcard_type=='1'?'radioItemActive':'radioItem'" @click="changeRadio('giftcard_type',1)">平台提供</div>
+            <div :class="newItem.giftcard_type=='2'?'radioItemActive':'radioItem'" @click="changeRadio('giftcard_type',2)">自行提供</div>
+            <div class="radioItem" style="color:var(--color-all);background-color:#fff;margin:0" v-if="newItem.giftcard_type=='2'">
+              <span @click="dialogShow=true" style="border:1px solid var(--color-all);border-radius:3px;padding:2px">导入</span>
+            </div>
             <div v-if="newItem.giftcard_type=='2'">
               <table class="giftcardTable">
                 <thead>
@@ -58,12 +59,12 @@
         <div class="name">折扣码</div>
         <div class="inputBox">
           <div class="inputContent" id="discountBox">
-            <span class="discountRadio"><input type="radio" v-model="newItem.discount_type" value="0" id="discount1">不使用</span>
-            <span class="discountRadio"><input type="radio" v-model="newItem.discount_type" value="1" id="discount2">平台提供</span>
-            <span class="discountRadio"><input type="radio" v-model="newItem.discount_type" value="2" id="discount3" placeholder="输入单次码，用逗号隔开">单次码</span>
-            <span class="discountRadio"><input type="radio" v-model="newItem.discount_type" value="3" id="discount4" placeholder="输入复用码">复用码</span>
+            <div :class="newItem.discount_type=='0'?'radioItemActive':'radioItem'" @click="changeRadio('discount_type',0)">不使用</div>
+            <div :class="newItem.discount_type=='1'?'radioItemActive':'radioItem'" @click="changeRadio('discount_type',1)">平台提供</div>
+            <div :class="newItem.discount_type=='2'?'radioItemActive':'radioItem'" @click="changeRadio('discount_type',2)">单次码</div>
+            <div :class="newItem.discount_type=='3'?'radioItemActive':'radioItem'" @click="changeRadio('discount_type',3)">复用码</div>
             <div v-if="['2','3'].indexOf(newItem.discount_type)!=-1">            
-              <input type="text" v-model="newItem.discount_code" style="border: 1px solid #ccc;margin-top:5px" id="giftcard2">
+              <input type="text" v-model="newItem.discount_code" style="border: 1px solid #ccc;margin-top:5px;font-size:12px;padding:5px 10px" :placeholder="newItem.discount_type=='2'?'输入单次码，用逗号隔开':'输入复用码'">
             </div>
           </div>
         </div>
@@ -72,15 +73,12 @@
         <div class="name">购物账号</div>
         <div class="inputBox">
           <div class="inputContent" id="accountBox">
-            <span class="accountRadio"><input type="radio" v-model="newItem.account_type" value="0" id="account1">不使用</span>
-            <span class="accountRadio"><input type="radio" v-model="newItem.account_type" value="1" id="account2">普通账号</span>
-            <span class="accountRadio"><input type="radio" v-model="newItem.account_type" value="2" id="account3">生日账号</span>
+            <div :class="newItem.account_type=='0'?'radioItemActive':'radioItem'" @click="changeRadio('account_type',0)">不使用</div>
+            <div :class="newItem.account_type=='1'?'radioItemActive':'radioItem'" @click="changeRadio('account_type',1)">普通账号</div>
+            <div :class="newItem.account_type=='2'?'radioItemActive':'radioItem'" @click="changeRadio('account_type',2)">生日账号</div>
           </div>
         </div>
       </div>
-      <!-- 
-      <div class="formItem">折扣码</div>
-      <div class="formItem">购物账号</div> -->
       <div class="formItem">
         <div class="name">单数</div>
         <input type="text" id="order_num" v-model="newItem.order_num"></div>
@@ -129,10 +127,10 @@ xxxx xxxx xxxx
           storage_link: 'www.baidu.com',
           price: '123',
           size: [],
-          account_type: '',
-          discount_type: '',
+          account_type: '0',
+          discount_type: '0',
           discount_code: '',
-          giftcard_type: '2',
+          giftcard_type: '0',
           giftcards: [
             {'card_num':123,'pin':213,'brand':'Nike','right':true},
             {'card_num':123,'pin':213,'brand':'Nike','right':true},
@@ -161,13 +159,47 @@ xxxx xxxx xxxx
     methods:{
       test() {
       },
+      checkOne(item) {
+        if(this.checkall==true) {
+          this.checkAll();
+        }
+        let btn = document.getElementById('size-'+item);
+        if(btn.className=='checkboxContent') {
+          btn.className = 'checkboxContentActive';
+          this.newItem.size.push(item);
+        } else if(btn.className=='checkboxContentActive') {
+          btn.className = 'checkboxContent';
+          this.newItem.size.splice(this.newItem.size.findIndex(e=>e==item),1)
+        }
+        this.newItem.size.sort();
+      },
       checkAll() {
         this.checkall = !this.checkall;
         if(this.checkall==true) {
-          this.newItem.size = this.sizeList
+          this.sizeList.map(size=>{
+            document.getElementById('size-'+size).className = 'checkboxContentActive';
+          })
+          this.newItem.size = this.sizeList;
         } else {
-          this.newItem.size = [];
+          this.sizeList.map(size=>{
+            document.getElementById('size-'+size).className = 'checkboxContent';
+          })
+          this.newItem.size = []
         }
+        // if(this.checkall==true) {
+        //   this.newItem.size = this.sizeList
+        // } else {
+        //   this.newItem.size = [];
+        // }
+      },
+      changeRadio(name,value) {
+        value = ''+value;
+        if(name=='discount_type') {
+          if((this.newItem.discount_type=='2'&&value=='3')||(this.newItem.discount_type=='3'&&value=='2')) {
+            this.newItem.discount_code = ''
+          }
+        }
+        this.newItem[name] = value;
       },
       enterOrder() {
         if(this.dialogText=='') {
@@ -216,7 +248,7 @@ xxxx xxxx xxxx
           addAgency(this.newItem).then(res=>{
             if(res.data.status=='200') {
               this.dialogAddVisible = false;
-              this.$router.replace({name:'Application'});
+              this.$router.push({name:'Application'});
               this.$router.push({name:'AgencyOrderlist'});
             }
           })
@@ -240,6 +272,28 @@ xxxx xxxx xxxx
         case '通用':
           this.brand = 'U';
           break;
+      };
+      
+      this.newItem = {
+        user_email: '1@1.com',
+        user_id: '',
+        brand: '',
+        storage_link: 'www.baidu.com',
+        price: '123',
+        size: [],
+        account_type: '0',
+        discount_type: '0',
+        discount_code: '',
+        giftcard_type: '0',
+        giftcards: [
+          {'card_num':123,'pin':213,'brand':'Nike','right':true},
+          {'card_num':123,'pin':213,'brand':'Nike','right':true},
+          {'card_num':123,'pin':213,'brand':'Nike','right':false},
+          {'card_num':123,'pin':213,'brand':'Nike','right':false},
+          {'card_num':123,'pin':213,'brand':'Nike','right':true},
+        ],
+        order_num: '',
+        interval: '',
       }
     }
   }
@@ -326,10 +380,57 @@ xxxx xxxx xxxx
   .inputContent .checkboxItem {
     width: 12vw;
   }
+  .inputContent .checkboxItem .checkboxContent {
+    background-color:#f0f1f2;
+    color:#777;
+    width:10vw;
+    border-radius:5px;
+    height:20px;
+    line-height:20px;
+    text-align:center;
+    margin-bottom:5px;
+    font-size: 12px;
+  }
+  .inputContent .checkboxItem .checkboxContentActive {
+    background-color:#d5ebe7;
+    color: var(--color-all);
+    width:10vw;
+    border-radius:5px;
+    height:20px;
+    line-height:20px;
+    text-align:center;
+    margin-bottom:5px;
+    font-size: 12px;
+  }
   .formItem .inputBox #giftcardBox,
   .formItem .inputBox #discountBox,
   .formItem .inputBox #accountBox {
-    justify-content: space-around;
+    /* justify-content: space-around; */
+  }
+
+  .formItem .inputBox .inputContent .radioItem {
+    background-color:#f0f1f2;
+    color:#777;
+    padding: 2px 5px;
+    border-radius:5px;
+    height:22px;
+    line-height:20px;
+    text-align:center;
+    margin-bottom:5px;
+    margin-left: 10px;
+    font-size: 12px;
+  }
+  .formItem .inputBox .inputContent .radioItemActive {
+    background-color:#d5ebe7;
+    color: var(--color-all);
+    padding: 2px 5px;
+    border-radius:5px;
+    height:22px;
+    line-height:20px;
+    text-align:center;
+    margin-bottom:5px;
+    margin-left: 10px;
+    font-size: 12px;
   }
 
   .giftcardTable {

@@ -1,0 +1,102 @@
+Date : 2021-06-07 11:59:08
+Directory : c:\Users\16473\Desktop\SmartPurchase\spforestage
+Total : 56 files,  32882 codes, 918 comments, 382 blanks, all 34182 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JSON       |          3 |     24,608 |          1 |          3 |     24,612 |
+| Vue        |         28 |      6,746 |        745 |        171 |      7,662 |
+| JavaScript |         18 |        790 |         36 |         73 |        899 |
+| HTML       |          2 |        393 |          3 |         43 |        439 |
+| CSS        |          4 |        330 |        133 |         87 |        550 |
+| Markdown   |          1 |         15 |          0 |          5 |         20 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                   | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                      |         56 |     32,882 |        918 |        382 |     34,182 |
+| public                                                                                 |          2 |        225 |          2 |          2 |        229 |
+| src                                                                                    |         48 |      8,196 |        915 |        371 |      9,482 |
+| src\assets                                                                             |          5 |        707 |        135 |        129 |        971 |
+| src\assets\backimage                                                                   |          1 |        377 |          2 |         42 |        421 |
+| src\assets\css                                                                         |          4 |        330 |        133 |         87 |        550 |
+| src\components                                                                         |          6 |      1,041 |         14 |         21 |      1,076 |
+| src\network                                                                            |          8 |        451 |          5 |         48 |        504 |
+| src\router                                                                             |          1 |         38 |          9 |          9 |         56 |
+| src\store                                                                              |          1 |        127 |          7 |          3 |        137 |
+| src\utils                                                                              |          4 |        114 |         14 |          8 |        136 |
+| src\views                                                                              |         21 |      5,600 |        623 |        143 |      6,366 |
+| src\views\form                                                                         |          7 |      2,533 |        552 |         76 |      3,161 |
+| src\views\home                                                                         |          6 |      1,212 |         22 |         25 |      1,259 |
+| src\views\login                                                                        |          1 |        232 |         12 |          3 |        247 |
+| src\views\orderlist                                                                    |          4 |      1,537 |         37 |         33 |      1,607 |
+| src\views\pay                                                                          |          1 |         14 |          0 |          3 |         17 |
+| src\views\search                                                                       |          1 |          0 |          0 |          1 |          1 |
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                               | language   | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\README.md                             | Markdown   |         15 |          0 |          5 |         20 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\babel.config.js                       | JavaScript |          5 |          0 |          1 |          6 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\package-lock.json                     | JSON       |     24,368 |          0 |          1 |     24,369 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\package.json                          | JSON       |         31 |          0 |          1 |         32 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\postcss.config.js                     | JavaScript |         14 |          0 |          1 |         15 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\public\index.html                     | HTML       |         16 |          1 |          1 |         18 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\public\manifest.json                  | JSON       |        209 |          1 |          1 |        211 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\App.vue                           | Vue        |        105 |        108 |          7 |        220 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\assets\backimage\spbackstage.html | HTML       |        377 |          2 |         42 |        421 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\assets\css\base.css               | CSS        |         50 |          3 |         10 |         63 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\assets\css\custom.css             | CSS        |        134 |          4 |          4 |        142 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\assets\css\normalize.css          | CSS        |        143 |        126 |         73 |        342 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\assets\css\table.css              | CSS        |          3 |          0 |          0 |          3 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\components\AddrAdd.vue            | Vue        |        149 |          1 |          3 |        153 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\components\AddrEdit.vue           | Vue        |        149 |          1 |          3 |        153 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\components\AddrManage.vue         | Vue        |        341 |          5 |          8 |        354 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\components\Pay.vue                | Vue        |        225 |          4 |          3 |        232 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\components\PostCard.vue           | Vue        |        142 |          2 |          2 |        146 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\components\loading.vue            | Vue        |         35 |          1 |          2 |         38 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\main.js                           | JavaScript |         13 |          0 |          3 |         16 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\network\address.js                | JavaScript |         48 |          0 |          1 |         49 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\network\agency.js                 | JavaScript |         27 |          0 |          2 |         29 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\network\payment.js                | JavaScript |         51 |          0 |          5 |         56 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\network\post.js                   | JavaScript |        101 |          0 |         10 |        111 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\network\request.js                | JavaScript |         41 |          4 |          4 |         49 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\network\tag.js                    | JavaScript |         34 |          0 |          7 |         41 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\network\transship.js              | JavaScript |         69 |          0 |          9 |         78 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\network\user.js                   | JavaScript |         80 |          1 |         10 |         91 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\router\index.js                   | JavaScript |         38 |          9 |          9 |         56 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\store\index.js                    | JavaScript |        127 |          7 |          3 |        137 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\utils\image.js                    | JavaScript |         59 |         14 |          3 |         76 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\utils\spider.js                   | JavaScript |         21 |          0 |          1 |         22 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\utils\time.js                     | JavaScript |         30 |          0 |          4 |         34 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\utils\validate.js                 | JavaScript |          4 |          0 |          0 |          4 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\form\agency.vue             | Vue        |        367 |          4 |         13 |        384 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\form\bank.vue               | Vue        |          0 |          0 |          1 |          1 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\form\index.vue              | Vue        |         14 |          0 |          3 |         17 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\form\output.vue             | Vue        |        810 |         21 |         20 |        851 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\form\outputtax.vue          | Vue        |        434 |        518 |         19 |        971 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\form\purchase.vue           | Vue        |          0 |          0 |          1 |          1 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\form\transmit.vue           | Vue        |        908 |          9 |         19 |        936 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\home\application.vue        | Vue        |        205 |          1 |          3 |        209 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\home\index.vue              | Vue        |         83 |          0 |          2 |         85 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\home\my.vue                 | Vue        |        284 |          5 |          4 |        293 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\home\post.vue               | Vue        |        343 |          9 |          9 |        361 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\home\post_detail.vue        | Vue        |        108 |          1 |          2 |        111 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\home\search.vue             | Vue        |        189 |          6 |          5 |        200 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\login\index.vue             | Vue        |        232 |         12 |          3 |        247 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\orderlist\agency.vue        | Vue        |        317 |          7 |          7 |        331 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\orderlist\output.vue        | Vue        |        431 |         18 |          8 |        457 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\orderlist\storage.vue       | Vue        |        297 |          0 |          5 |        302 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\orderlist\transmit.vue      | Vue        |        492 |         12 |         13 |        517 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\pay\index.vue               | Vue        |         14 |          0 |          3 |         17 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\search\index.vue            | Vue        |          0 |          0 |          1 |          1 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\src\views\test.vue                    | Vue        |         72 |          0 |          2 |         74 |
+| c:\Users\16473\Desktop\SmartPurchase\spforestage\vue.config.js                         | JavaScript |         28 |          1 |          0 |         29 |
+| Total                                                                                  |            |     32,882 |        918 |        382 |     34,182 |
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

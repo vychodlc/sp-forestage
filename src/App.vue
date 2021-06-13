@@ -166,7 +166,7 @@
   }
   
   .messageTip {
-    z-index: 3000;
+    z-index: 10000;
     position: fixed;
     left: 50%;
     transform: translateX(-50%);

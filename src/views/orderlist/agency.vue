@@ -23,13 +23,11 @@
           <thead>
             <tr>
               <th>单号</th>
-              <th>订单</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item,index) in tableData" :key="index">        
               <td>{{item.agency_ID}}</td>
-              <td>{{item.storage_link}}</td>
             </tr>
           </tbody>
         </table>
@@ -38,6 +36,7 @@
         <table>
           <thead>
             <tr>
+              <th>订单</th>
               <th>价格</th>
               <th>数量</th>
               <th>尺寸</th>
@@ -51,6 +50,7 @@
           </thead>
           <tbody>
             <tr v-for="(item,index) in tableData" :key="index">
+              <td>{{item.storage_link}}</td>
               <td>￡{{item.price}}</td>
               <td>{{item.order_num}}</td>
               <td>{{item.size}}</td>
@@ -104,7 +104,7 @@
       </div>
       <div v-if="tableData.length==0" style="font-size:20px;line-height:642px;text-align:center;width:100vw;">查询无果</div>
     </div>
-    <div class="tableFooter" v-if="pageNum>1">
+    <div class="tableFooter" v-if="pageNum>0">
       <div class="pageIndex" @click="changePage(-1)" :style="{'color':(currentIndex==1)?'#aaa':'var(--color-all)'}">◂</div>
       <div class="pageIndex" v-for="(item,index) in pageNum" :key="index"
         @click="changePage(item)"
@@ -281,8 +281,9 @@
   
   
   .tableBox {
+    margin-top: 20px;
     width: 100vw;
-    height: 700px;
+    height: 642px;
     display: flex;
     flex-direction: row;
   }
@@ -303,14 +304,14 @@
   }
 
   .tableBox .tableItem:nth-child(1) {
-    width: 25vw;
+    width: 15vw;
     height: 100%;
     overflow-x: scroll;
     overflow-y: hidden;
     box-shadow:5px 0 10px -5px #ccc;
   }
   .tableBox .tableItem:nth-child(2) {
-    width: 60vw;
+    width: 70vw;
     height: 100%;
     overflow-x: scroll;
     overflow-y: hidden;

@@ -16,12 +16,15 @@
       </div>
     </div>
     <div class="content" v-else>
-      <div class="title">付款金额：<span style="font-size: 20px;color:var(--color-all)">￡{{parseFloat(price/100).toFixed(2)}}</span></div>
+      <div class="title">付款金额：<span style="font-size: 20px;color:var(--color-all)">￡{{parseFloat(this.$store.state.pay.price/100).toFixed(2)}}</span></div>
       <div class="text" style="font-size: 12px;width:100%;padding:3px 30px">选择支付方式</div>
       <div class="method" style="padding-left:50px;padding-top:6px">
-        <input type="radio" v-model="paymethod" value="0" id="m1" v-if='price<=money'/>
-        <input type="radio" v-model="useBalance" value="1" id="m1" v-else disabled/>
-        <label for="m1">余额支付
+        <input type="radio" v-model="paymethod" value="0" id="m1" v-if='parseInt(price)<=parseInt(money)'/>
+        <input type="radio" v-model="paymethod" value="2" id="m1" v-else-if="parseInt(price)>parseInt(money)&&parseInt(money)>0"/>
+        <label for="m1" v-if='parseInt(price)<=parseInt(money)'>余额支付
+          <span style="color:var(--color-all)">余额:￡{{parseFloat(money/100).toFixed(2)}}</span>
+        </label>
+        <label for="m1" v-else-if="parseInt(price)>parseInt(money)&&parseInt(money)>0">混合支付
           <span style="color:var(--color-all)">余额:￡{{parseFloat(money/100).toFixed(2)}}</span>
         </label>
       </div>
@@ -37,23 +40,23 @@
 </template>
 
 <script>
-  import {getOrder,paymentBalance,putOrder} from '@/network/payment.js'
+  import {getOrder,paymentBalance,putOrder,checkPayment} from '@/network/payment.js'
   export default {
     name: "Pay",
     data () {
       return {
         pwd: '123456',
-        paymethod: this.$store.state.pay.price>this.$store.state.user.balance?'1':'0',
-        useBalance: this.$store.state.pay.price>this.$store.state.user.balance?'1':'0',
-        money: this.$store.state.user.balance,
-        price: this.$store.state.pay.price,
+        paymethod: '',
+        useBalance: parseInt(this.$store.state.pay.price)>parseInt(this.$store.state.user.balance)?'1':'0',
+        money: parseInt(this.$store.state.user.balance),
+        price: parseInt(this.$store.state.pay.price),
       }
     },
     activated() {
     },
     methods:{
       test() {
-        // console.log(this.$store.state.pay);
+        // console.log(this.price,this.money,parseInt(this.price)<parseInt(this.money));
       },
       inputChange() {
         let inputPwd = this.$refs.pwdInput;
@@ -78,6 +81,7 @@
           }).then(resPay=>{
             console.log(resPay);
             if(resPay.data.status=='302') {
+              this.$store.commit('handlePay',{show:false})
               this.$store.commit('showTip','您有未支付的订单')
               if(this.$route.path!='/application') {
                 this.$router.replace({name:'Application'})
@@ -99,32 +103,38 @@
         }
       },
       selectMethod() {
-        if(this.paymethod=='0'&&this.useBalance=='0') {
+        console.log(this.$store.state.pay);
+        // checkPayment({
+
+        // })
+        if(this.paymethod=='0') {
+          console.log('余额');
           this.$store.commit('handlePay',{method:false,pay_type:'balance'})
         } else if(this.paymethod=='1') {
-          if(this.useBalance=='0') {
-            console.log('聚合');
-            this.$store.commit('handlePay',{pay_type:'Globepay'});
-            putOrder({
-              id:this.$store.state.pay.id,
-              order_type:this.$store.state.pay.order_type,
-              pay_type:this.$store.state.pay.pay_type
-            }).then(resPay=>{
-              if(resPay.data.status=='302') {
-                this.$store.commit('showTip','您有未支付的订单')
-                if(this.$route.path!='/application') {
-                  this.$router.replace({name:'Application'})
-                }
-                this.$router.push({name:'OutputOrderlist'})
-              } else if(resPay.data.status=='200') {
-                let url = resPay.data.RedirectUrl;
-                window.location.replace(url);
+          console.log('聚合');
+          this.$store.commit('handlePay',{pay_type:'Globepay'});
+          putOrder({
+            id:this.$store.state.pay.id,
+            order_type:this.$store.state.pay.order_type,
+            pay_type:this.$store.state.pay.pay_type
+          }).then(resPay=>{
+            if(resPay.data.status=='302') {
+              this.$store.commit('handlePay',{show:false})
+              this.$store.commit('showTip','您有未支付的订单')
+              if(this.$route.path!='/application') {
+                this.$router.replace({name:'Application'})
               }
-            })
-          } else if(this.useBalance=='1') {
-            console.log('混合');
-            this.$store.commit('handlePay',{method:false,pay_type:'mix'})
-          } 
+              this.$router.push({name:'OutputOrderlist'})
+            } else if(resPay.data.status=='200') {
+              let url = resPay.data.RedirectUrl;
+              window.location.replace(url);
+            }
+          })
+        } else if(this.paymethod=='2') {
+          console.log('混合');
+          this.$store.commit('handlePay',{method:false,pay_type:'mix'})
+        } else {
+          this.$store.commit('showTip','请选择支付方式')
         }
       }
     },

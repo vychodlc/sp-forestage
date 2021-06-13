@@ -58,7 +58,7 @@
                 @click="$store.commit('showImg',[i,true])"
                 :key="index2" :src="i" alt="">
               </td>
-              <td>{{item.price}}</td>
+              <td>{{parseFloat(item.price/100).toFixed(2)}}</td>
               <td>
                 <span v-if="item.pay_type=='balance'">余额</span>
                 <span v-else>聚合</span>
@@ -95,7 +95,7 @@
       </div>
       <div v-if="tableData.length==0" style="font-size:20px;line-height:642px;text-align:center;width:100vw">查询无果</div>
     </div>
-    <div class="tableFooter" v-if="pageNum>1">
+    <div class="tableFooter" v-if="pageNum>0">
       <div class="pageIndex" @click="changePage(-1)" :style="{'color':(currentIndex==1)?'#aaa':'var(--color-all)'}">◂</div>
       <div class="pageIndex" v-for="(item,index) in pageNum" :key="index"
         @click="changePage(item)"
@@ -222,17 +222,21 @@
         }).then(res=>{
           if(res.data.status=='302') {
             this.pay302 = res.data;
-            this.showChangePay = true;
-            this.$store.commit('handlePay',{price:res.data.price,order_type:res.data.order_type,id:res.data.order_id});
             getBalance().then(res=>{
               this.$store.commit('handleUser',{balance:res.data.balance})
+              if(this.pay302.order_id==item.outbound_ID) {
+                this.showChangePay = false;
+                this.$store.commit('handlePay',{show:true,method:true,id:this.pay302.order_id,order_type:this.pay302.order_type,price:this.pay302.price});
+              } else {
+                this.showChangePay = true;
+                this.$store.commit('handlePay',{price:res.data.price,order_type:res.data.order_type,id:res.data.order_id});
+              }
               this.$store.commit('showLoading',false);
-              console.log(this.$store.state);
             })
           } else if(res.data.status=='200') {
-            this.$store.commit('handlePay',{price:item.price,order_type:'o',id:item.outbound_ID,show:true,method:true});
             getBalance().then(res=>{
               this.$store.commit('handleUser',{balance:res.data.balance})
+              this.$store.commit('handlePay',{price:item.price,order_type:'o',id:item.outbound_ID,show:true,method:true});
               this.$store.commit('showLoading',false);
             })
           }
@@ -240,8 +244,7 @@
       },
       goPay() {
         this.showChangePay = false;
-        console.log(this.pay302);
-        this.$store.commit('handlePay',{show:true,method:true});
+        this.$store.commit('handlePay',{show:true,method:true,id:this.pay302.order_id,order_type:this.pay302.order_type,price:this.pay302.price});
         // if(item.pay_type=="balance") {
         //   this.$store.commit('handlePay',{
         //     order_type:'o',

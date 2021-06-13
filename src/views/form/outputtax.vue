@@ -151,15 +151,22 @@
       <div class="addressbox">
         <div class="text">
           <span class="name">支付方式</span>
-          <!-- <span class="money" style="color:#000;margin-left:10px;font-size:18px">￥3030.22</span> -->
           <div class="method">
-            <input type="radio" v-model="paymethod" value="0" id="0"/><label for="0">余额支付
-              <span>余额：￡{{parseFloat(money/100).toFixed(2)}}</span>
-              <!-- <span id="nomoney">余额不足(${{money}})</span> -->
+            <input type="radio" v-model="paymethod" value="0" id="m1" v-if='parseInt(price)<=parseInt(money)'/>
+            <input type="radio" v-model="paymethod" value="2" id="m1" v-else-if="parseInt(price)>parseInt(money)&&parseInt(money)>0"/>
+            <input type="radio" value="-1" id="m1" v-else disabled/>
+            <label for="m1" v-if='parseInt(price)<=parseInt(money)'>余额支付
+              <span style="color:var(--color-all)">余额:￡{{parseFloat(money/100).toFixed(2)}}</span>
+            </label>
+            <label for="m1" v-else-if="parseInt(price)>parseInt(money)&&parseInt(money)>0">混合支付
+              <span style="color:var(--color-all)">余额:￡{{parseFloat(money/100).toFixed(2)}}</span>
+            </label>
+            <label for="m1" v-else>余额不足
+              <span style="color:red">余额:￡{{parseFloat(money/100).toFixed(2)}}</span>
             </label>
           </div>
           <div class="method">          
-            <!-- <input type="radio" v-model="paymethod" value="1" id="1"/><label for="1">聚合支付</label> -->
+            <input type="radio" v-model="paymethod" value="1" id="method1"/><label for="method1">聚合支付</label>
           </div>
         </div>
       </div>
@@ -213,7 +220,7 @@
 
 <script>
   import {getStorageList,filterStorageList,addOutput,addImg} from '@/network/transship.js'
-  import {putOrder,paymentBalance} from '@/network/payment.js'
+  import {putOrder,paymentBalance,checkPayment} from '@/network/payment.js'
   import {getBalance} from '@/network/user.js'
 
   export default {
@@ -231,7 +238,7 @@
         showDialog: false,
         addrIndex: 0,
         showEdit: false,
-        editform: {name: '某人',phone: '12312312312',address: '按市场库哈斯客户大厦是肯定哈里斯电话啦'},
+        editform: {name: '',phone: '',address: ''},
         uploadList: [],
         materialList: [],
         selectAddr: null,
@@ -331,28 +338,38 @@
                 let info = {
                   order_type: 'o',
                   id: res.data.outbound_id,
+                  pay_type: '',
                 }
                 if(this.paymethod=='0') {
                   console.log('余额');
-                  this.$store.commit('handlePay',{success:false,state:true,show:true});
-                  this.$store.commit('showLoading',false);
-                } else {
+                  getBalance().then(res=>{
+                    this.$store.commit('handleUser',{balance:res.data.balance})
+                    this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'balance'});
+                    this.$store.commit('showLoading',false);
+                  })
+                } else if(this.paymethod=='1'){
                   console.log('聚合');
-                  this.$store.commit('showTip','聚合支付还没做！')
-                  // putOrder(info).then(res=>{
-                  //   let url = res.data.RedirectUrl;
-                  //   window.location.replace(url);
-                  // })
+                  info.pay_type = 'Globepay'
+                  putOrder(info).then(resPay=>{
+                    if(resPay.data.status=='302') {
+                      this.$store.commit('showTip','您有未支付的订单')
+                      if(this.$route.path!='/application') {
+                        this.$router.replace({name:'Application'})
+                      }
+                      this.$router.push({name:'OutputOrderlist'})
+                    } else if(resPay.data.status=='200') {
+                      let url = resPay.data.RedirectUrl;
+                      window.location.replace(url);
+                    }
+                  })
+                } else if(this.paymethod=='2'){
+                  console.log('混合');
+                  getBalance().then(res=>{
+                    this.$store.commit('handleUser',{balance:res.data.balance})
+                    this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'mix'});
+                    this.$store.commit('showLoading',false);
+                  })
                 }
-                // putOrder(info).then(res=>{
-                //   // document.getElementById('payment').src = res.data.RedirectUrl;
-                //   let url = res.data.RedirectUrl;
-                //   window.location.replace(url);
-                // })
-                // document.getElementById('step2').className = 'step step-ed'
-                // document.getElementById('step3').className = 'step step-ing'
-                // document.getElementsByClassName('line')[1].className = 'line line-ed'
-                // this.currentStep+=1
               }
             })
           }
@@ -461,13 +478,19 @@
       this.$bus.$on('paystatus', (info)=>{
         if(info.order_type=='o') {
           if(info.status=='ok') {
-            document.getElementById('step3').className = 'step step-ed'
-            document.getElementById('step4').className = 'step step-ing'
-            document.getElementsByClassName('line')[2].className = 'line line-ed'
-            this.currentStep+=1;
-            this.$store.commit('showTip', '支付成功')
+            if(document.getElementById('step3')&&document.getElementById('step3').className) {
+              this.currentStep=3;
+              document.getElementById('step3').className = 'step step-ed'
+              document.getElementById('step4').className = 'step step-ing'
+              document.getElementsByClassName('line')[2].className = 'line line-ed';
+            }
+            this.$store.commit('showLoading',false);
+            this.$store.commit('showTip', '支付成功');
           } else {
             this.$store.commit('showTip', '支付失败')
+            if(this.$route.path!='/application') {
+              this.$router.replace({name:'Application'})
+            }
             this.$router.push({name:'OutputOrderlist'})
           }
         }

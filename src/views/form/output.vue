@@ -131,11 +131,17 @@
         <div class="text">
           <span class="name">支付方式</span>
           <div class="method">
-            <input type="radio" v-model="paymethod" value="0" id="method0" v-if='price<money'/>
-            <input type="radio" v-model="useBalance" value="1" id="0" v-else disabled/>
-            <label for="method0">余额支付
-              <span>余额:￡{{parseFloat(money/100).toFixed(2)}}</span>
-              <!-- <span id="nomoney" style="font-size:14px">余额不足(￡{{parseFloat(money/100).toFixed(2)}})</span> -->
+            <input type="radio" v-model="paymethod" value="0" id="m1" v-if='parseInt(price)<=parseInt(money)'/>
+            <input type="radio" v-model="paymethod" value="2" id="m1" v-else-if="parseInt(price)>parseInt(money)&&parseInt(money)>0"/>
+            <input type="radio" value="-1" id="m1" v-else disabled/>
+            <label for="m1" v-if='parseInt(price)<=parseInt(money)'>余额支付
+              <span style="color:var(--color-all)">余额:￡{{parseFloat(money/100).toFixed(2)}}</span>
+            </label>
+            <label for="m1" v-else-if="parseInt(price)>parseInt(money)&&parseInt(money)>0">混合支付
+              <span style="color:var(--color-all)">余额:￡{{parseFloat(money/100).toFixed(2)}}</span>
+            </label>
+            <label for="m1" v-else>余额不足
+              <span style="color:red">余额:￡{{parseFloat(money/100).toFixed(2)}}</span>
             </label>
           </div>
           <div class="method">          
@@ -237,7 +243,6 @@
             weight = parseInt(weight/0.5);
             if(weight>59) {
               this.price = 11800;
-              this.price = 2;
             } else {
               this.price = this.$store.state.expressPrice[weight]*100;
             }
@@ -252,6 +257,7 @@
               } else if(this.$store.state.address.list.length>0){
                 this.selectAddr = this.$store.state.address.list[0]
               }
+              this.$store.commit('showLoading',false);
               document.getElementById('step1').className = 'step step-ed'
               document.getElementById('step2').className = 'step step-ing'
               document.getElementsByClassName('line')[0].className = 'line line-ed'
@@ -284,16 +290,14 @@
                 }
                 if(this.paymethod=='0') {
                   console.log('余额');
-                  this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'balance'});
-                  this.$store.commit('showLoading',false);
-                } else {
-                  if(this.price<this.money) {
-                    console.log('聚合');
-                    info.pay_type = 'Globepay'
-                  } else {
-                    console.log('混合');
-                    info.pay_type = 'mix'
-                  }
+                  getBalance().then(res=>{
+                    this.$store.commit('handleUser',{balance:res.data.balance})
+                    this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'balance'});
+                    this.$store.commit('showLoading',false);
+                  })
+                } else if(this.paymethod=='1'){
+                  console.log('聚合');
+                  info.pay_type = 'Globepay'
                   putOrder(info).then(resPay=>{
                     if(resPay.data.status=='302') {
                       this.$store.commit('showTip','您有未支付的订单')
@@ -306,16 +310,14 @@
                       window.location.replace(url);
                     }
                   })
+                } else if(this.paymethod=='2'){
+                  console.log('混合');
+                  getBalance().then(res=>{
+                    this.$store.commit('handleUser',{balance:res.data.balance})
+                    this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'mix'});
+                    this.$store.commit('showLoading',false);
+                  })
                 }
-                // putOrder(info).then(res=>{
-                //   // document.getElementById('payment').src = res.data.RedirectUrl;
-                //   let url = res.data.RedirectUrl;
-                //   window.location.replace(url);
-                // })
-                // document.getElementById('step2').className = 'step step-ed'
-                // document.getElementById('step3').className = 'step step-ing'
-                // document.getElementsByClassName('line')[1].className = 'line line-ed'
-                // this.currentStep+=1
               }
             })
           }

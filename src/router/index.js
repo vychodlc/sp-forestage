@@ -6,6 +6,16 @@ const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location) {
   return originalPush.call(this, location).catch(err => err)
 }
+// const originalPush = VueRouter.prototype.push
+// const originalReplace = VueRouter.prototype.replace
+// VueRouter.prototype.push = function push(location, onResolve, onReject) {
+//     if (onResolve || onReject) return originalPush.call(this, location, onResolve, onReject)
+//     return originalPush.call(this, location).catch(err => err)
+// }
+// VueRouter.prototype.replace = function push(location, onResolve, onReject) {
+//     if (onResolve || onReject) return originalReplace.call(this, location, onResolve, onReject)
+//     return originalReplace.call(this, location).catch(err => err)
+// }
 
 Vue.use(VueRouter)
 
@@ -34,6 +44,7 @@ const routes = [
   { path: '/form/outputtax',name: 'Outputtax',component: () => import('../views/form/outputtax.vue')},
   { path: '/form/purchase',name: 'Purchase',component: () => import('../views/form/purchase.vue')},
   { path: '/form/agency',name: 'Agency',component: () => import('../views/form/agency.vue')},
+  { path: '/form/query',name: 'Query',component: () => import('../views/form/query.vue')},
   
   { path: '/orderlist/transmit',name: 'TransmitOrderlist',component: () => import('../views/orderlist/transmit.vue')},
   { path: '/orderlist/storage',name: 'StorageOrderlist',component: () => import('../views/orderlist/storage.vue')},
