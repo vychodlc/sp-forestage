@@ -67,30 +67,6 @@
       getAddress().then(res=>{
         this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
       })
-
-      
-      document.addEventListener('plusready', function(){
-        var xhr = new plus.net.XMLHttpRequest();
-        let url = "https://www.jdsports.co.uk/gift-cards/5948883129";
-        let sendData = {
-          "cardPin": "S61V",
-        }
-        xhr.onreadystatechange = function () {
-          if(xhr.readyState == 4) {
-            if ( xhr.status == 200 ) {
-              console.log( "xhr请求成功："+xhr.responseText );
-            } else {
-              alert( "xhr请求失败："+xhr.readyState+xhr.status+'----' );
-              console.log( "xhr请求失败："+xhr.readyState+xhr.status );
-            }
-          }
-        }
-        xhr.open("POST", url);
-        xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
-        xhr.setRequestHeader("accept", "*/*");
-        xhr.setRequestHeader("x-requested-with", "XMLHttpRequest");
-        xhr.send("cardPin=S61V");
-      }, false );
     },
     watch: {
       $route(to, from) {
