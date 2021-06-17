@@ -79,15 +79,16 @@
           <tbody>
             <tr v-for="(item,index) in tableData" :key="index">
               <td>
-                <span v-if="item.outbound_status=='0'">待支付
+                <span v-if="item.pay_status==0">待支付
                 <div style="margin-top:5px" @click="handlePay(item)">
                   <span style="background-color:var(--color-all);color:#fff;padding:3px">付款</span>
                 </div></span>
-                <span v-if="item.outbound_status=='1'">待审核</span>
-                <span v-if="item.outbound_status=='2'">已驳回</span>
-                <span v-if="item.outbound_status=='3'">已取消</span>
-                <span v-if="item.outbound_status=='4'">运输中</span>
-                <span v-if="item.outbound_status=='5'">已完成</span>
+                <span v-else-if="item.outbound_status=='0'">待审核</span>
+                <span v-else-if="item.outbound_status=='1'">已取消</span>
+                <span v-else-if="item.outbound_status=='2'">已驳回</span>
+                <span v-else-if="item.outbound_status=='3'">待出库</span>
+                <span v-else-if="item.outbound_status=='4'">转运中</span>
+                <span v-else-if="item.outbound_status=='5'">已完成</span>
               </td>
             </tr>
           </tbody>

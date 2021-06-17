@@ -2,7 +2,7 @@
   <div class="transmit">
     <div class="header">
       <div class="back" @click="$router.go(-1)"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
-      <div class="title" @click="test">{{kind}}出库</div>
+      <div class="title" @click="test">{{kind}}申报</div>
     </div>
     <div class="progress">
       <div class="linebox">
@@ -274,6 +274,7 @@
         })
       },
       checkOrder() {
+        this.$store.commit('showLoading', true);
         let falseList = [];
         let trueList = [];
         this.handleTimes = 0;
@@ -328,14 +329,14 @@
               }).catch(e=>{
                 order.right = false;
                 this.handleTimes++;
-                this.wrongDataNum = this.orders.filter(item=>item.right==false).length;
+                this.wrongDataNum = this.orders.filter(item=>{return item.right==false}).length;
                 
-                if(this.handleTimes==this.orders.length) {
+                if(this.handleTimes==falseList.length) {
                   this.$store.commit('showLoading', false);
                   document.getElementById('step1').className = 'step step-ed'
                   document.getElementById('step2').className = 'step step-ing'
                   document.getElementsByClassName('line')[0].className = 'line line-ed'
-                  if(this.orders.filter(item=>item.right==true).length==this.orders.length) {
+                  if(falseList.length==0) {
                     this.wrongDataStatus = false
                     console.log('all ok');
                   }
@@ -350,14 +351,14 @@
             ]).then(this.$axios.spread((res1,res2)=>{
               order.right = true;
               this.handleTimes++;
-              this.wrongDataNum = this.orders.filter(item=>item.right==false).length;
-              if(this.handleTimes==this.orders.length) {
+              this.wrongDataNum = this.orders.filter(item=>{return item.right==false}).length;
+              if(this.handleTimes==falseList.length) {
                 this.$store.commit('showLoading', false);
                 document.getElementById('step1').className = 'step step-ed'
                 document.getElementById('step2').className = 'step step-ing'
                 document.getElementsByClassName('line')[0].className = 'line line-ed'
-                if(this.orders.filter(item=>item.right==true).length==this.orders.length) {
-                  this.wrongDataStatus = false
+                if(falseList.length==0) {
+                  this.wrongDataStatus = false;
                   console.log('all ok');
                 }
                 if(this.currentStep==1) {
@@ -440,14 +441,14 @@
             this.$axios.get(url).catch(e=>{
               order.right = false;
               this.handleTimes++;
-              this.wrongDataNum = this.orders.filter(item=>item.right==false).length;
+              this.wrongDataNum = this.orders.filter(item=>{return item.right==false}).length;
               
-              if(this.handleTimes==this.orders.length) {
+              if(this.handleTimes==falseList.length) {
                 this.$store.commit('showLoading', false);
                 document.getElementById('step1').className = 'step step-ed'
                 document.getElementById('step2').className = 'step step-ing'
                 document.getElementsByClassName('line')[0].className = 'line line-ed'
-                if(this.orders.filter(item=>item.right==true).length==this.orders.length) {
+                if(falseList.length==0) {
                   this.wrongDataStatus = false
                   console.log('all ok');
                 }
@@ -459,13 +460,13 @@
               if(res!=undefined) {
                 order.right = true;
                 this.handleTimes++;
-                this.wrongDataNum = this.orders.filter(item=>item.right==false).length;
-                if(this.handleTimes==this.orders.length) {
+                this.wrongDataNum = this.orders.filter(item=>{return item.right==false}).length;
+                if(this.handleTimes==falseList.length) {
                   this.$store.commit('showLoading', false);
                   document.getElementById('step1').className = 'step step-ed'
                   document.getElementById('step2').className = 'step step-ing'
                   document.getElementsByClassName('line')[0].className = 'line line-ed'
-                  if(this.orders.filter(item=>item.right==true).length==this.orders.length) {
+                  if(falseList.length==0) {
                     this.wrongDataStatus = false
                     console.log('all ok');
                   }
@@ -544,14 +545,14 @@
             this.$axios.get(url).catch(e=>{
               order.right = false;
               this.handleTimes++;
-              this.wrongDataNum = this.orders.filter(item=>item.right==false).length;
+              this.wrongDataNum = this.orders.filter(item=>{return item.right==false}).length;
               
-              if(this.handleTimes==this.orders.length) {
+              if(this.handleTimes==falseList.length) {
                 this.$store.commit('showLoading', false);
                 document.getElementById('step1').className = 'step step-ed'
                 document.getElementById('step2').className = 'step step-ing'
                 document.getElementsByClassName('line')[0].className = 'line line-ed'
-                if(this.orders.filter(item=>item.right==true).length==this.orders.length) {
+                if(falseList.length==0) {
                   this.wrongDataStatus = false
                   console.log('all ok');
                 }
@@ -563,13 +564,13 @@
               if(res!=undefined) {
                 order.right = true;
                 this.handleTimes++;
-                this.wrongDataNum = this.orders.filter(item=>item.right==false).length;
-                if(this.handleTimes==this.orders.length) {
+                this.wrongDataNum = this.orders.filter(item=>{return item.right==false}).length;
+                if(this.handleTimes==falseList.length) {
                   this.$store.commit('showLoading', false);
                   document.getElementById('step1').className = 'step step-ed'
                   document.getElementById('step2').className = 'step step-ing'
                   document.getElementsByClassName('line')[0].className = 'line line-ed'
-                  if(this.orders.filter(item=>item.right==true).length==this.orders.length) {
+                  if(falseList.length==0) {
                     this.wrongDataStatus = false
                     console.log('all ok');
                   }

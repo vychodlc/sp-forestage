@@ -396,7 +396,6 @@
       this.pageIndex = 1,
       this.selectList = [],
       this.$store.commit('showLoading', true);
-      console.log(this.$router);
       this._getStorageList();
       
       if(this.$store.state.address.default!=null) {

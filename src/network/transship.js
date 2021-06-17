@@ -55,7 +55,7 @@ export function filterOutputList(filter,value,p) {
 
 export function addOutput(info) {
   let formData = new FormData();
-  formData.append('storage_nums',info.storage_nums.map(item=>('"'+item+'"')).join(','));
+  formData.append('storage_nums',info.storage_nums.join(','));
   formData.append('outbound_type',info.outbound_type);
   formData.append('material',info.material);
   formData.append('address',info.address);
