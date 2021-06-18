@@ -110,7 +110,8 @@
     components: {},
     methods:{
       test() {
-        console.log(this.$store.state)
+        console.log(window.location.href)
+        // window.location.push('http://goback.vychod.top/');
       },
       goAddress() {
         getAddress().then(res=>{
