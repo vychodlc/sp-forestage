@@ -222,6 +222,7 @@
   import {getStorageList,filterStorageList,addOutput,addImg} from '@/network/transship.js'
   import {putOrder,paymentBalance,checkPayment} from '@/network/payment.js'
   import {getBalance} from '@/network/user.js'
+  import {getAddress} from '@/network/address'
 
   export default {
     name: "Transmit",
@@ -459,10 +460,11 @@
       this.selectList = [];
       this.$store.commit('showLoading', true);
       
-      // document.getElementById('payment').contentWindow.location.reload(true);
-      this._getStorageList();
-      // window.open("http://www.baidu.com")
-
+      getAddress().then(res=>{
+        this.$store.commit('handleAddress',{name:'updateList',value:res.data.data});
+        this._getStorageList();
+      })
+    
       if(this.$store.state.address.default!=null) {
         this.selectAddr = this.$store.state.address.default[0];
       } else {
@@ -495,7 +497,7 @@
           }
         }
       })
-    }
+    },
   }
 </script>
 

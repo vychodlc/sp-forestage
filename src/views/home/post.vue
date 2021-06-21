@@ -15,44 +15,50 @@
     <div class="content" style="padding-top:0px">
       <swiper :options="swiperOption1" ref="tabSwiper" style="transform: translateY(-0px);">
         <swiper-slide class="tabSlide">
-          <div class="refreshText" id="refreshText1"></div>
-          <!-- <div class="refreshDiv"></div> -->
-          <div class="post-content" id="content1" @scroll="scrollBottom($event,0)">
-            <div class="banners">
-              <swiper v-if="bannerData.length>0" :options="swiperOption2" ref="bannerSwiper">
-                <swiper-slide v-for="(item,index) in bannerData" :key="index">
-                  <div class="bannerSlide" @click='$router.push({name:"PostDetail",params:{id:item.ID}})'>
-                    <img :src="item.cover_img" alt="">
-                    <span class="bannerTitle">{{item.post_title}}</span>
-                  </div>
-                </swiper-slide>
-                <div class="swiper-pagination" slot="pagination"></div>
-              </swiper>
-            </div>
-            <div class="PostCards">
-              <post-card v-for="(item,index) in postData[0].slice(5)" :key="index" :data="item"></post-card>
-            </div>
-            <div class="loadMore">
-              <div class="tip" v-if="hasMore[0]==false">没有更多啦 ~</div>
-              <div class="tip" v-if="hasMore[0]==true&&loadflag[0]==true">往下滑还有更多资讯哦 ~</div>
-              <div class="tip" v-if="hasMore[0]==true&&loadflag[0]==false"><img style="width:40px;height:40px" src="~/assets/images/load.gif" alt=""> ~</div>
-            </div>
+          <div id="my_scroller0">
+            <scroller :on-infinite="infinite0" :on-refresh="refresh0" ref="my_scroller0">
+              <div class="banners">
+                <swiper v-if="this.postData[0].length>5" :options="swiperOption2" ref="bannerSwiper">
+                  <swiper-slide v-for="(item,index) in this.postData[0].slice(0,5)" :key="index">
+                    <div class="bannerSlide" @click='$router.push({name:"PostDetail",params:{id:item.ID}})'>
+                      <img :src="item.cover_img" alt="">
+                      <span class="bannerTitle">{{item.post_title}}</span>
+                    </div>
+                  </swiper-slide>
+                  <div class="swiper-pagination" slot="pagination"></div>
+                </swiper>
+              </div>
+              <div class="PostCards">
+                <post-card v-for="(item,index0) in postData[0].slice(5)" :key="index0" :data="item"></post-card>
+              </div>
+            </scroller>
           </div>
         </swiper-slide>
-        <swiper-slide class="tabSlide" v-for="(item,index) in 3" :key="index">
-          <div class="refreshText" :id="'refreshText'+(index+2)"></div>
-          <div class="post-content" :id="'content'+(index+2)" @scroll="scrollBottom($event,item)">
+        <swiper-slide class="tabSlide">
+          <scroller :on-infinite="infinite1" :on-refresh="refresh1" ref="my_scroller1">
             <div class="PostCards">
-              <post-card v-for="(item,index1) in postData[item]" :key="index1" :data="item"></post-card>
+              <post-card v-for="(item,index1) in postData[1]" :key="index1" :data="item"></post-card>
             </div>
-            <div class="loadMore">
-              <div class="tip" v-if="hasMore[item]==false">没有更多啦 ~</div>
-              <div class="tip" v-if="hasMore[item]==true&&loadflag[item]==true">往下滑还有更多资讯哦 ~</div>
-              <div class="tip" v-if="hasMore[item]==true&&loadflag[item]==false"><img style="width:40px;height:40px" src="~/assets/images/load.gif" alt=""> ~</div>
+          </scroller>
+        </swiper-slide>
+        <swiper-slide class="tabSlide">
+          <scroller :on-infinite="infinite2" :on-refresh="refresh2" ref="my_scroller2">
+            <div class="PostCards">
+              <post-card v-for="(item,index1) in postData[2]" :key="index1" :data="item"></post-card>
             </div>
-          </div>
+          </scroller>
+        </swiper-slide>
+        <swiper-slide class="tabSlide">
+          <scroller :on-infinite="infinite3" :on-refresh="refresh3" ref="my_scroller3">
+            <div class="PostCards">
+              <post-card v-for="(item,index1) in postData[3]" :key="index1" :data="item"></post-card>
+            </div>
+          </scroller>
         </swiper-slide>
       </swiper>
+    </div>
+    <div class="backTotop" @click="scrollTotop" v-show="showTotop">
+      <img src="~/assets/images/back-to-top.png" alt="">
     </div>
   </div>
 </template>
@@ -101,9 +107,22 @@
         hasMore: [false,false,false,false],
         loadflag: [false,false,false,false],
         _refreshText: [],
+        isRefresh: false,
+
+        totop: [0,0,0,0],
+        showTotop: false,
+        listenTotop: null,
       }
     },
     methods:{
+      refresh0(){this.isRefresh=true;this.postData[0]=[];this.currentPage[0]=1;this._getPostList(0)},
+      refresh1(){this.isRefresh=true;this.postData[1]=[];this.currentPage[1]=1;this._getPostList(1)},
+      refresh2(){this.isRefresh=true;this.postData[2]=[];this.currentPage[2]=1;this._getPostList(2)},
+      refresh3(){this.isRefresh=true;this.postData[3]=[];this.currentPage[3]=1;this._getPostList(3)},
+      infinite0(){if(this.hasMore[0]==true){this._getPostList(0)}else{this.$refs.my_scroller0.finishInfinite(true)}},
+      infinite1(){if(this.hasMore[1]==true){this._getPostList(1)}else{this.$refs.my_scroller1.finishInfinite(true)}},
+      infinite2(){if(this.hasMore[2]==true){this._getPostList(2)}else{this.$refs.my_scroller2.finishInfinite(true)}},
+      infinite3(){if(this.hasMore[3]==true){this._getPostList(3)}else{this.$refs.my_scroller3.finishInfinite(true)}},
       changeTab(tabIndex) {
         this.currentTab = tabIndex;
         this.tabSwiper.slideTo(tabIndex,300,false)
@@ -115,6 +134,7 @@
               this.currentPage[index]+=1;
               let data = res.data.data;
               this.hasMore[index] = res.data.more;
+              this.$refs.my_scroller0.finishInfinite(!res.data.more)
               for(let item of data) {
                 this.postData[index].push(item)
               }
@@ -122,12 +142,9 @@
               this.$store.commit('showTip', res.data.msg)
             }
             this.loadflag[index] = false;
-            if(this.currentPage[index]==2) {
-              this._getPostList(0);
-              this.bannerData = this.postData[index].slice(0,5)
-            }
-            if(this._refreshText[index] &&this._refreshText[index].innerText) {
-              this._refreshText[index].innerText = '';
+            if(this.isRefresh==true) {
+              this.isRefresh = false;
+              this.$refs.my_scroller0.finishPullToRefresh()
             }
           })
         }else{
@@ -137,30 +154,30 @@
               this.currentPage[index]+=1;
               let data = res.data.data;
               this.hasMore[index] = res.data.more;
+              if(index==1){this.$refs.my_scroller1.finishInfinite(!res.data.more)}
+              if(index==2){this.$refs.my_scroller2.finishInfinite(!res.data.more)}
+              if(index==3){this.$refs.my_scroller3.finishInfinite(!res.data.more)}
               for(let item of data) {
                 this.postData[index].push(item)
-              }
-              if(this._refreshText[index] &&this._refreshText[index].innerText) {
-                this._refreshText[index].innerText = '';
               }
             }else{
               this.$store.commit('showTip', res.data.msg)
             }
             this.loadflag[index] = false;
+            if(this.isRefresh==true) {
+              this.isRefresh = false;
+              if(index==1){this.$refs.my_scroller1.finishPullToRefresh()}
+              if(index==2){this.$refs.my_scroller2.finishPullToRefresh()}
+              if(index==3){this.$refs.my_scroller3.finishPullToRefresh()}
+            }
           })          
         }
       },
-      scrollBottom(e,index) {
-        let Scroll = e.target
-        // 网页可见区域高：document.body.clientHeight
-        // 网页正文全文高：document.body.scrollHeight
-        let scrollHeight = Scroll.scrollHeight - Scroll.clientHeight
-        // self.scrollTop = Scroll.scrollTop
-        if (scrollHeight - Scroll.scrollTop < 20 && !this.loadflag[index] && this.hasMore[index]) {
-          // console.log(index+'到底部了')
-          this.loadflag[index] = true;
-          this._getPostList(index);
-        }
+      scrollTotop() {
+        if(this.currentTab==0){this.$refs.my_scroller0.scrollTo(0,0,100)}
+        if(this.currentTab==1){this.$refs.my_scroller1.scrollTo(0,0,100)}
+        if(this.currentTab==2){this.$refs.my_scroller2.scrollTo(0,0,100)}
+        if(this.currentTab==3){this.$refs.my_scroller3.scrollTo(0,0,100)}
       }
     },
     computed: {
@@ -181,51 +198,21 @@
       })
     },
     mounted() {
-      var _element = [ 
-        document.getElementById('content1'),
-        document.getElementById('content2'),
-        document.getElementById('content3'),
-        document.getElementById('content4')
-      ];
-      this._refreshText = [
-        document.getElementById('refreshText1'),
-        document.getElementById('refreshText2'),
-        document.getElementById('refreshText3'),
-        document.getElementById('refreshText4'),
-      ];
-      var _startPos = [0,0,0,0];
-      var _transitionHeight = [0,0,0,0];
-
-      for(let i=0;i<4;i++) {
-        _element[i].addEventListener('touchstart', e=>{
-          _startPos[i] = e.touches[0].pageY;
-          _element[i].style.position = 'relative';
-          _element[i].style.transition = 'transform 0s';
-        }, false);
-
-        _element[i].addEventListener('touchmove', e=>{
-          _transitionHeight[i] = e.touches[0].pageY - _startPos[i];
-          if (_transitionHeight[i] > 0 && _transitionHeight[i] < 30) { 
-            this._refreshText[i].innerText = '下拉刷新'; 
-            _element[i].style.transform = 'translateY('+_transitionHeight[i]+'px)';
-            if (_transitionHeight[i] > 20) {
-              this._refreshText[i].innerText = '释放更新';
-            } else {
-            }
-          }                
-        }, false);
-
-        _element[i].addEventListener('touchend', e=>{
-          if(this._refreshText[i].innerText == '释放更新') {
-            _element[i].style.transition = 'transform 0.5s ease 1s';
-            _element[i].style.transform = 'translateY(0px)';
-            this._refreshText[i].innerText = '更新中...';
-            this.currentPage[i] = 1;
-            this.$set(this.postData,i,[])
-            this._getPostList(i);
-          }
-        }, false);
-      }
+      
+    },
+    activated() {
+      this.listenTotop = setInterval(()=>{
+        let top;
+        if(this.currentTab==0){top = this.$refs.my_scroller0.getPosition().top}
+        if(this.currentTab==1){top = this.$refs.my_scroller1.getPosition().top}
+        if(this.currentTab==2){top = this.$refs.my_scroller2.getPosition().top}
+        if(this.currentTab==3){top = this.$refs.my_scroller3.getPosition().top}
+        this.showTotop = top>200?true:false;
+      },500)
+    },
+    deactivated() {
+      window.clearInterval(this.listenTotop);
+      this.listenTotop = null;
     }
   }
 </script>
@@ -357,5 +344,20 @@
     top: 0;
     transform: translateY(-20px);
     background-color: #f0f;
+  }
+
+  .backTotop {
+    position: fixed;
+    right: 10px;
+    bottom: 80px;
+    width: 40px;
+    height: 40px;
+    z-index: 4000;
+    background-color: #fff;
+    border-radius: 50%;
+  }
+  .backTotop img {
+    width: 100%;
+    height: 100%;
   }
 </style>

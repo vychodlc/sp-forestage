@@ -654,7 +654,7 @@
       document.getElementsByClassName('line')[0].className = 'line line-not'
       document.getElementsByClassName('line')[1].className = 'line line-not'
       this.currentStep=1;
-    }
+    },
   }
 </script>
 

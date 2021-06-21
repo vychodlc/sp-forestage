@@ -248,7 +248,9 @@ xxxx xxxx xxxx
           addAgency(this.newItem).then(res=>{
             if(res.data.status=='200') {
               this.dialogAddVisible = false;
-              this.$router.push({name:'Application'});
+              if(this.$route.path!='/application') {
+                this.$router.replace({name:'Application'})
+              }
               this.$router.push({name:'AgencyOrderlist'});
             }
           })

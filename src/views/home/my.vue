@@ -122,6 +122,11 @@
       logOut() {
         this.$store.commit('rmToken');
         this.$router.replace('/login')
+      },
+      
+      scrollTotop() {
+        console.log(123);
+        window.scrollTo(0,0)
       }
     },
     activated() {
@@ -290,5 +295,22 @@
     border-bottom: 1px solid #666;
     color: #666;
     padding: 2px;
+  }
+
+
+  
+  .backTotop {
+    position: fixed;
+    right: 10px;
+    bottom: 80px;
+    width: 40px;
+    height: 40px;
+    z-index: 4000;
+    background-color: #fff;
+    border-radius: 50%;
+  }
+  .backTotop img {
+    width: 100%;
+    height: 100%;
   }
 </style>

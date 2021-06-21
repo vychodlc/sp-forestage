@@ -201,6 +201,7 @@
   import {getStorageList,filterStorageList,addOutput} from '@/network/transship.js'
   import {putOrder,paymentBalance,checkPayment} from '@/network/payment.js'
   import {getBalance} from '@/network/user.js'
+  import {getAddress} from '@/network/address'
 
   export default {
     name: "Transmit",
@@ -396,7 +397,12 @@
       this.pageIndex = 1,
       this.selectList = [],
       this.$store.commit('showLoading', true);
-      this._getStorageList();
+
+      
+      getAddress().then(res=>{
+        this.$store.commit('handleAddress',{name:'updateList',value:res.data.data});
+        this._getStorageList();
+      })
       
       if(this.$store.state.address.default!=null) {
         this.selectAddr = this.$store.state.address.default[0];

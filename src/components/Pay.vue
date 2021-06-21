@@ -73,13 +73,11 @@
       payYes() {
         if(this.pwd=='123456') {
           this.$store.commit('showLoading',true);
-          console.log(this.$store.state.pay.pay_type);
           putOrder({
             id:this.$store.state.pay.id,
             order_type:this.$store.state.pay.order_type,
             pay_type:this.$store.state.pay.pay_type
           }).then(resPay=>{
-            console.log(resPay);
             if(resPay.data.status=='302') {
               this.$store.commit('handlePay',{show:false})
               this.$store.commit('showTip','您有未支付的订单')
