@@ -7,7 +7,7 @@
     <div class="formbox">
       <div class="formItem">
         <div class="name">商品链接</div>
-        <input type="text" id="storage_link" v-model="newItem.storage_link">
+        <input @input="priceOk=false" type="text" id="storage_link" v-model="newItem.storage_link">
       </div>
       <div class="formItem">
         <div class="name">尺码</div>
@@ -64,7 +64,7 @@
             <div :class="newItem.discount_type=='2'?'radioItemActive':'radioItem'" @click="changeRadio('discount_type',2)">单次码</div>
             <div :class="newItem.discount_type=='3'?'radioItemActive':'radioItem'" @click="changeRadio('discount_type',3)">复用码</div>
             <div v-if="['2','3'].indexOf(newItem.discount_type)!=-1">            
-              <input type="text" v-model="newItem.discount_code" style="border: 1px solid #ccc;margin-top:5px;font-size:12px;padding:5px 10px" :placeholder="newItem.discount_type=='2'?'输入单次码，用逗号隔开':'输入复用码'">
+              <input @input="priceOk=false" type="text" v-model="newItem.discount_code" style="border: 1px solid #ccc;margin-top:5px;font-size:12px;padding:5px 10px" :placeholder="newItem.discount_type=='2'?'输入单次码，用逗号隔开':'输入复用码'">
             </div>
           </div>
         </div>
@@ -81,14 +81,18 @@
       </div>
       <div class="formItem">
         <div class="name">单数</div>
-        <input type="text" id="order_num" v-model="newItem.order_num"></div>
+        <input @input="priceOk=false" type="text" id="order_num" v-model="newItem.order_num"></div>
       <div class="formItem">
         <div class="name">时限</div>
-        <input type="text" id="interval" v-model="newItem.interval"></div>
+        <input @input="priceOk=false" type="text" id="interval" v-model="newItem.interval"></div>
+      <div class="formItem" v-if="priceOk==true">
+        <div class="name">价钱</div>
+        <input @input="priceOk=false" disabled type="text" id="price" v-model="newItem.price"></div>
     </div>
     <div class="footer">
       <div class="btnbox">
-        <div class="btn" @click="submit()">下一步</div>
+        <div class="btn" v-if="priceOk==false" @click="submit()">生成价格</div>
+        <div class="btn" v-else @click="submit()">下一步</div>
       </div>
     </div>
 
@@ -113,7 +117,7 @@ xxxx xxxx xxxx
 </template>
 
 <script>
-  import { addAgency } from '@/network/agency.js'
+  import { addAgency,getOption } from '@/network/agency.js'
   export default {
     name: "Agency",
     data () {
@@ -124,20 +128,14 @@ xxxx xxxx xxxx
           user_email: '1@1.com',
           user_id: '',
           brand: '',
-          storage_link: 'www.baidu.com',
-          price: '123',
+          storage_link: '',
+          price: '0',
           size: [],
           account_type: '0',
           discount_type: '0',
           discount_code: '',
           giftcard_type: '0',
-          giftcards: [
-            {'card_num':123,'pin':213,'brand':'Nike','right':true},
-            {'card_num':123,'pin':213,'brand':'Nike','right':true},
-            {'card_num':123,'pin':213,'brand':'Nike','right':false},
-            {'card_num':123,'pin':213,'brand':'Nike','right':false},
-            {'card_num':123,'pin':213,'brand':'Nike','right':true},
-          ],
+          giftcards: [],
           order_num: '',
           interval: '',
         },
@@ -153,7 +151,8 @@ xxxx xxxx xxxx
         wrongOrders: [],
         handleTimes: 0,
 
-        okOrders: []
+        options: null,
+        priceOk: false,      
       }
     },
     methods:{
@@ -172,6 +171,7 @@ xxxx xxxx xxxx
           this.newItem.size.splice(this.newItem.size.findIndex(e=>e==item),1)
         }
         this.newItem.size.sort();
+        this.priceOk = false;
       },
       checkAll() {
         this.checkall = !this.checkall;
@@ -186,6 +186,7 @@ xxxx xxxx xxxx
           })
           this.newItem.size = []
         }
+        this.priceOk = false;
         // if(this.checkall==true) {
         //   this.newItem.size = this.sizeList
         // } else {
@@ -223,8 +224,11 @@ xxxx xxxx xxxx
         this.newItem.giftcards.splice(index,1);
       },
       submit() {
+        this.newItem.brand = this.brand;
         if(this.newItem.storage_link=='') {
           this.$store.commit('showTip','请填写商品链接')
+        } else if(this.newItem.brand=='N'&&this.newItem.storage_link.indexOf('www.nike.com/gb')==-1) {
+          this.$store.commit('showTip','请填写Nike(GB)的商品链接')
         } else if(this.newItem.size.length==0) {
           this.$store.commit('showTip','请选择尺寸')
         } else if(this.newItem.giftcard_type=='') {
@@ -244,22 +248,48 @@ xxxx xxxx xxxx
         } else if(this.newItem.interval=='') {
           this.$store.commit('showTip','请选择代购时限')
         } else {
-          this.newItem.brand = this.brand;
-          addAgency(this.newItem).then(res=>{
-            if(res.data.status=='200') {
-              this.dialogAddVisible = false;
-              if(this.$route.path!='/application') {
-                this.$router.replace({name:'Application'})
+          if(this.priceOk==false) {
+            this.$axios({
+              method: 'get',
+              url: this.newItem.storage_link,
+            }).then(res=>{
+              let index = res.data.indexOf('currentPrice')
+              let price = res.data.slice(index,index+20).split(':')[1].split(',')[0]
+              price = parseFloat(price)
+              this.options = {}
+              getOption().then(res=>{
+                res.data.data.map(opt=>{
+                  this.options[opt.option] = parseFloat(opt.value)
+                })
+                let totalPrice = parseFloat((this.newItem.account_type==2?this.options.account_birthday:0)
+                + (this.newItem.account_type==1?this.options.account_common:0)
+                + (this.newItem.discount_type==1?this.options.discount:0)
+                + (price * this.options.k)
+                + (this.newItem.giftcard_type==1?price*this.options.giftcard:0))
+                this.newItem.price = parseFloat(totalPrice*parseInt(this.newItem.order_num)).toFixed(2)
+                console.log(this.newItem.price);
+                this.priceOk = true;
+              })
+            }).catch(e=>{
+              this.$store.commit('showTip','获取商品价格失败')
+            })
+          } else {
+            addAgency(this.newItem).then(res=>{
+              if(res.data.status=='200') {
+                this.dialogAddVisible = false;
+                if(this.$route.path!='/application') {
+                  this.$router.replace({name:'Application'})
+                }
+                this.$router.push({name:'AgencyOrderlist'});
               }
-              this.$router.push({name:'AgencyOrderlist'});
-            }
-          })
-          
+            })
+          }          
         }
       }
       
     },
     activated() {
+      console.log(23)
       this.kind = this.$route.params.name?this.$route.params.name:'Nike';
       switch(this.kind){
         case 'Nike':
@@ -276,24 +306,22 @@ xxxx xxxx xxxx
           break;
       };
       
+      this.sizeList.map(size=>{
+        document.getElementById('size-'+size).className = 'checkboxContent';
+      })
+
       this.newItem = {
         user_email: '1@1.com',
         user_id: '',
         brand: '',
-        storage_link: 'www.baidu.com',
-        price: '123',
+        storage_link: '',
+        price: '0',
         size: [],
         account_type: '0',
         discount_type: '0',
         discount_code: '',
         giftcard_type: '0',
-        giftcards: [
-          {'card_num':123,'pin':213,'brand':'Nike','right':true},
-          {'card_num':123,'pin':213,'brand':'Nike','right':true},
-          {'card_num':123,'pin':213,'brand':'Nike','right':false},
-          {'card_num':123,'pin':213,'brand':'Nike','right':false},
-          {'card_num':123,'pin':213,'brand':'Nike','right':true},
-        ],
+        giftcards: [],
         order_num: '',
         interval: '',
       }

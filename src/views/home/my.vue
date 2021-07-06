@@ -27,7 +27,7 @@
             <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
             <div class="btnName"><span>充值</span></div>
           </div>
-          <div class="btn">
+          <div class="btn" @click="$router.push({name:'Withdrawl'})">
             <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
             <div class="btnName"><span>提现</span></div>
           </div>
@@ -127,6 +127,9 @@
       scrollTotop() {
         console.log(123);
         window.scrollTo(0,0)
+      },
+      goWithdrawl() {
+
       }
     },
     activated() {

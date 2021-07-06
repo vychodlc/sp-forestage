@@ -148,7 +148,7 @@
           <span class="money" style="color:#000;margin-left:10px;font-size:18px">￡{{parseFloat(price/100).toFixed(2)}}</span>
         </div>
       </div>
-      <div class="addressbox">
+      <!-- <div class="addressbox">
         <div class="text">
           <span class="name">支付方式</span>
           <div class="method">
@@ -169,7 +169,7 @@
             <input type="radio" v-model="paymethod" value="1" id="method1"/><label for="method1">聚合支付</label>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
     <div class="formbox" v-show="currentStep==4">
       <div class="resultBox">
@@ -281,12 +281,15 @@
             let imgNum = this.uploadList.length;
             while(this.uploadList!=0) {
               let file = this.uploadList.pop();
+              console.log(file.type)
               let fileName = new Date().getTime() + '-' +file.name;
               let uploadFile = new File([file], fileName, {type: file.type});
               addImg(uploadFile).then(res=>{
+                console.log(res);
+                imgNum-=1;
                 if(res.data.status=='201') {
                   this.materialList.push(res.data.img_url)
-                  if(this.materialList.length==imgNum) {
+                  if(imgNum==0) {
                     let weight = 0;
                     this.selectList.map(item=>weight+=parseFloat(item.weight));
                     weight = parseInt(weight/0.5);
@@ -318,9 +321,9 @@
             }
           }
         } else if(this.currentStep==3&&direction==0){
-          document.getElementById('step1').className = 'step step-ing'
-          document.getElementById('step2').className = 'step step-not'
-          document.getElementsByClassName('line')[0].className = 'line line-not'
+          document.getElementById('step2').className = 'step step-ing'
+          document.getElementById('step3').className = 'step step-not'
+          document.getElementsByClassName('line')[1].className = 'line line-not'
           this.currentStep-=1
         } else if(this.currentStep==3&&direction==1){
           if(this.selectAddr==null) {
@@ -335,42 +338,47 @@
               price: this.price,
             }).then(res=>{
               if(res.data.status=='200') {
-                this.$store.commit('handlePay',{order_type:'o',price:this.price,id:res.data.outbound_id});
-                let info = {
-                  order_type: 'o',
-                  id: res.data.outbound_id,
-                  pay_type: '',
-                }
-                if(this.paymethod=='0') {
-                  console.log('余额');
-                  getBalance().then(res=>{
-                    this.$store.commit('handleUser',{balance:res.data.balance})
-                    this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'balance'});
-                    this.$store.commit('showLoading',false);
-                  })
-                } else if(this.paymethod=='1'){
-                  console.log('聚合');
-                  info.pay_type = 'Globepay'
-                  putOrder(info).then(resPay=>{
-                    if(resPay.data.status=='302') {
-                      this.$store.commit('showTip','您有未支付的订单')
-                      if(this.$route.path!='/application') {
-                        this.$router.replace({name:'Application'})
-                      }
-                      this.$router.push({name:'OutputOrderlist'})
-                    } else if(resPay.data.status=='200') {
-                      let url = resPay.data.RedirectUrl;
-                      window.location.replace(url);
-                    }
-                  })
-                } else if(this.paymethod=='2'){
-                  console.log('混合');
-                  getBalance().then(res=>{
-                    this.$store.commit('handleUser',{balance:res.data.balance})
-                    this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'mix'});
-                    this.$store.commit('showLoading',false);
-                  })
-                }
+                this.currentStep+=1;
+                document.getElementById('step3').className = 'step step-ed'
+                document.getElementById('step4').className = 'step step-ing'
+                document.getElementsByClassName('line')[2].className = 'line line-ed';
+                this.$store.commit('showLoading',false);
+                // this.$store.commit('handlePay',{order_type:'o',price:this.price,id:res.data.outbound_id});
+                // let info = {
+                //   order_type: 'o',
+                //   id: res.data.outbound_id,
+                //   pay_type: '',
+                // }
+                // if(this.paymethod=='0') {
+                //   console.log('余额');
+                //   getBalance().then(res=>{
+                //     this.$store.commit('handleUser',{balance:res.data.balance})
+                //     this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'balance'});
+                //     this.$store.commit('showLoading',false);
+                //   })
+                // } else if(this.paymethod=='1'){
+                //   console.log('聚合');
+                //   info.pay_type = 'Globepay'
+                //   putOrder(info).then(resPay=>{
+                //     if(resPay.data.status=='302') {
+                //       this.$store.commit('showTip','您有未支付的订单')
+                //       if(this.$route.path!='/application') {
+                //         this.$router.replace({name:'Application'})
+                //       }
+                //       this.$router.push({name:'OutputOrderlist'})
+                //     } else if(resPay.data.status=='200') {
+                //       let url = resPay.data.RedirectUrl;
+                //       window.location.replace(url);
+                //     }
+                //   })
+                // } else if(this.paymethod=='2'){
+                //   console.log('混合');
+                //   getBalance().then(res=>{
+                //     this.$store.commit('handleUser',{balance:res.data.balance})
+                //     this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'mix'});
+                //     this.$store.commit('showLoading',false);
+                //   })
+                // }
               }
             })
           }
@@ -382,9 +390,7 @@
         } else if(this.currentStep==4&&direction==1){
           document.getElementById('step3').className = 'step step-ed';
           document.getElementsByClassName('footer')[0].style.display = 'none';
-          setTimeout(() => {
-            this.$router.go(-1);
-          }, 1000);
+          this.$router.go(-1);
         }
       },
       _getStorageList() {

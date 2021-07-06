@@ -127,7 +127,7 @@
           <span class="money" style="color:#000;margin-left:10px;font-size:18px">￡{{parseFloat(price/100).toFixed(2)}}</span>
         </div>
       </div>
-      <div class="addressbox">
+      <!-- <div class="addressbox">
         <div class="text">
           <span class="name">支付方式</span>
           <div class="method">
@@ -148,7 +148,7 @@
             <input type="radio" v-model="paymethod" value="1" id="method1"/><label for="method1">聚合支付</label>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
     <div class="formbox" v-show="currentStep==3">
       <div class="resultBox">
@@ -282,43 +282,48 @@
               address:this.selectAddr.addr,
               price: this.price,
             }).then(res=>{
-              if(res.data.status=='200') {
-                this.$store.commit('handlePay',{order_type:'o',price:this.price,id:res.data.outbound_id});
-                let info = {
-                  order_type: 'o',
-                  id: res.data.outbound_id,
-                  pay_type: '',
-                }
-                if(this.paymethod=='0') {
-                  console.log('余额');
-                  getBalance().then(res=>{
-                    this.$store.commit('handleUser',{balance:res.data.balance})
-                    this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'balance'});
-                    this.$store.commit('showLoading',false);
-                  })
-                } else if(this.paymethod=='1'){
-                  console.log('聚合');
-                  info.pay_type = 'Globepay'
-                  putOrder(info).then(resPay=>{
-                    if(resPay.data.status=='302') {
-                      this.$store.commit('showTip','您有未支付的订单')
-                      if(this.$route.path!='/application') {
-                        this.$router.replace({name:'Application'})
-                      }
-                      this.$router.push({name:'OutputOrderlist'})
-                    } else if(resPay.data.status=='200') {
-                      let url = resPay.data.RedirectUrl;
-                      window.location.replace(url);
-                    }
-                  })
-                } else if(this.paymethod=='2'){
-                  console.log('混合');
-                  getBalance().then(res=>{
-                    this.$store.commit('handleUser',{balance:res.data.balance})
-                    this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'mix'});
-                    this.$store.commit('showLoading',false);
-                  })
-                }
+              if(res.data.status=='200') {                
+                this.currentStep=3;
+                document.getElementById('step2').className = 'step step-ed'
+                document.getElementById('step3').className = 'step step-ing'
+                document.getElementsByClassName('line')[1].className = 'line line-ed';
+                this.$store.commit('showLoading',false);
+                // this.$store.commit('handlePay',{order_type:'o',price:this.price,id:res.data.outbound_id});
+                // let info = {
+                //   order_type: 'o',
+                //   id: res.data.outbound_id,
+                //   pay_type: '',
+                // }
+                // if(this.paymethod=='0') {
+                //   console.log('余额');
+                //   getBalance().then(res=>{
+                //     this.$store.commit('handleUser',{balance:res.data.balance})
+                //     this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'balance'});
+                //     this.$store.commit('showLoading',false);
+                //   })
+                // } else if(this.paymethod=='1'){
+                //   console.log('聚合');
+                //   info.pay_type = 'Globepay'
+                //   putOrder(info).then(resPay=>{
+                //     if(resPay.data.status=='302') {
+                //       this.$store.commit('showTip','您有未支付的订单')
+                //       if(this.$route.path!='/application') {
+                //         this.$router.replace({name:'Application'})
+                //       }
+                //       this.$router.push({name:'OutputOrderlist'})
+                //     } else if(resPay.data.status=='200') {
+                //       let url = resPay.data.RedirectUrl;
+                //       window.location.replace(url);
+                //     }
+                //   })
+                // } else if(this.paymethod=='2'){
+                //   console.log('混合');
+                //   getBalance().then(res=>{
+                //     this.$store.commit('handleUser',{balance:res.data.balance})
+                //     this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'mix'});
+                //     this.$store.commit('showLoading',false);
+                //   })
+                // }
               }
             })
           }
@@ -330,9 +335,7 @@
         } else if(this.currentStep==3&&direction==1){
           document.getElementById('step3').className = 'step step-ed';
           document.getElementsByClassName('footer')[0].style.display = 'none';
-          setTimeout(() => {
-            this.$router.go(-1);
-          }, 1000);
+          this.$router.go(-1);
         }
       },
       _getStorageList() {

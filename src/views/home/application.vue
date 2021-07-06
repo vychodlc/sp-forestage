@@ -61,28 +61,43 @@
       </div>
     </div>
     <div class="formCard">
-      <div class="header" id="header3" @click="hasCard=!hasCard">
+      <div class="header" id="header3">
         <div class="title">银行卡</div>
       </div>
       <div class="options" id="options3">
-        <div class="option" v-if="!hasCard">
-          <div class="optionheader">
+        <div class="option" v-if="cardStatus==0||cardStatus==3">
+          <div class="optionheader" @click="$router.push({name:'Bankcard'})">
             <div class="icon"><img src="~/assets/images/application/biaodan.png" alt=""></div>
             <div class="name">申请/修改资料</div>
           </div>
         </div>
-        <div class="option" v-else>
+        <div class="option" v-if="cardStatus==1">
           <div class="optionheader">
             <div class="icon"><img src="~/assets/images/application/biaodan.png" alt=""></div>
-            <div class="name">充值</div>
+            <div class="name">已有卡(可使用)</div>
+            <div class="name"></div>
           </div>
           <div class="optionheader">
-            <div class="icon"><img src="~/assets/images/application/biaodan.png" alt=""></div>
-            <div class="name">提现</div>
+            <div class="name">{{cardNum}}</div>
           </div>
+        </div>
+        <div class="option" v-if="cardStatus==2">
           <div class="optionheader">
             <div class="icon"><img src="~/assets/images/application/biaodan.png" alt=""></div>
-            <div class="name">记录</div>
+            <div class="name">已有卡(已冻结)</div>
+            <div class="name"></div>
+          </div>
+          <div class="optionheader">
+            <div class="name">{{cardNum}}</div>
+          </div>
+        </div>
+        <div class="option" v-if="cardStatus==3">
+          <div class="optionheader">
+            <div class="icon"><img src="~/assets/images/application/biaodan.png" alt=""></div>
+            <div class="name">审批中</div>
+          </div>
+          <div class="optionheader">
+            <div class="name">已驳回</div>
           </div>
         </div>
       </div>
@@ -91,15 +106,33 @@
 </template>
 
 <script>
+  import { getBankcard } from '@/network/bankcard.js'
   export default {
     name: "Application",
     data () {
       return {
-        hasCard: false,
+        cardStatus: true,
+        cardNum: ''
       }
     },
     methods:{},
     created() {
+      getBankcard().then(res=>{
+        console.log(res);
+        if(res.data.status=='200') {
+          if(res.data.data.bankcard_status==0) {
+            this.cardNum = res.data.data.cardnum;
+            this.cardStatus = 1
+          } else {
+            this.cardNum = res.data.data.cardnum;
+            this.cardStatus = 2
+          }
+        } else if(res.data.status=='501') {
+          if(res.data.msg=='Apply_status error') {
+            this.cardStatus = 3
+          }
+        }
+      })
     }
   }
 </script>

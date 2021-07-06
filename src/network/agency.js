@@ -20,7 +20,7 @@ export function addAgency(info) {
   formData.append('giftcard_type',info.giftcard_type);
   let giftcards = info.giftcards.filter(item=>{return item.right==true||item.right=='true'})
   formData.append('giftcards',JSON.stringify(giftcards));
-  formData.append('price',info.price);
+  formData.append('price',parseInt(info.price*100));
   return request({
     method: 'POST',
     url: '/add_agency.php',
@@ -36,5 +36,11 @@ export function crawlerGiftcard(info) {
       card_num: info.card_num,
       pin: info.pin,
     }
+  })
+}
+
+export function getOption() {
+  return request({
+    url: '/get_options.php',
   })
 }

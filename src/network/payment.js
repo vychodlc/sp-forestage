@@ -54,3 +54,14 @@ export function checkPayment(info) {
     }
   })
 }
+
+export function addWithdrawl(info) {
+  let formData = new FormData()
+  formData.append('amount', info.amount)
+  formData.append('bankcard', info.bankcard)
+  return request({
+    mehtod: 'POST',
+    url: '/add_withdrawl.php',
+    data: formData
+  })
+}

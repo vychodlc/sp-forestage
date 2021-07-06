@@ -79,10 +79,7 @@
           <tbody>
             <tr v-for="(item,index) in tableData" :key="index">
               <td>
-                <span v-if="item.pay_status==0">待支付
-                <div style="margin-top:5px" @click="handlePay(item)">
-                  <span style="background-color:var(--color-all);color:#fff;padding:3px">付款</span>
-                </div></span>
+                <span v-if="item.pay_status==0">待支付</span>
                 <span v-else-if="item.outbound_status=='0'">待审核</span>
                 <span v-else-if="item.outbound_status=='1'">已取消</span>
                 <span v-else-if="item.outbound_status=='2'">已驳回</span>
@@ -158,13 +155,13 @@
       _getOutputList() {
         if(this.isSearch==false) {
           getOutputList(this.currentIndex).then(res=>{
+            console.log(res);
             if(res.data.status=='200') {
               this.tableData = res.data.data;
               this.tableData.map(item=>{
                 item.material = item.material.split(',')
               })
               this.pageNum = Math.ceil(res.data.outbounds_num/10);
-              console.log(this.tableData);
               this.$store.commit('showLoading',false);
             }
           })
@@ -271,9 +268,9 @@
       this.currentIndex = 1;
       this._getOutputList();
       
-      getBalance().then(res=>{
-        console.log(res);
-      })
+      // getBalance().then(res=>{
+      //   console.log(res);
+      // })
 
       this.$bus.$on('paystatus', (info)=>{
         if(info.order_type=='o') {

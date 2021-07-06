@@ -35,6 +35,8 @@ const routes = [
   { path: '/form/outputtax',name: 'Outputtax',component: () => import('../views/form/outputtax.vue')},
   { path: '/form/agency',name: 'Agency',component: () => import('../views/form/agency.vue')},
   { path: '/form/query',name: 'Query',component: () => import('../views/form/query.vue')},
+  { path: '/form/bankcard',name: 'Bankcard',component: () => import('../views/form/bankcard.vue')},
+  { path: '/form/withdrawl',name: 'Withdrawl',component: () => import('../views/form/withdrawl.vue')},
   
   { path: '/orderlist/transmit',name: 'TransmitOrderlist',component: () => import('../views/orderlist/transmit.vue')},
   { path: '/orderlist/storage',name: 'StorageOrderlist',component: () => import('../views/orderlist/storage.vue')},

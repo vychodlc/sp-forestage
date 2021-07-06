@@ -51,7 +51,7 @@
           <tbody>
             <tr v-for="(item,index) in tableData" :key="index">
               <td>{{item.storage_link}}</td>
-              <td>￡{{item.price}}</td>
+              <td>￡{{parseFloat(item.price/100).toFixed(2)}}</td>
               <td>{{item.order_num}}</td>
               <td>{{item.size}}</td>
               <td>
