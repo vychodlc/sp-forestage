@@ -46,6 +46,7 @@ const routes = [
   { path: '/pay',name: 'Pay',component: () => import('../views/pay/index.vue') },
   { path: '/post_detail',name: 'PostDetail',component: () => import('../views/home/post_detail.vue')},
   { path: '/search',name: 'Search',component: () => import('../views/home/search.vue')},
+  { path: '/payment',name: 'Payment',component: () => import('../views/pay/detail.vue') },
 ] 
 
 const router = new VueRouter({

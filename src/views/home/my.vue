@@ -13,7 +13,7 @@
       <div class="card">
         <div class="title">
           <span class="titlespan">钱包管理</span>
-          <div class="more">
+          <div class="more" @click="$router.push({name:'Payment'})">
             <span>交易明细</span>
             <img src="~/assets/images/my/arrow-right.png" alt="">
           </div>
@@ -24,7 +24,7 @@
             <div class="btnName"><span>余额</span></div>
             <div class="btnName" style="margin-top:5px"><span>{{balance}}</span></div>
           </div>
-          <div class="btn">
+          <div class="btn" @click="$router.push({name:'Withdrawl'})">
             <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
             <div class="btnName"><span>提现</span></div>
           </div>

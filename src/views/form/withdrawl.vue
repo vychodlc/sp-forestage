@@ -6,20 +6,17 @@
     </div>
     <div class="formbox" v-if="submitOk==false">
       <div class="formItem">
-        <div class="name">地址</div>
-        <input type="text" id="storage_link" v-model="newItem.addr">
+        <div class="name">余额</div>
+        <input type="text" id="balance" v-model="newItem.balance" disabled>
+        <!-- <span style="font-size:14px">{{parseFloat(newItem.balance/100).toFixed(2)}}</span> -->
       </div>
       <div class="formItem">
-        <div class="name">图片</div>
-        <input type="file" ref="uploadImg" accept="image/*" multiple="multiple" @change="uploadImg" style="display:none">
-        <div class="uploadBtn" @click="$refs.uploadImg.click()">+</div>
-        <div class="uploadList" v-if="$refs.uploadImg">
-          <div v-for="(item,index) in uploadList" :key="index" class="uploadListItem">
-            <!-- <img src="https://img1.baidu.com/it/u=2869661283,3188552792&fm=26&fmt=auto&gp=0.jpg" alt=""> -->
-            <span style="margin-left:20px">{{item.name}}</span>
-            <span style="position:absolute;right:20px" @click="delImg(index)">×</span>
-          </div>
-        </div>
+        <div class="name">提现金额</div>
+        <input type="number" id="amount" v-model="newItem.amount">
+      </div>
+      <div class="formItem">
+        <div class="name">提现卡号</div>
+        <input type="text" id="bankcard" v-model="newItem.bankcard">
       </div>
     </div>
     <div class="formbox" v-else>
@@ -47,8 +44,8 @@
 </template>
 
 <script>
-  import { addAgency } from '@/network/agency.js'
-  import { addBankcardApply } from '@/network/bankcard.js'
+  import { getBalance } from '@/network/user.js'
+  import { getBankcard,getWithdrawlCardnum } from '@/network/bankcard.js'
   import { addWithdrawl } from '@/network/payment.js'
   export default {
     name: "Agency",
@@ -68,13 +65,15 @@
     },
     methods:{
       submit() {
-        console.log(this.newItem);
-        if(this.newItem.addr=='') {
-          this.$store.commit('showTip','请填写地址')
-        } else if(this.newItem.pic.length==0) {
-          this.$store.commit('showTip','请上传图片')
+        if(this.newItem.amount=='') {
+          this.$store.commit('showTip','请填写提现金额')
+        } else if(this.newItem.bankcard=='') {
+          this.$store.commit('showTip','请填写提现卡号')
+        } else if(parseFloat(this.newItem.amount)>parseFloat(this.newItem.balance)) {
+          this.$store.commit('showTip','请输入比余额小的提现金额')
         } else {
           addWithdrawl(this.newItem).then(res=>{
+            console.log(res);
             if(res.data.status=='200') {
               this.submitOk = true;
               this.applyOk = true;
@@ -84,7 +83,6 @@
               this.applyOk = false
             }
           })
-          
         }
       },
       uploadImg(e) {
@@ -99,10 +97,17 @@
       
     },
     activated() {
-      this.newItem = {
-        addr: '',
-        pic: []
-      };
+      this.$store.commit('showLoading',true)
+      getBalance().then(resBalance=>{
+        getWithdrawlCardnum().then(res=>{
+          this.newItem = {
+            balance: parseFloat(resBalance.data.balance/100).toFixed(2),
+            amount: '',
+            bankcard: res.data.data
+          };
+          this.$store.commit('showLoading',false)
+        })
+      })
       this.applyOk = false;
       this.submitOk = false;
       this.uploadList = [];
@@ -167,7 +172,8 @@
     text-align: right;
     color: #999;
   }
-  .formbox .formItem input[type="text"] {
+  .formbox .formItem input[type="text"],
+  .formbox .formItem input[type="number"] {
     font-size: 14px;
     width: calc(100vw - 40px - 80px - 10px);
     background: none;
@@ -212,11 +218,6 @@
     text-align:center;
     margin-bottom:5px;
     font-size: 12px;
-  }
-  .formItem .inputBox #giftcardBox,
-  .formItem .inputBox #discountBox,
-  .formItem .inputBox #accountBox {
-    /* justify-content: space-around; */
   }
 
   .formItem .inputBox .inputContent .radioItem {
@@ -305,23 +306,6 @@
     margin-top: 20px;
     margin-bottom: 10px;
   }
-  .uploadList {
-    max-height: 400px;
-    overflow-y: scroll;
-  }
-  .uploadList .uploadListItem {
-    position: relative;
-    margin-top: 10px;
-    /* width: 100%;
-    height: 60px;
-    border: 1px solid var(--color-all);
-    border-radius: 10px;
-    margin-top: 10px; */
-  }
-  .uploadListItem span {
-    font-size: 16px;
-  }
-
   
   .formbox .resultBox {
     display: flex;

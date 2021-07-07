@@ -16,3 +16,9 @@ export function getBankcard() {
     url: '/get_bankcard.php'
   })
 }
+
+export function getWithdrawlCardnum() {
+  return request({
+    url: '/get_withdraw_cardnum.php'
+  })
+}
