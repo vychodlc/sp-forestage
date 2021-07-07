@@ -6,16 +6,20 @@
     </div>
     <div class="formbox" v-if="submitOk==false">
       <div class="formItem">
-        <div class="name">余额</div>
-        <input type="text" id="balance" v-model="newItem.balance" disabled>
+        <div class="name">地址</div>
+        <input type="text" id="storage_link" v-model="newItem.addr">
       </div>
       <div class="formItem">
-        <div class="name">提现金额</div>
-        <input type="text" id="amount" v-model="newItem.amount">
-      </div>
-      <div class="formItem">
-        <div class="name">提现卡号</div>
-        <input type="text" id="bankcard" v-model="newItem.bankcard">
+        <div class="name">图片</div>
+        <input type="file" ref="uploadImg" accept="image/*" multiple="multiple" @change="uploadImg" style="display:none">
+        <div class="uploadBtn" @click="$refs.uploadImg.click()">+</div>
+        <div class="uploadList" v-if="$refs.uploadImg">
+          <div v-for="(item,index) in uploadList" :key="index" class="uploadListItem">
+            <!-- <img src="https://img1.baidu.com/it/u=2869661283,3188552792&fm=26&fmt=auto&gp=0.jpg" alt=""> -->
+            <span style="margin-left:20px">{{item.name}}</span>
+            <span style="position:absolute;right:20px" @click="delImg(index)">×</span>
+          </div>
+        </div>
       </div>
     </div>
     <div class="formbox" v-else>
@@ -43,8 +47,8 @@
 </template>
 
 <script>
-  import { addAgency } from '@/network/agency.js'
   import { addBankcardApply } from '@/network/bankcard.js'
+  import { addImg } from '@/network/transship.js'
   export default {
     name: "Agency",
     data () {
@@ -52,9 +56,8 @@
         kind: this.$route.params.name?this.$route.params.name:'Nike',
         brand: '',
         newItem: {
-          balance: '',
-          amount: '',
-          bankcard: '',
+          addr: '',
+          pic: []
         },
         loading: false,
         submitOk: false,
@@ -64,31 +67,51 @@
     },
     methods:{
       submit() {
-        console.log(this.newItem);
-        if(this.newItem.amount=='') {
-          this.$store.commit('showTip','请填写提现金额')
-        } else if(this.newItem.bankcard=='') {
-          this.$store.commit('showTip','请填写提现卡号')
+        if(this.newItem.addr=='') {
+          this.$store.commit('showTip','请填写地址')
+        } else if(this.uploadList.length==0) {
+          this.$store.commit('showTip','请上传图片')
         } else {
-          addBankcardApply(this.newItem).then(res=>{
-            if(res.data.status=='200') {
-              this.submitOk = true;
-              this.applyOk = true;
-            } else {
-              this.submitOk = true;
-              this.errorText = res.data.msg;
-              this.applyOk = false
-            }
-          })
-          
+          let imgNum = this.uploadList.length;
+          this.uploadList.map(file=>{
+            let fileName = new Date().getTime() + '-' +file.name;
+            let uploadFile = new File([file], fileName, {type: file.type});
+            addImg(uploadFile).then(res=>{
+              imgNum-=1;
+              if(res.data.status=='201') {
+                this.newItem.pic.push(res.data.img_url)
+                if(imgNum==0) {
+                  addBankcardApply(this.newItem).then(res=>{
+                    console.log(res);
+                    if(res.data.status=='200') {
+                      this.submitOk = true;
+                      this.applyOk = true;
+                    } else {
+                      this.submitOk = true;
+                      this.errorText = res.data.msg;
+                      this.applyOk = false
+                    }
+                  })        
+                }
+              }
+            })
+          })  
         }
-      },      
+      },
+      uploadImg(e) {
+        for(let item of this.$refs.uploadImg.files) {
+          this.uploadList.push(item)
+        }
+      },
+      delImg(index) {
+        this.uploadList.splice(index,1);
+      },
+      
     },
     activated() {
       this.newItem = {
-        balance: '',
-        amount: '',
-        bankcard: '',
+        addr: '',
+        pic: []
       };
       this.applyOk = false;
       this.submitOk = false;

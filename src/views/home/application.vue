@@ -65,7 +65,7 @@
         <div class="title">银行卡</div>
       </div>
       <div class="options" id="options3">
-        <div class="option" v-if="cardStatus==0||cardStatus==3">
+        <div class="option" v-if="cardStatus==0||cardStatus==4">
           <div class="optionheader" @click="$router.push({name:'Bankcard'})">
             <div class="icon"><img src="~/assets/images/application/biaodan.png" alt=""></div>
             <div class="name">申请/修改资料</div>
@@ -94,7 +94,16 @@
         <div class="option" v-if="cardStatus==3">
           <div class="optionheader">
             <div class="icon"><img src="~/assets/images/application/biaodan.png" alt=""></div>
-            <div class="name">审批中</div>
+            <div class="name">申请状态</div>
+          </div>
+          <div class="optionheader">
+            <div class="name">待审批</div>
+          </div>
+        </div>
+        <div class="option" v-if="cardStatus==4">
+          <div class="optionheader">
+            <div class="icon"><img src="~/assets/images/application/biaodan.png" alt=""></div>
+            <div class="name">申请状态</div>
           </div>
           <div class="optionheader">
             <div class="name">已驳回</div>
@@ -111,28 +120,41 @@
     name: "Application",
     data () {
       return {
-        cardStatus: true,
-        cardNum: ''
+        cardStatus: 0,
+        cardNum: '',
       }
     },
-    methods:{},
+    methods:{
+      _getBnkcard() {
+        getBankcard().then(res=>{
+          console.log(res);
+          if(res.data.status=='200') {
+            if(res.data.msg=='Apply') {
+              this.cardStatus = 3;
+            }
+            if(res.data.msg=='Reject') {
+              this.cardStatus = 4;
+            }
+            if(res.data.msg=='OK') {
+              this.cardStatus = 1;
+              this.cardNum = res.data.data.cardnum
+            }
+            if(res.data.msg=='Block') {
+              this.cardStatus = 2;
+              this.cardNum = res.data.data.cardnum
+            }
+            if(res.data.msg=='Pass'&&res.data.data.bankcard_id==null) {
+              this.cardStatus = 0
+            }
+          }
+        })
+      }
+    },
     created() {
-      getBankcard().then(res=>{
-        console.log(res);
-        if(res.data.status=='200') {
-          if(res.data.data.bankcard_status==0) {
-            this.cardNum = res.data.data.cardnum;
-            this.cardStatus = 1
-          } else {
-            this.cardNum = res.data.data.cardnum;
-            this.cardStatus = 2
-          }
-        } else if(res.data.status=='501') {
-          if(res.data.msg=='Apply_status error') {
-            this.cardStatus = 3
-          }
-        }
-      })
+      this._getBnkcard()
+    },
+    activated() {
+      this._getBnkcard()
     }
   }
 </script>

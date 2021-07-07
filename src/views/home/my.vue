@@ -19,15 +19,12 @@
           </div>
         </div>
         <div class="btns">
-          <div class="btn" @click="$store.commit('handlePay',{price:100,success:false,state:true,show:true})">
+          <div class="btn">
             <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
             <div class="btnName"><span>余额</span></div>
+            <div class="btnName" style="margin-top:5px"><span>{{balance}}</span></div>
           </div>
-          <div class="btn" @click="$store.commit('handlePay',{price:200,success:false,state:true,show:true})">
-            <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
-            <div class="btnName"><span>充值</span></div>
-          </div>
-          <div class="btn" @click="$router.push({name:'Withdrawl'})">
+          <div class="btn">
             <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
             <div class="btnName"><span>提现</span></div>
           </div>
@@ -100,11 +97,13 @@
 
 <script>
 
-  import {getAddress} from '@/network/address'
+  import {getAddress} from '@/network/address.js'
+  import {getUserInfo} from '@/network/user.js'
   export default {
     name: "My",
     data () {
       return {
+        balance: 0
       }
     },
     components: {},
@@ -135,6 +134,9 @@
     activated() {
       getAddress().then(res=>{
         this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
+      })
+      getUserInfo().then(res=>{
+        this.balance = parseFloat(res.data.data.balance/100).toFixed(2)
       })
       this.$bus.$on("addrChange",()=>{
         getAddress().then(res=>{

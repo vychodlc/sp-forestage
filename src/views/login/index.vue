@@ -82,21 +82,17 @@
             if(res.data.status=='200') {
               let token = res.data.token;
               this.$store.commit('setToken', token);
-              auth(token).then(res=>{
-                let uuid = res.data.data.sub;
-                getUserInfo(uuid).then(res=>{
-                  console.log('res',res);
-                  let data = res.data.data;
-                  localStorage.uuid = data.uuid;
-                  localStorage.balance = data.balance;
-                  localStorage.ID = data.ID;
-                  localStorage.nickname = data.user_nickname;
-                  localStorage.right = data.user_right;
-                  this.$store.commit('setUser', [data.ID, data.user_nickname,data.user_right,data.balance]);
-                  this.$store.commit('showLoading',false);
-                  this.$store.commit('showTip', '登陆成功');
-                  this.$router.replace('/home');
-                })
+              getUserInfo().then(res=>{
+                console.log('res',res);
+                let data = res.data.data;
+                localStorage.uuid = data.uuid;
+                localStorage.balance = data.balance;
+                localStorage.ID = data.ID;
+                localStorage.nickname = data.user_nickname;
+                this.$store.commit('setUser', [data.ID, data.user_nickname,data.balance]);
+                this.$store.commit('showLoading',false);
+                this.$store.commit('showTip', '登陆成功');
+                this.$router.replace('/home');
               })
             } else {
               this.$store.commit('showTip', res.data.msg);
