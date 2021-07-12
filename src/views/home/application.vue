@@ -14,7 +14,7 @@
             <div class="item" @click="$router.push({name:'Transmit',params:{name:'Nike'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Nike</div>
             <div class="item" @click="$router.push({name:'Transmit',params:{name:'Adidas'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Adidas</div>
             <div class="item" @click="$router.push({name:'Transmit',params:{name:'JD'}})"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
-            <div class="item" @click="$router.push({name:'Transmit',params:{name:'通用'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 通用</div>
+            <!-- <div class="item" @click="$router.push({name:'Transmit',params:{name:'通用'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 通用</div> -->
           </div>
           <div class="more" @click="$router.push({name:'TransmitOrderlist'})"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
         </div>
@@ -68,7 +68,7 @@
         <div class="option" v-if="cardStatus==0||cardStatus==4">
           <div class="optionheader" @click="$router.push({name:'Bankcard'})">
             <div class="icon"><img src="~/assets/images/application/biaodan.png" alt=""></div>
-            <div class="name">申请/修改资料</div>
+            <div class="name">提交申请</div>
           </div>
         </div>
         <div class="option" v-if="cardStatus==1">
@@ -127,7 +127,6 @@
     methods:{
       _getBnkcard() {
         getBankcard().then(res=>{
-          console.log(res);
           if(res.data.status=='200') {
             if(res.data.msg=='Apply') {
               this.cardStatus = 3;

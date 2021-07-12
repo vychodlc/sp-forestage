@@ -43,15 +43,23 @@
           this.$store.commit('showTip','请输入收货人')
         } else if(this.newAddress.phone=='') {
           this.$store.commit('showTip','请输入手机号码')
+        } else if(this.newAddress.phone!=parseInt(this.newAddress.phone)) {
+          this.$store.commit('showTip','请输入正确的手机号码')
         } else if(this.newAddress.address=='') {
           this.$store.commit('showTip','请输入收货地址')
         } else {
+          this.$store.commit('showLoading',true)
           addAddress(this.newAddress).then(res=>{
             if(res.data.status='200') {
-              this.$store.commit('changeShow',{name:'addrAdd',value:false});
-              this.$bus.$emit("addrChange");
+              getAddress().then(res=>{
+                this.$store.commit('handleAddress',{name:'updateList',value:res.data.data});
+                this.$store.commit('changeShow',{name:'addrAdd',value:false});
+                this.$bus.$emit("addrChange");
+                this.$store.commit('showLoading',false)
+              })
             } else {
               this.$store.commit('showTip','新增地址失败'+msg)
+              this.$store.commit('showLoading',false)
             }
           })
         }

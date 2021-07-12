@@ -86,25 +86,28 @@
       </div>
     </div>
     <div class="formbox" v-show="currentStep==2">
-      <div class="addressbox">
+      <!-- <div class="addressbox">
         <div class="content">
           <div class="text" v-if="$store.state.address.default==null&&selectAddr==null">
             <span style="line-height:20vw;text-align:center;font-size:20px">未设置默认地址</span>
           </div>
-          <!-- <div class="text" v-else-if="selectAddr==null">
-            <span class="name">{{$store.state.address.default[0].user_name}}</span>
-            <span class="phone">{{$store.state.address.default[0].phone}}</span>
-            <div class="address">{{$store.state.address.default[0].addr}}</div>
+          <div class="text" v-else-if="selectAddr!=null">
+            <span class="name">{{selectAddr.user_name}}</span>
+            <span class="phone">{{selectAddr.phone}}</span>
+            <div class="address">{{selectAddr.addr}}</div>
           </div>
-          <div class="text" v-else-if="selectAddr!=null">
-            <span class="name">{{selectAddr.user_name}}</span>
-            <span class="phone">{{selectAddr.phone}}</span>
-            <div class="address">{{selectAddr.addr}}</div>
-          </div> -->
-          <div class="text" v-else-if="selectAddr!=null">
-            <span class="name">{{selectAddr.user_name}}</span>
-            <span class="phone">{{selectAddr.phone}}</span>
-            <div class="address">{{selectAddr.addr}}</div>
+          <div class="edit" @click="$store.commit('changeShow',{name:'showAddr',value:true});"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
+        </div>
+      </div> -->
+      <div class="addressbox">
+        <div class="content">
+          <div class="text" v-if="$store.state.address.select==null">
+            <span style="line-height:20vw;text-align:center;font-size:20px">未设置默认地址</span>
+          </div>
+          <div class="text" v-else-if="$store.state.address.select!=null">
+            <span class="name">{{$store.state.address.select.user_name}}</span>
+            <span class="phone">{{$store.state.address.select.phone}}</span>
+            <div class="address">{{$store.state.address.select.addr}}</div>
           </div>
           <div class="edit" @click="$store.commit('changeShow',{name:'showAddr',value:true});"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
         </div>
@@ -253,10 +256,21 @@
                 this.useBalance = 1;
                 this.paymethod = 1;
               }
-              if(this.$store.state.address.default!=null) {
-                this.selectAddr = this.$store.state.address.default[0]
-              } else if(this.$store.state.address.list.length>0){
-                this.selectAddr = this.$store.state.address.list[0]
+              // if(this.$store.state.address.default!=null) {
+              //   this.selectAddr = this.$store.state.address.default[0]
+              // } else if(this.$store.state.address.list.length>0){
+              //   this.selectAddr = this.$store.state.address.list[0]
+              // }
+              let list = this.$store.state.address.list;
+              let hasDefault = false;
+              list.map(addr=>{
+                if(addr.default=='1') {
+                  hasDefault = true;
+                  this.$store.commit('handleAddress',{name:'selectAddress',item:addr})
+                }
+              })
+              if(hasDefault==false) {
+                this.$store.commit('handleAddress',{name:'selectAddress',item:list[0]})
               }
               this.$store.commit('showLoading',false);
               document.getElementById('step1').className = 'step step-ed'
@@ -271,7 +285,7 @@
           document.getElementsByClassName('line')[0].className = 'line line-not'
           this.currentStep-=1
         } else if(this.currentStep==2&&direction==1){
-          if(this.selectAddr==null) {
+          if(this.$store.state.address.select==null) {
             this.$store.commit('showTip','请选择收货地址')
           } else {
             this.$store.commit('showLoading',true);
@@ -279,7 +293,7 @@
               storage_nums:this.selectList.map(item=>(item.storage_ID)),
               outbound_type:'0',
               material:'',
-              address:this.selectAddr.addr,
+              address: this.$store.state.address.select.addr,
               price: this.price,
             }).then(res=>{
               if(res.data.status=='200') {                

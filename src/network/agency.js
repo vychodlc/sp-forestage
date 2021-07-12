@@ -28,7 +28,7 @@ export function addAgency(info) {
   })
 }
 
-export function crawlerGiftcard(info) {
+export function getCrawlerGiftcard(info) {
   return request({
     url: '/get_crawler_giftcard.php',
     params: {

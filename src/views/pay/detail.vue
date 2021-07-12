@@ -90,8 +90,8 @@
       this.currentPage = 1;
       this._getList();
       this.listenTotop = setInterval(()=>{
-        // let top = this.$refs.my_scroller.getPosition().top;
-        // this.showTotop = top>100?true:false;
+        let top = this.$refs.my_scroller.getPosition().top;
+        this.showTotop = top>100?true:false;
       },500)
     },
     deactivated() {

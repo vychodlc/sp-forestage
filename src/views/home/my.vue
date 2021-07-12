@@ -7,7 +7,7 @@
         <div class="info" id="nickname">{{$store.state.user.nickname}}</div>
         <div class="info" id="uuid">UUID:{{$store.state.user.id}}</div>
       </div>
-      <div class="icon" @click="test()"><img src="~/assets/images/my/setting.png" alt=""></div>
+      <!-- <div class="icon" @click="test()"><img src="~/assets/images/my/setting.png" alt=""></div> -->
     </div>
     <div class="content">
       <div class="card">
@@ -20,12 +20,12 @@
         </div>
         <div class="btns">
           <div class="btn">
-            <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
+            <div class="btnImage"><img src="~/assets/images/my/balance.png" alt=""></div>
             <div class="btnName"><span>余额</span></div>
             <div class="btnName" style="margin-top:5px"><span>{{balance}}</span></div>
           </div>
           <div class="btn" @click="$router.push({name:'Withdrawl'})">
-            <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
+            <div class="btnImage"><img src="~/assets/images/my/withdrawl.png" alt=""></div>
             <div class="btnName"><span>提现</span></div>
           </div>
         </div>
@@ -40,15 +40,15 @@
         </div>
         <div class="btns">
           <div class="btn" @click="$router.push({name:'TransmitOrderlist'})">
-            <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
+            <div class="btnImage"><img src="~/assets/images/my/input.png" alt=""></div>
             <div class="btnName"><span>入库订单</span></div>
           </div>
           <div class="btn" @click="$router.push({name:'OutputOrderlist'})">
-            <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
+            <div class="btnImage"><img src="~/assets/images/my/output.png" alt=""></div>
             <div class="btnName"><span>出库订单</span></div>
           </div>
           <div class="btn" @click="$router.push({name:'AgencyOrderlist'})">
-            <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
+            <div class="btnImage"><img src="~/assets/images/my/agency.png" alt=""></div>
             <div class="btnName"><span>代购订单</span></div>
           </div>
           <!-- <div class="btn" @click="$router.push({name:'OutputOrderlist'})">
@@ -67,7 +67,7 @@
         </div>
         <div class="addr-box">
           <div class="addr-icon">
-            <img src="~/assets/images/application/dizhi.png" alt="">
+            <img src="~/assets/images/my/address.png" alt="">
           </div>
           <div class="addr-text" v-if="$store.state.address.default!=null">
             <span id="addr-title">默认地址：</span>
@@ -228,8 +228,9 @@
     flex: 1;
   }
   .btnImage img {
-    width: 15vw;
-    height: 15vw;
+    width: 10vw;
+    height: 10vw;
+    margin-bottom: 10px;
   }
   .btnName span {
     font-size: 16px;

@@ -25,6 +25,7 @@ export default new Vuex.Store({
       default: null,
       new: {name: '',phone: '',address: ''},
       edit: {name: '',phone: '',address: '',address_ID:''},
+      select: null,
     },
     expressPrice: [13.25,15.07,18.46,20.27,23.66,24.1,27.3,27.3,33,33,35.3,35.3,36.35,36.35,39.9,39.9,43.45,43.45,47,47,50.55,50.55,54.1,54.1,57.65,57.65,61.2,61.2,64.75,64.75,68.3,68.3,71.86,71.85,75.4,75.4,78.95,78.95,82.5,82.5,86.05,86.05,89.6,89.6,93.15,93.15,96.7,96.7,100.25,100.25,103.8,103.8,107.35,107.35,110.9,110.9,114.45,114.45,118,118],
   },
@@ -49,7 +50,6 @@ export default new Vuex.Store({
       localStorage.token = token
     },
     setUser(state, data) {
-      console.log(data);
       state.user.id = data[0]
       state.user.nickname = data[1]
       state.user.right = data[2]
@@ -94,7 +94,6 @@ export default new Vuex.Store({
         if(key=='method'){state.pay.method=info[key]}
         if(key=='pay_type'){state.pay.pay_type=info[key]}
       }
-      console.log(state.pay);
     },
     handleAddress(state,info) {
       if(info.name=='updateList') {
@@ -126,6 +125,8 @@ export default new Vuex.Store({
       } else if(info.name=='updateEdit') {
         state.show.addrEdit = true;
         state.address.edit = info.value;
+      } else if(info.name=='selectAddress') {
+        state.address.select = info.item
       }
     },
   },

@@ -68,12 +68,30 @@
         getAddress().then(res=>{
           if(res.data.status=='200') {
             this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
-            console.log(this.$store.state.address);
+            let list = this.$store.state.address.list;
+            let select = this.$store.state.address.select;
+            let has = false;
+            list.map(addr=>{
+              if(addr.address_ID==select.address_ID) {
+                has = true
+              }
+            })
+            if(has==false) {
+              let hasDefault = false;
+              list.map(addr=>{
+                if(addr.default=='1') {
+                  hasDefault = true;
+                  this.$store.commit('handleAddress',{name:'selectAddress',item:addr})
+                }
+              })
+              if(hasDefault==false) {
+                this.$store.commit('handleAddress',{name:'selectAddress',item:list[0]})
+              }
+            }
           }
         })
       },
       _editAddress(item) {
-        console.log(item);
         this.$store.commit('handleAddress',{name:'updateEdit',value:{
           name: item.user_name,
           address: item.addr,
@@ -104,6 +122,7 @@
       },
       selectAddress(item) {
         this.$bus.$emit('selectAddress',item)
+        this.$store.commit('handleAddress',{name:'selectAddress',item:item})
       },
     },
   }

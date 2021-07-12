@@ -36,7 +36,7 @@
                   <tr>
                     <th>卡号</th>
                     <th>PIN</th>
-                    <th>品牌</th>
+                    <th>余额</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -44,10 +44,11 @@
                   <tr v-for="(item,index) in newItem.giftcards" :key="index">
                     <td>{{item.card_num}}</td>
                     <td>{{item.pin}}</td>
-                    <td>{{item.brand}}</td>
+                    <td>{{item.balance}}</td>
                     <!-- <td>{{item.right==true?'ok':'×'}}</td> -->
-                    <td v-if="item.right==true"><div style="color:#fff;background-color:var(--color-all);width:12px;height:12px;border-radius:5px;texa-align:center;line-height:12px">✔</div></td>
-                    <td v-else><div @click="delGiftcard(index)" style="color:#fff;background-color:#f56c6c;width:12px;height:12px;border-radius:5px;texa-align:center;line-height:12px">×</div></td>
+                    <!-- <td v-if="item.right==true"><div style="color:#fff;background-color:var(--color-all);width:12px;height:12px;border-radius:5px;texa-align:center;line-height:12px">✔</div></td> -->
+                    <!-- <td v-else><div @click="delGiftcard(index)" style="color:#fff;background-color:#f56c6c;width:12px;height:12px;border-radius:5px;texa-align:center;line-height:12px">×</div></td> -->
+                    <td><div @click="delGiftcard(index)" style="color:#fff;background-color:#f56c6c;width:12px;height:12px;border-radius:5px;texa-align:center;line-height:12px">×</div></td>
                   </tr>
                 </tbody>
               </table>
@@ -103,9 +104,9 @@
           <div class="cancel" @click="dialogShow=false">×</div>
         </div>
         <div class="dialogContent">
-          <textarea name="inputMany" id="dialogText" v-model="dialogText" placeholder="xxxx xxxx xxxx
-xxxx xxxx xxxx
-卡号 PIN 品牌"></textarea>
+          <textarea name="inputMany" id="dialogText" v-model="dialogText" placeholder="xxxx xxxx
+xxxx xxxx
+卡号 PIN"></textarea>
         </div>
         <div class="dialogBtns">
           <div class="btn" @click="dialogShow=false"><span>取消</span></div>
@@ -117,7 +118,7 @@ xxxx xxxx xxxx
 </template>
 
 <script>
-  import { addAgency,getOption } from '@/network/agency.js'
+  import { addAgency,getOption,getCrawlerGiftcard } from '@/network/agency.js'
   export default {
     name: "Agency",
     data () {
@@ -206,35 +207,131 @@ xxxx xxxx xxxx
         if(this.dialogText=='') {
           this.$store.commit('showTip','请输入礼品卡信息')
         } else {
-          let rows = this.dialogText.split('\n');
+          let rows = this.dialogText.split('\n').filter(row=>{return row!=''});
+          this.enterNum = rows.length;
           rows.map(row=>{
-            if(row!='') {
-              let rowData = row.split(' ').filter(iii=>{return iii!=''&&iii!=' '});
-              this._addGiftcard({card_num:rowData[0],pin:rowData[1],brand:rowData[2],right:false});
-              this.dialogShow = false;
+            this.$store.commit("showLoading",true)
+            let rowData = row.split(' ').filter(iii=>{return iii!=''&&iii!=' '});
+            if(rowData.length==2) {
+              let flag = false;
+              this.newItem.giftcards.map(card=>{
+                if(card.card_num==rowData[0]){flag=true;console.log(card.card_num)};
+              })
+              if(flag==true) {
+                this.enterNum--;
+                this.newItem.giftcards.push({card_num:rowData[0],pin:rowData[1],balance:'重复',right:false})
+              } else {
+                this._addGiftcard({card_num:rowData[0],pin:rowData[1]});
+              }
+            } else {
+              this.enterNum--;
+              this.newItem.giftcards.push({card_num:rowData[0],pin:rowData[1]?rowData[1]:'',balance:'无效',right:false})
+              if(this.enterNum==0) {
+                this.$store.commit('showLoading',false)
+              }
             }
+            this.dialogShow = false;
           })
           this.dialogText = '';
         }
       },
-      _addGiftcard(card) {
-        this.newItem.giftcards.push({card_num:card.card_num,pin:card.pin,brand:card.brand,right:card.right})
+      _addGiftcard(item) {
+        // this.newItem.giftcards.push({card_num:item.card_num,pin:item.pin,brand:item.brand,right:item.right})
+        if(this.brand=='N') {
+          this.brand = 'N'
+          this.$axios({
+            method: 'post',
+            url: 'https://api.nike.com/payment/giftcard_balance/v1/',
+            data: JSON.stringify({
+              'accountNumber': item.card_num.toString(),
+              'currency': 'GBP',
+              'pin': item.pin.toString(),
+            }),
+            headers: {
+              "Content-Type": "application/json",
+              "appid":"orders",
+              "x-nike-visitid":"3",
+              "x-nike-visitorid":this.guid(),
+            }
+          }).then(res=>{
+            item.balance = res.data.balance;
+            item.right = true;
+            let flag = false;
+            this.newItem.giftcards.map(card=>{
+              if(card.card_num==item.card_num){flag=true};
+            })
+            if(flag==true) {
+              item.balance = '重复'
+              item.right = false
+            }
+            this.newItem.giftcards.push(item);
+            this.enterNum--;
+            if(this.enterNum==0) {
+              this.$store.commit('showLoading',false);
+            }
+          }).catch(e=>{
+            item.balance = '无效';
+            item.right = false;
+            this.newItem.giftcards.push(item);
+            this.enterNum--;
+            if(this.enterNum==0) {
+              this.$store.commit('showLoading',false);
+            }
+          })
+        } else if(this.brand=='JD') {
+          let right,balance,flag;
+          balance = '无效'
+          getCrawlerGiftcard({card_num:item.card_num,pin:item.pin.toUpperCase(),brand:'JD'}).then(res=>{
+            right = false
+            if(res.data.status=='200') {
+              balance = parseFloat(parseInt(res.data.balance)/100).toFixed(2);
+              right = true
+            }
+            this.newItem.giftcards.map(card=>{
+              if(card.card_num==item.card_num){flag=true};
+            })
+            if(flag==true) {
+              balance = '重复'
+              right = false
+            }
+            this.newItem.giftcards.push({card_num:item.card_num,pin:item.pin.toUpperCase(),brand:'JD',right:right,balance:balance});
+            this.enterNum--;
+            if(this.enterNum==0) {
+              this.$store.commit('showLoading',false);
+            }
+          });
+        // } else if(item.brand=='A') {
+        }
+      },
+      guid() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+          let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
       },
       delGiftcard(index) {
         this.newItem.giftcards.splice(index,1);
       },
       submit() {
+        this.newItem.storage_link = 'https://www.jdsports.co.uk/product/blue-official-team-england-3-lions-short-sleeve-t-shirt/16126764'
+        let linkMsg = {
+          'N': {link:'www.nike.com/gb',msg:'请填写https://www.nike.com/gb中的商品链接'},
+          'A': {link:'www.adidas.co.uk',msg:'请填写https://www.adidas.co.uk/中的商品链接'},
+          'JD': {link:'www.jdsports.co.uk',msg:'请填写https://www.jdsports.co.uk/中的商品链接'},
+        }
         this.newItem.brand = this.brand;
         if(this.newItem.storage_link=='') {
           this.$store.commit('showTip','请填写商品链接')
-        } else if(this.newItem.brand=='N'&&this.newItem.storage_link.indexOf('www.nike.com/gb')==-1) {
-          this.$store.commit('showTip','请填写Nike(GB)的商品链接')
+        } else if(this.newItem.storage_link.indexOf(linkMsg[this.brand].link)==-1) {
+          this.$store.commit('showTip',linkMsg[this.brand].msg)
         } else if(this.newItem.size.length==0) {
           this.$store.commit('showTip','请选择尺寸')
         } else if(this.newItem.giftcard_type=='') {
           this.$store.commit('showTip','请选择礼品卡类别')
         } else if(this.newItem.giftcard_type=='2'&&this.newItem.giftcards.length==0) {
           this.$store.commit('showTip','请添加礼品卡信息')
+        } else if(this.newItem.giftcard_type=='2'&&this.newItem.giftcards.filter(card=>{return card.right==true}).length==0) {
+          this.$store.commit('showTip','请添加有效礼品卡信息')
         } else if(this.newItem.discount_type=='') {
           this.$store.commit('showTip','请选择折扣码类别')
         } else if(this.newItem.discount_type=='2'&&this.newItem.discount_code=='') {
@@ -245,17 +342,46 @@ xxxx xxxx xxxx
           this.$store.commit('showTip','请选择购物账号类别')
         } else if(this.newItem.order_num=='') {
           this.$store.commit('showTip','请选择单数')
+        } else if(this.newItem.order_num!=parseInt(this.newItem.order_num)) {
+          this.$store.commit('showTip','请确保单数是正整数')
         } else if(this.newItem.interval=='') {
           this.$store.commit('showTip','请选择代购时限')
+        } else if(this.newItem.interval!=parseFloat(this.newItem.interval)) {
+          this.$store.commit('showTip','请确保代购时限是数字')
+        } else if(parseFloat(this.newItem.interval)<20||parseFloat(this.newItem.interval)>300) {
+          this.$store.commit('showTip','请确保代购时限的范围为 20~300 小时')
         } else {
           if(this.priceOk==false) {
-            this.$axios({
-              method: 'get',
-              url: this.newItem.storage_link,
-            }).then(res=>{
-              let index = res.data.indexOf('currentPrice')
-              let price = res.data.slice(index,index+20).split(':')[1].split(',')[0]
-              price = parseFloat(price)
+            this.$store.commit('showLoading',true)
+            if(this.brand=='N') {
+              this.$axios({
+                method: 'get',
+                url: this.newItem.storage_link,
+              }).then(res=>{
+                let index = res.data.indexOf('currentPrice')
+                let price = res.data.slice(index,index+20).split(':')[1].split(',')[0]
+                price = parseFloat(price)
+                this.options = {}
+                getOption().then(res=>{
+                  res.data.data.map(opt=>{
+                    this.options[opt.option] = parseFloat(opt.value)
+                  })
+                  let totalPrice = parseFloat((this.newItem.account_type==2?this.options.account_birthday:0)
+                  + (this.newItem.account_type==1?this.options.account_common:0)
+                  + (this.newItem.discount_type==1?this.options.discount:0)
+                  + (price * this.options.k)
+                  + (this.newItem.giftcard_type==1?price*this.options.giftcard:0))
+                  this.newItem.price = parseFloat(totalPrice*parseInt(this.newItem.order_num)).toFixed(2)
+                  this.priceOk = true;                
+                  this.$store.commit('showLoading',false)
+                })
+              }).catch(e=>{
+                this.$store.commit('showLoading',false)
+                this.$store.commit('showTip','获取商品价格失败')
+              })
+            } else {
+              let price;
+              price = parseFloat(10.00)
               this.options = {}
               getOption().then(res=>{
                 res.data.data.map(opt=>{
@@ -267,12 +393,10 @@ xxxx xxxx xxxx
                 + (price * this.options.k)
                 + (this.newItem.giftcard_type==1?price*this.options.giftcard:0))
                 this.newItem.price = parseFloat(totalPrice*parseInt(this.newItem.order_num)).toFixed(2)
-                console.log(this.newItem.price);
-                this.priceOk = true;
+                this.priceOk = true; 
+                this.$store.commit('showLoading',false)
               })
-            }).catch(e=>{
-              this.$store.commit('showTip','获取商品价格失败')
-            })
+            }
           } else {
             addAgency(this.newItem).then(res=>{
               if(res.data.status=='200') {
@@ -289,7 +413,6 @@ xxxx xxxx xxxx
       
     },
     activated() {
-      console.log(23)
       this.kind = this.$route.params.name?this.$route.params.name:'Nike';
       switch(this.kind){
         case 'Nike':

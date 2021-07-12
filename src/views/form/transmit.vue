@@ -2,7 +2,7 @@
   <div class="transmit">
     <div class="header">
       <div class="back" @click="$router.go(-1)"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
-      <div class="title" @click="test">{{kind}}申报</div>
+      <div class="title">{{kind}}申报</div>
     </div>
     <div class="progress">
       <div class="linebox">
@@ -33,7 +33,7 @@
     <div class="formbox" v-show="currentStep==1">
       <div>
         <table>
-          <thead><tr><th style="width:48vw;font-size:18px">快递单号</th><th style="width:40vw;font-size:18px">邮箱地址</th></tr></thead>
+          <thead><tr><th style="width:48vw;font-size:18px">单号</th><th style="width:40vw;font-size:18px">邮箱地址</th></tr></thead>
         </table>
       </div>
       <div class="table" id="orderTable">
@@ -209,7 +209,6 @@
             document.getElementsByClassName('line')[1].className = 'line line-ed'
             this.currentStep+=1;
             addApply(this.brand,this.okOrders).then(res=>{
-              console.log(res);
               if(res.data.status=='200') {
                 this.loading = false
               } else {
@@ -254,24 +253,30 @@
         this.orders.splice(index,1);
       },
       enterOrder() {
-        let rows = this.dialogText.split('\n');
-        let input = [];
-        for(let i=0;i<rows.length;i++) {
-          let splitRow = rows[i].split(' ').filter(item=>item==''?false:true);
-          if(splitRow.length>2) {
-            input.push(splitRow.slice(0,2))
-          }else if(splitRow.length==2) {
-            input.push(splitRow)
+        if(this.dialogText=='') {
+          this.$store.commit('showTip','请输入申报信息')
+        } else {
+          let rows = this.dialogText.split('\n');
+          let input = [];
+          for(let i=0;i<rows.length;i++) {
+            let splitRow = rows[i].split(' ').filter(item=>item==''?false:true);
+            if(splitRow.length>2) {
+              input.push(splitRow.slice(0,2))
+            }else if(splitRow.length==2) {
+              input.push(splitRow)
+            } else if(splitRow.length==1) [
+              input.push([splitRow[0],''])
+            ]
           }
+          for(let i=0;i<input.length;i++) {
+            this.orders.push({id: input[i][0], email: input[i][1], right: false});
+          }
+          this.dialogShow = false;
+          this.dialogText = '';
+          this.$nextTick(()=>{
+            orderTable.scrollTo(0,orderTable.scrollHeight)
+          })
         }
-        for(let i=0;i<input.length;i++) {
-          this.orders.push({id: input[i][0], email: input[i][1]});
-        }
-        this.dialogShow = false;
-        this.dialogText = '';
-        this.$nextTick(()=>{
-          orderTable.scrollTo(0,orderTable.scrollHeight)
-        })
       },
       checkOrder() {
         this.$store.commit('showLoading', true);
@@ -288,6 +293,7 @@
         if(falseList.length==0) {
           this.wrongDataStatus = false;
           this.wrongDataNum = 0;
+          this.$store.commit('showLoading', false);
         }
         if(this.brand=='N') {
           falseList.map(order=>{
@@ -441,7 +447,7 @@
             this.$axios.get(url).catch(e=>{
               order.right = false;
               this.handleTimes++;
-              this.wrongDataNum = this.orders.filter(item=>{return item.right==false}).length;
+              this.wrongDataNum = this.orders.filter(item=>{return item.right==false;}).length;
               
               if(this.handleTimes==falseList.length) {
                 this.$store.commit('showLoading', false);

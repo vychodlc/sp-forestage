@@ -10,7 +10,7 @@
         <div class="inputBox">
           <div class="inputContent">
             <div :class="cardInfo.brand=='N'?'radioItemActive':'radioItem'" @click="changeRadio(0)">Nike</div>
-            <div :class="cardInfo.brand=='A'?'radioItemActive':'radioItem'" @click="changeRadio(1)">Adidas</div>
+            <!-- <div :class="cardInfo.brand=='A'?'radioItemActive':'radioItem'" @click="changeRadio(1)">Adidas</div> -->
             <div :class="cardInfo.brand=='JD'?'radioItemActive':'radioItem'" @click="changeRadio(2)">JD</div>
           </div>
         </div>
@@ -31,14 +31,15 @@
     </div>
     <div class="footer">
       <div class="btnbox">
-        <div class="btn" @click="submit()">查询</div>
+        <div class="btn" v-if="isCommit==false" @click="submit()">查询</div>
+        <div class="btn" v-else @click="$router.go(-1)">完成</div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import { crawlerGiftcard } from '@/network/agency.js'
+  import { getCrawlerGiftcard } from '@/network/agency.js'
   export default {
     name: "Query",
     data () {
@@ -68,6 +69,12 @@
         let brands = ['N','A','JD']
         this.cardInfo.brand = brands[val]
       },
+      guid() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+          let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      },
       submit() {
         if(this.cardInfo.brand=='') {
           this.$store.commit('showTip','请选择礼品卡品牌')
@@ -77,22 +84,46 @@
           this.$store.commit('showTip','请输入礼品卡PIN码')
         } else {
           this.$store.commit('showLoading',true)
-          if(this.cardInfo.brand=='JD') {
-            crawlerGiftcard(this.cardInfo).then(res=>{
-              console.log(res);
+          if(this.cardInfo.brand=='N') {
+            this.$axios({
+              method: 'post',
+              url: 'https://api.nike.com/payment/giftcard_balance/v1/',
+              data: JSON.stringify({
+                'accountNumber': this.cardInfo.card_num.toString(),
+                'currency': 'GBP',
+                'pin': this.cardInfo.pin.toString(),
+              }),
+              headers: {
+                "Content-Type": "application/json",
+                "appid":"orders",
+                "x-nike-visitid":"3",
+                "x-nike-visitorid":this.guid(),
+              }
+            }).then(res=>{
               this.isCommit = true;
-              if(res.data.status=='503') {
+              this.money = parseFloat(parseInt(res.data.balance)/100).toFixed(2);
+              this.isValid = true;
+              this.$store.commit('showLoading',false)
+            }).catch(e=>{
+              this.isCommit = true;
+              this.isValid = false;
+              this.$store.commit('showLoading',false)
+           }) 
+          } else if(this.cardInfo.brand=='JD') {
+            getCrawlerGiftcard(this.cardInfo).then(res=>{
+              this.isCommit = true;
+              if(res.data.status=='503'||res.data.status=='404') {
                 this.isValid = false
               } else if(res.data.status=='200') {
                 this.isValid = true;
-                this.money = res.data.balance;
+                this.money = parseFloat(parseInt(res.data.balance)/100).toFixed(2);
               } else if(res.data.status=='501') {
                 console.log('eeee');
               }
               this.$store.commit('showLoading',false)
             })
           } else {
-            this.$store.commit('showTip','当前仅支持JD查询')
+            this.$store.commit('showTip','当前仅支持Nike, JD查询')
             this.$store.commit('showLoading',false)
           }
         }

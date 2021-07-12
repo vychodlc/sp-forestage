@@ -43,15 +43,29 @@
           this.$store.commit('showTip','请输入收货人')
         } else if(this.$store.state.address.edit.phone=='') {
           this.$store.commit('showTip','请输入手机号码')
+        } else if(this.$store.state.address.edit.phone!=parseInt(this.$store.state.address.edit.phone)) {
+          this.$store.commit('showTip','请输入正确的手机号码')
         } else if(this.$store.state.address.edit.address=='') {
           this.$store.commit('showTip','请输入收货地址')
         } else {
+          this.$store.commit('showLoading',true)
           editAddress(this.$store.state.address.edit).then(res=>{
             if(res.data.status='200') {
-              this.$store.commit('changeShow',{name:'addrEdit',value:false});
-              this.$bus.$emit("addrChange");
+              getAddress().then(res=>{
+                this.$store.commit('handleAddress',{name:'updateList',value:res.data.data});
+                this.$store.commit('changeShow',{name:'addrEdit',value:false});
+                this.$bus.$emit("addrChange");
+                let list = this.$store.state.address.list;
+                list.map(addr=>{
+                  if(addr.address_ID==this.$store.state.address.edit.address_ID) {
+                    this.$store.commit('handleAddress',{name:'selectAddress',item:addr})
+                  }
+                })
+                this.$store.commit('showLoading',false)
+              })
             } else {
               this.$store.commit('showTip','修改地址失败'+msg)
+                this.$store.commit('showLoading',false)
             }
           })
         }
