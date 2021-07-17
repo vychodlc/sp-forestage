@@ -133,7 +133,8 @@
             <span class="phone">{{$store.state.address.select.phone}}</span>
             <div class="address">{{$store.state.address.select.addr}}</div>
           </div>
-          <div class="edit" @click="$store.commit('changeShow',{name:'showAddr',value:true});"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
+          <!-- <div class="edit" @click="$store.commit('changeShow',{name:'showAddr',value:true});"><img src="~/assets/images/application/arrow-right.png" alt=""></div> -->
+          <div class="edit" @click="goAddress()"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
         </div>
       </div>
       <div class="addressbox">
@@ -194,10 +195,10 @@
       </div>
     </div>
     <div class="footer">
-      <div class="btnbox" @click="changeStep(0)" v-if="currentStep!=4">
+      <!-- <div class="btnbox" @click="changeStep(0)" v-if="currentStep!=4">
         <div class="btn" v-if="currentStep==1">取消</div>
         <div class="btn" v-else>上一步</div>
-      </div>
+      </div> -->
       <div class="btnbox" @click="changeStep(1)">
         <div class="btn" v-if="currentStep==stepNum">完成</div>
         <div class="btn" v-else>下一步</div>
@@ -373,14 +374,12 @@
                 //   pay_type: '',
                 // }
                 // if(this.paymethod=='0') {
-                //   console.log('余额');
                 //   getBalance().then(res=>{
                 //     this.$store.commit('handleUser',{balance:res.data.balance})
                 //     this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'balance'});
                 //     this.$store.commit('showLoading',false);
                 //   })
                 // } else if(this.paymethod=='1'){
-                //   console.log('聚合');
                 //   info.pay_type = 'Globepay'
                 //   putOrder(info).then(resPay=>{
                 //     if(resPay.data.status=='302') {
@@ -395,7 +394,6 @@
                 //     }
                 //   })
                 // } else if(this.paymethod=='2'){
-                //   console.log('混合');
                 //   getBalance().then(res=>{
                 //     this.$store.commit('handleUser',{balance:res.data.balance})
                 //     this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'mix'});
@@ -470,25 +468,49 @@
       addrEdit() {
         // 提交位置修改信息
         this.showEdit = false;
-      }
+      },
+      goAddress() {
+        localStorage.cache = JSON.stringify({
+          'selectList': this.selectList,
+          'currentStep': this.currentStep,
+        })
+        this.$router.push({name:'Address'})
+      },
     },
     activated() {
       this.kind = this.$route.params.name?this.$route.params.name:'普通';
-      document.getElementsByClassName('footer')[0].style.display = '';
-      document.getElementsByClassName('step')[0].className = 'step step-ing'
-      document.getElementsByClassName('step')[1].className = 'step step-not'
-      document.getElementsByClassName('step')[2].className = 'step step-not'
-      document.getElementsByClassName('line')[0].className = 'line line-not'
-      document.getElementsByClassName('line')[1].className = 'line line-not'
-      this.currentStep=1;
-      this.storageList = [];
-      this.uploadList = [];
-      this.materialList = [];
-      this.storageNum = null;
-      this.pageIndex = 1;
-      this.selectList = [];
-      this.$store.commit('showLoading', true);
-      
+      if(localStorage.cache&&(localStorage.cache!='')) {
+        document.getElementsByClassName('footer')[0].style.display = '';
+        document.getElementsByClassName('step')[0].className = 'step step-ed'
+        document.getElementsByClassName('step')[1].className = 'step step-ed'
+        document.getElementsByClassName('step')[2].className = 'step step-ing'
+        document.getElementsByClassName('step')[3].className = 'step step-not'
+        document.getElementsByClassName('line')[0].className = 'line line-ed'
+        document.getElementsByClassName('line')[1].className = 'line line-ed'
+        document.getElementsByClassName('line')[2].className = 'line line-not'
+        let cache = JSON.parse(localStorage.cache);
+        this.currentStep=cache.currentStep;
+        this.storageList = [];
+        this.selectList = cache.selectList;
+        this.$store.commit('showLoading', true);
+        localStorage.cache = ''
+      } else {
+        document.getElementsByClassName('footer')[0].style.display = '';
+        document.getElementsByClassName('step')[0].className = 'step step-ing'
+        document.getElementsByClassName('step')[1].className = 'step step-not'
+        document.getElementsByClassName('step')[2].className = 'step step-not'
+        document.getElementsByClassName('line')[0].className = 'line line-not'
+        document.getElementsByClassName('line')[1].className = 'line line-not'
+        this.currentStep=1;
+        this.storageList = [];
+        this.uploadList = [];
+        this.materialList = [];
+        this.storageNum = null;
+        this.pageIndex = 1;
+        this.selectList = [];
+        this.$store.commit('showLoading', true);
+      }
+
       getAddress().then(res=>{
         this.$store.commit('handleAddress',{name:'updateList',value:res.data.data});
         this._getStorageList();

@@ -124,7 +124,6 @@
       _getStorageList() {
         if(this.isSearch==false) {
           getStorageList(this.currentIndex).then(res=>{
-            console.log(res);
             if(res.data.status=='200') {
               this.tableData = res.data.data;
               this.pageNum = Math.ceil(res.data.storages_num/10);
@@ -175,7 +174,6 @@
         this._getStorageList();
       },
       showImg(url) {
-        console.log(url);
       }
     },
     activated() {

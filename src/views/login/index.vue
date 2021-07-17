@@ -83,7 +83,6 @@
               let token = res.data.token;
               this.$store.commit('setToken', token);
               getUserInfo().then(res=>{
-                console.log('res',res);
                 let data = res.data.data;
                 localStorage.uuid = data.uuid;
                 localStorage.balance = data.balance;

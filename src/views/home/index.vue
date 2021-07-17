@@ -5,21 +5,21 @@
     </keep-alive>
     <div class="navbar">
       <div :class="$route.name=='Post'?'navbarActive':'navbarItem'">
-        <router-link :to="{path:'/post'}" append>
+        <router-link :to="{path:'/post'}" replace>
           <div class="icon" v-if="$route.name=='Post'"><img src="~/assets/images/comment-filling.png" alt=""></div>
           <div class="icon" v-else><img src="~/assets/images/comment.png" alt=""></div>
           <div class="name">资讯</div>
         </router-link>
       </div>
       <div :class="$route.name=='Application'?'navbarActive':'navbarItem'">    
-        <router-link :to="{path:'/application'}" append>
+        <router-link :to="{path:'/application'}" replace>
           <div class="icon" v-if="$route.name=='Application'"><img src="~/assets/images/dynamic-filling.png" alt=""></div>
           <div class="icon" v-else><img src="~/assets/images/modular.png" alt=""></div>
           <div class="name">服务</div>
         </router-link>
       </div>
       <div :class="$route.name=='My'?'navbarActive':'navbarItem'">
-        <router-link :to="{path:'/my'}" append>
+        <router-link :to="{path:'/my'}" replace>
           <div class="icon" v-if="$route.name=='My'"><img src="~/assets/images/user-filling.png" alt=""></div>
           <div class="icon" v-else><img src="~/assets/images/user.png" alt=""></div>
           <div class="name">我的</div>

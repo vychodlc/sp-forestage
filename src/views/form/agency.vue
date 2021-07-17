@@ -215,7 +215,7 @@ xxxx xxxx
             if(rowData.length==2) {
               let flag = false;
               this.newItem.giftcards.map(card=>{
-                if(card.card_num==rowData[0]){flag=true;console.log(card.card_num)};
+                if(card.card_num==rowData[0]){flag=true;};
               })
               if(flag==true) {
                 this.enterNum--;
@@ -313,7 +313,6 @@ xxxx xxxx
         this.newItem.giftcards.splice(index,1);
       },
       submit() {
-        this.newItem.storage_link = 'https://www.jdsports.co.uk/product/blue-official-team-england-3-lions-short-sleeve-t-shirt/16126764'
         let linkMsg = {
           'N': {link:'www.nike.com/gb',msg:'请填写https://www.nike.com/gb中的商品链接'},
           'A': {link:'www.adidas.co.uk',msg:'请填写https://www.adidas.co.uk/中的商品链接'},
@@ -366,13 +365,17 @@ xxxx xxxx
                   res.data.data.map(opt=>{
                     this.options[opt.option] = parseFloat(opt.value)
                   })
-                  let totalPrice = parseFloat((this.newItem.account_type==2?this.options.account_birthday:0)
-                  + (this.newItem.account_type==1?this.options.account_common:0)
-                  + (this.newItem.discount_type==1?this.options.discount:0)
-                  + (price * this.options.k)
-                  + (this.newItem.giftcard_type==1?price*this.options.giftcard:0))
-                  this.newItem.price = parseFloat(totalPrice*parseInt(this.newItem.order_num)).toFixed(2)
-                  this.priceOk = true;                
+                  if(this.options.k&&this.options.account_birthday&&this.options.account_common&&this.options.discount&&this.options.giftcard) {
+                    let totalPrice = parseFloat((this.newItem.account_type==2?this.options.account_birthday:0)
+                    + (this.newItem.account_type==1?this.options.account_common:0)
+                    + (this.newItem.discount_type==1?this.options.discount:0)
+                    + (price * this.options.k)
+                    + (this.newItem.giftcard_type==1?price*this.options.giftcard:0))
+                    this.newItem.price = parseFloat(totalPrice*parseInt(this.newItem.order_num)).toFixed(2)
+                    this.priceOk = true;                
+                  } else {
+                    this.$store.commit('showTip', "代购参数后台设置错误")
+                  }
                   this.$store.commit('showLoading',false)
                 })
               }).catch(e=>{

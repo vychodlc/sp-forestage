@@ -118,7 +118,6 @@
                 this.isValid = true;
                 this.money = parseFloat(parseInt(res.data.balance)/100).toFixed(2);
               } else if(res.data.status=='501') {
-                console.log('eeee');
               }
               this.$store.commit('showLoading',false)
             })

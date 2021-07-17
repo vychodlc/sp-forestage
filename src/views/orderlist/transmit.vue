@@ -127,7 +127,6 @@
       _getApplyList() {
         if(this.isSearch==false) {
           getApplyList(this.currentIndex).then(res=>{
-            console.log(res);
             if(res.data.status=='200') {
               this.tableData = res.data.data;
               this.tableData.map(data=>{
@@ -297,7 +296,6 @@
                     this.CDTime = 10;
                     this.refreshCD();
                   }
-                  console.log('ok');
                 }))
               } else if(item.brand=='JD') {
                 let id = item.expressid;
@@ -350,7 +348,6 @@
                       this.CDTime = 10;
                       this.refreshCD();
                     }
-                    console.log('ok');
                   }
                 })
               } else if(item.brand=='A') {

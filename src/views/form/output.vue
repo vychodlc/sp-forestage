@@ -109,7 +109,9 @@
             <span class="phone">{{$store.state.address.select.phone}}</span>
             <div class="address">{{$store.state.address.select.addr}}</div>
           </div>
-          <div class="edit" @click="$store.commit('changeShow',{name:'showAddr',value:true});"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
+          <!-- <div class="edit" @click="$store.commit('changeShow',{name:'showAddr',value:true});"><img src="~/assets/images/application/arrow-right.png" alt=""></div> -->
+          <!-- <div class="edit" @click="showDialog=true"><img src="~/assets/images/application/arrow-right.png" alt=""></div> -->
+          <div class="edit" @click="goAddress()"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
         </div>
       </div>
       <div class="addressbox">
@@ -162,10 +164,10 @@
       </div>
     </div>
     <div class="footer">
-      <div class="btnbox" @click="changeStep(0)" v-if="currentStep!=3">
+      <!-- <div class="btnbox" @click="changeStep(0)" v-if="currentStep!=3">
         <div class="btn" v-if="currentStep==1">取消</div>
         <div class="btn" v-else>上一步</div>
-      </div>
+      </div> -->
       <div class="btnbox" @click="changeStep(1)">
         <div class="btn" v-if="currentStep==stepNum">完成</div>
         <div class="btn" v-else>下一步</div>
@@ -174,14 +176,38 @@
     <div class="dialog" v-if="showDialog">
       <div class="content">
         <div class="close" @click="showDialog=false">×</div>
-        <div class="addrCard" v-for="(item,index) in 20" :key="index">
-          <div class="text" @click="showDialog=false;addrIndex=index">
-            <span class="name"></span>
-            <span class="phone"></span>
-            <div class="address"></div>
+        <div class="addrCards" v-if="$store.state.address.list.length>0">
+          <div class="addrCard" v-for="(item,index) in $store.state.address.list" :key="index">
+            <div class="cardTop">
+              <div class="cardLeft">
+                <div class="icon">{{item.user_name.slice(0,1)}}</div>
+              </div>
+              <div class="cardRight">
+                <div class="addrText">
+                  <span class="title">{{item.user_name}}</span>
+                  <span class="phone">{{item.phone}}</span>
+                  <div style="margin-top:10px;width:60vw;">
+                    <span class="address">{{item.addr}}</span>
+                  </div>
+                </div>
+                <div class="editIcon">
+                  <img src="~/assets/images/edit.png" alt="">
+                </div>
+              </div>
+            </div>
+            <div class="cardBottom">
+              <div class="bottomLeft">
+                <div v-if="item.default==1" class="checked">✓</div>
+                <div v-else class="nocheck"></div>
+                <span>默认地址</span>
+              </div>
+              <div class="bottomRight">
+                <span>删除</span>
+              </div>
+            </div>
           </div>
-          <div class="edit" @click="goEdit">编辑</div>
         </div>
+        <div class="tip" v-else>暂无收货地址</div>
       </div>
     </div>
     <div class="editBox" v-if="showEdit">
@@ -309,14 +335,12 @@
                 //   pay_type: '',
                 // }
                 // if(this.paymethod=='0') {
-                //   console.log('余额');
                 //   getBalance().then(res=>{
                 //     this.$store.commit('handleUser',{balance:res.data.balance})
                 //     this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'balance'});
                 //     this.$store.commit('showLoading',false);
                 //   })
                 // } else if(this.paymethod=='1'){
-                //   console.log('聚合');
                 //   info.pay_type = 'Globepay'
                 //   putOrder(info).then(resPay=>{
                 //     if(resPay.data.status=='302') {
@@ -331,7 +355,6 @@
                 //     }
                 //   })
                 // } else if(this.paymethod=='2'){
-                //   console.log('混合');
                 //   getBalance().then(res=>{
                 //     this.$store.commit('handleUser',{balance:res.data.balance})
                 //     this.$store.commit('handlePay',{success:false,state:true,show:true,info:info,method:false,pay_type:'mix'});
@@ -395,30 +418,53 @@
       goEdit() {
         this.showEdit = true;
       },
+      changeDefault(id) {
+        console.log(id);
+      },
       addrEdit() {
         // 提交位置修改信息
         this.showEdit = false;
-      }
+      },
+      goAddress() {
+        localStorage.cache = JSON.stringify({
+          'selectList': this.selectList,
+          'currentStep': this.currentStep,
+        })
+        this.$router.push({name:'Address'})
+      },
     },
     activated() {
       this.kind = this.$route.params.name?this.$route.params.name:'普通';
-      document.getElementsByClassName('footer')[0].style.display = '';
-      document.getElementsByClassName('step')[0].className = 'step step-ing'
-      document.getElementsByClassName('step')[1].className = 'step step-not'
-      document.getElementsByClassName('step')[2].className = 'step step-not'
-      document.getElementsByClassName('line')[0].className = 'line line-not'
-      document.getElementsByClassName('line')[1].className = 'line line-not'
-      this.currentStep=1;
-      this.storageList = [],
-      this.storageNum = null,
-      this.pageIndex = 1,
-      this.selectList = [],
-      this.$store.commit('showLoading', true);
-
+      if(localStorage.cache&&(localStorage.cache!='')) {
+        document.getElementsByClassName('footer')[0].style.display = '';
+        document.getElementsByClassName('step')[0].className = 'step step-ed'
+        document.getElementsByClassName('step')[1].className = 'step step-ing'
+        document.getElementsByClassName('step')[2].className = 'step step-not'
+        document.getElementsByClassName('line')[0].className = 'line line-ed'
+        document.getElementsByClassName('line')[1].className = 'line line-not'
+        let cache = JSON.parse(localStorage.cache);
+        this.currentStep=cache.currentStep;
+        this.storageList = [];
+        this.selectList = cache.selectList;
+        this.$store.commit('showLoading', true);
+        localStorage.cache = ''
+      } else {
+        document.getElementsByClassName('footer')[0].style.display = '';
+        document.getElementsByClassName('step')[0].className = 'step step-ing'
+        document.getElementsByClassName('step')[1].className = 'step step-not'
+        document.getElementsByClassName('step')[2].className = 'step step-not'
+        document.getElementsByClassName('line')[0].className = 'line line-not'
+        document.getElementsByClassName('line')[1].className = 'line line-not'
+        this.currentStep=1;
+        this.storageList = [];
+        this.selectList = [];
+        this.$store.commit('showLoading', true);
+      }
       
       getAddress().then(res=>{
         this.$store.commit('handleAddress',{name:'updateList',value:res.data.data});
         this._getStorageList();
+        // console.log(this.$store.state);
       })
       
       if(this.$store.state.address.default!=null) {
@@ -755,28 +801,6 @@
     border-radius: 50%;
     background-color: #888;
   }
-  .dialog .addrCard {
-    width: 90vw;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    position: relative;
-    margin-bottom: 30px;
-  }
-  .dialog .addrCard .text {
-    width: 90%;
-  }  
-  .dialog .addrCard .text .name{font-size: 18px;color:var(--color-all);font-weight: bold;}
-  .dialog .addrCard .text .phone{color: #777;margin-left: 10px;}
-  .dialog .addrCard .text .address{margin-top: 10px;font-size: 16px;color: #000;width: 75vw;}
-  .dialog .addrCard .edit {
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
-    color: #555;
-  }
 
   .editBox {
     position: absolute;
@@ -869,5 +893,124 @@
     background-color: #f07000;
     padding: 3px;
     background-clip: content-box;
+  }
+
+
+  
+  .addrCard {
+    width: 100vw;
+    background-color: #fff;
+    height: 120px;
+    margin-top: 15px;
+    border-radius: 20px;
+  }
+  .cardTop {
+    /* border: 1px solid #6d6; */
+    height: 70%;
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px solid #ccc;
+    margin: 0 10px;
+  }
+  .cardBottom {
+    /* border: 1px solid #616; */
+    height: 30%;
+  }
+  .cardLeft {
+    /* border: 1px solid #66d; */
+    width: 70px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+  .cardLeft .icon {
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    color: #fff;
+    font-size: 25px;
+    border-radius: 50%;
+    background-color: var(--color-all);
+  }
+  .cardRight {
+    width: calc(96vw - 70px);
+    /* border: 1px solid #d60; */
+    padding-top: 10px;
+    position: relative;
+  }
+  .cardRight .title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-left: 5px;
+  }
+  .cardRight .phone {
+    font-size: 12px;
+    color: #777;
+    margin-left: 5px;
+  }
+  .cardRight .tag {
+    padding: 2px;
+    margin-top: 5px;
+    font-size: 12px;
+    border-radius: 5px;
+    background-color: var(--color-all);
+    color: #fff;
+  }
+  .cardRight .address {
+    margin-left: 5px;
+    line-height: 18px;
+
+    overflow:hidden;
+    text-overflow:ellipsis;
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2; 
+  }
+
+  .editIcon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+  .editIcon img {
+    width: 30px;
+    height: 30px;
+  }
+  .cardBottom {
+    color: #888;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+  }
+  .cardBottom .checked {
+    display: inline-block;
+    background-color: var(--color-all);
+    width: 15px;
+    height: 15px;
+    color: #fff;
+    line-height: 15px;
+    text-align: center;
+    border-radius: 50%;
+    margin-right: 5px;
+  }
+  .cardBottom .nocheck {
+    display: inline-block;
+    border: 1px solid #999;
+    width: 15px;
+    height: 15px;
+    color: #fff;
+    line-height: 15px;
+    text-align: center;
+    border-radius: 50%;
+    margin-right: 5px;
+  }
+  .bottomLeft {
+    display: flex;
+    align-items: center;
   }
 </style>

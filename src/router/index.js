@@ -47,6 +47,11 @@ const routes = [
   { path: '/post_detail',name: 'PostDetail',component: () => import('../views/home/post_detail.vue')},
   { path: '/search',name: 'Search',component: () => import('../views/home/search.vue')},
   { path: '/payment',name: 'Payment',component: () => import('../views/pay/detail.vue') },
+
+  // 地址
+  { path: '/address',name: 'Address',component: () => import('../components/AddrManage.vue')},
+  { path: '/address/add',name: 'AddressAdd',component: () => import('../components/AddrAdd.vue') },
+  { path: '/address/edit',name: 'AddressEdit',component: () => import('../components/AddrEdit.vue')},
 ] 
 
 const router = new VueRouter({

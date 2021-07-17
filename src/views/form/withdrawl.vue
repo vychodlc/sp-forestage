@@ -73,7 +73,6 @@
           this.$store.commit('showTip','请输入比余额小的提现金额')
         } else {
           addWithdrawl(this.newItem).then(res=>{
-            console.log(res);
             if(res.data.status=='200') {
               this.submitOk = true;
               this.applyOk = true;

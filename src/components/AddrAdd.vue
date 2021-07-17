@@ -1,7 +1,8 @@
 <template>
   <div class="addradd">
     <div class="header">
-      <div class="back" @click="$store.commit('changeShow',{name:'addrAdd',value:false})"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
+      <!-- <div class="back" @click="$store.commit('changeShow',{name:'addrAdd',value:false})"><img src="~/assets/images/arrow-left-bold.png" alt=""></div> -->
+      <div class="back" @click="$router.go(-1)"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
       <div class="title">添加收货地址</div>
     </div>
     <div class="content">
@@ -53,7 +54,8 @@
             if(res.data.status='200') {
               getAddress().then(res=>{
                 this.$store.commit('handleAddress',{name:'updateList',value:res.data.data});
-                this.$store.commit('changeShow',{name:'addrAdd',value:false});
+                // this.$store.commit('changeShow',{name:'addrAdd',value:false});
+                this.$router.go(-1)
                 this.$bus.$emit("addrChange");
                 this.$store.commit('showLoading',false)
               })
@@ -70,6 +72,7 @@
 
 <style scoped>
   .addradd {
+    border: 1px solid transparent;
     position: absolute;
     left: 0;
     top: 0;
@@ -113,6 +116,7 @@
   .content {
     width: 100vw;
     height: 100%;
+    border: 1px solid transparent;
     background-color: #fff;
   }
   .content .inputItem {

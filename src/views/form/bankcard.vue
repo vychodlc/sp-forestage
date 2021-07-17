@@ -82,7 +82,6 @@
                 this.newItem.pic.push(res.data.img_url)
                 if(imgNum==0) {
                   addBankcardApply(this.newItem).then(res=>{
-                    console.log(res);
                     if(res.data.status=='200') {
                       this.submitOk = true;
                       this.applyOk = true;

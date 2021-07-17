@@ -77,7 +77,6 @@ export default new Vuex.Store({
       state.tags = tags
     },
     // changeShow(state,name) {
-    //   console.log(state.show[name]);
     //   state.show[name] = !state.show[name]
     // },
     changeShow(state,info) {

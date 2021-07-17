@@ -17,6 +17,5 @@ export function spider() {
     },
     url:"https://api.nike.com/order_mgmt/user_order_details/v2/C00622025833?filter=email(huang.xi.ng77888877%40gmail.com)"
   }).then(res => {
-    console.log(res);
   })
 }

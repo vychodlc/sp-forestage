@@ -173,7 +173,6 @@
     },
     methods:{
       test() {
-        console.log(this.brand);
       },
       changeStep(direction) {
         if(this.currentStep==1&&direction==0) {
@@ -344,7 +343,6 @@
                   document.getElementsByClassName('line')[0].className = 'line line-ed'
                   if(falseList.length==0) {
                     this.wrongDataStatus = false
-                    console.log('all ok');
                   }
                   if(this.currentStep==1) {
                     this.currentStep+=1;
@@ -365,7 +363,6 @@
                 document.getElementsByClassName('line')[0].className = 'line line-ed'
                 if(falseList.length==0) {
                   this.wrongDataStatus = false;
-                  console.log('all ok');
                 }
                 if(this.currentStep==1) {
                   this.currentStep+=1;
@@ -456,7 +453,6 @@
                 document.getElementsByClassName('line')[0].className = 'line line-ed'
                 if(falseList.length==0) {
                   this.wrongDataStatus = false
-                  console.log('all ok');
                 }
                 if(this.currentStep==1) {
                   this.currentStep+=1;
@@ -474,7 +470,6 @@
                   document.getElementsByClassName('line')[0].className = 'line line-ed'
                   if(falseList.length==0) {
                     this.wrongDataStatus = false
-                    console.log('all ok');
                   }
                   if(this.currentStep==1) {
                     this.currentStep+=1;
@@ -560,7 +555,6 @@
                 document.getElementsByClassName('line')[0].className = 'line line-ed'
                 if(falseList.length==0) {
                   this.wrongDataStatus = false
-                  console.log('all ok');
                 }
                 if(this.currentStep==1) {
                   this.currentStep+=1;
@@ -578,7 +572,6 @@
                   document.getElementsByClassName('line')[0].className = 'line line-ed'
                   if(falseList.length==0) {
                     this.wrongDataStatus = false
-                    console.log('all ok');
                   }
                   if(this.currentStep==1) {
                     this.currentStep+=1;

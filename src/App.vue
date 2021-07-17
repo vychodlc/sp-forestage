@@ -18,9 +18,9 @@
       <img :src="$store.state.bigImg.url" alt="">
     </div>
     <Pay v-if="$store.state.pay.show"></Pay>
-    <AddrManage v-if="$store.state.show.showAddr"></AddrManage>
+    <!-- <AddrManage v-if="$store.state.show.showAddr"></AddrManage>
     <AddrEdit v-if="$store.state.show.addrEdit"></AddrEdit>
-    <AddrAdd v-if="$store.state.show.addrAdd"></AddrAdd>
+    <AddrAdd v-if="$store.state.show.addrAdd"></AddrAdd> -->
   </div>
 </template>
 
@@ -54,12 +54,6 @@
     methods: {
       gogogo() {
         console.log('gogogo');
-      },
-      guid() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-          let r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
       },
     },
     mounted() {

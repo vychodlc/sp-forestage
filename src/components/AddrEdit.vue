@@ -1,7 +1,8 @@
 <template>
   <div class="addrEdit">
     <div class="header">
-      <div class="back" @click="$store.commit('changeShow',{name:'addrEdit',value:false})"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
+      <!-- <div class="back" @click="$store.commit('changeShow',{name:'addrEdit',value:false})"><img src="~/assets/images/arrow-left-bold.png" alt=""></div> -->
+      <div class="back" @click="$router.go(-1)"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
       <div class="title">编辑收货地址</div>
     </div>
     <div class="content">
@@ -53,7 +54,8 @@
             if(res.data.status='200') {
               getAddress().then(res=>{
                 this.$store.commit('handleAddress',{name:'updateList',value:res.data.data});
-                this.$store.commit('changeShow',{name:'addrEdit',value:false});
+                // this.$store.commit('changeShow',{name:'addrEdit',value:false});
+                this.$router.go(-1)
                 this.$bus.$emit("addrChange");
                 let list = this.$store.state.address.list;
                 list.map(addr=>{
@@ -76,6 +78,7 @@
 
 <style scoped>
   .addrEdit {
+    border: 1px solid transparent;
     position: absolute;
     left: 0;
     top: 0;
@@ -117,6 +120,7 @@
     text-align: center;
   }
   .content {
+    border: 1px solid transparent;
     width: 100vw;
     height: 100%;
     background-color: #fff;

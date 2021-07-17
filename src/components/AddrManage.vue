@@ -1,7 +1,8 @@
 <template>
   <div class="addrmanager">
     <div class="header">
-      <div class="back" @click="$store.commit('changeShow',{name:'showAddr',value:false})"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
+      <!-- <div class="back" @click="$store.commit('changeShow',{name:'showAddr',value:false})"><img src="~/assets/images/arrow-left-bold.png" alt=""></div> -->
+      <div class="back" @click="$router.go(-1)"><img src="~/assets/images/arrow-left-bold.png" alt=""></div>
       <div class="title">我的收货地址</div>
     </div>
     <div class="addrCards" v-if="$store.state.address.list.length>0">
@@ -38,7 +39,8 @@
     </div>
     <div class="tip" v-else>暂无收货地址</div>
     <div class="footer">
-      <div @click="$store.commit('changeShow',{name:'addrAdd',value:true})"><span style="margin-right:10px;font-size:30px">+</span> 添加收货地址</div>
+      <!-- <div @click="$store.commit('changeShow',{name:'addrAdd',value:true})"><span style="margin-right:10px;font-size:30px">+</span> 添加收货地址</div> -->
+      <div @click="$router.push({name:'AddressAdd'})"><span style="margin-right:10px;font-size:30px">+</span> 添加收货地址</div>
     </div>
     <div class="delete" v-if="showDelete">
       <div class="content">
@@ -98,6 +100,7 @@
           phone: item.phone,
           address_ID: item.address_ID
         }});
+        this.$router.push({name:'AddressEdit'})
       },
       _delAddress() {
         delAddress(this.handleAddr.address_ID).then(res=>{
@@ -123,6 +126,9 @@
       selectAddress(item) {
         this.$bus.$emit('selectAddress',item)
         this.$store.commit('handleAddress',{name:'selectAddress',item:item})
+        if(localStorage.cache&&localStorage.cache!='') {
+          this.$router.go('-1')
+        }
       },
     },
   }
@@ -130,6 +136,7 @@
 
 <style scoped>
   .addrmanager {
+    border: 1px solid transparent;
     position: absolute;
     left: 0;
     top: 0;
@@ -172,6 +179,9 @@
     text-align: center;
   }
 
+  .addrCards {
+    border: 1px solid transparent;
+  }
   .addrCard {
     width: 96vw;
     margin-left: 2vw;

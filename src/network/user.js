@@ -73,7 +73,6 @@ export function delUser(id) {
 }
 
 export function setUserRight(id,newRight) {
-  // console.log(id,newRight);
   let form = new FormData();
   form.append("uuid", id);
   form.append('user_right', newRight);

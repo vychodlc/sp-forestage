@@ -5,7 +5,7 @@
       <div class="avatar"><img src="~/assets/images/my/avatar.png" alt=""></div>
       <div class="infos">
         <div class="info" id="nickname">{{$store.state.user.nickname}}</div>
-        <div class="info" id="uuid">UUID:{{$store.state.user.id}}</div>
+        <div class="info" id="uuid">编号:{{$store.state.user.id}}</div>
       </div>
       <!-- <div class="icon" @click="test()"><img src="~/assets/images/my/setting.png" alt=""></div> -->
     </div>
@@ -109,14 +109,14 @@
     components: {},
     methods:{
       test() {
-        console.log(window.location.href)
         // window.location.push('http://goback.vychod.top/');
       },
       goAddress() {
-        getAddress().then(res=>{
-          this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
-          this.$store.commit('changeShow',{name:'showAddr',value:true});
-        })
+        // getAddress().then(res=>{
+        //   this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
+        //   this.$store.commit('changeShow',{name:'showAddr',value:true});
+        // })
+        this.$router.push({name:'Address'})
       },
       logOut() {
         this.$store.commit('rmToken');
@@ -124,7 +124,6 @@
       },
       
       scrollTotop() {
-        console.log(123);
         window.scrollTo(0,0)
       },
       goWithdrawl() {

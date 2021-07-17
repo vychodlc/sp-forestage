@@ -155,7 +155,6 @@
       _getOutputList() {
         if(this.isSearch==false) {
           getOutputList(this.currentIndex).then(res=>{
-            console.log(res);
             if(res.data.status=='200') {
               this.tableData = res.data.data;
               this.tableData.map(item=>{
@@ -173,7 +172,6 @@
                 item.material = item.material.split(',')
               })
               this.pageNum = Math.ceil(res.data.applications_num/10);
-              console.log(this.tableData);
               this.$store.commit('showLoading',false);
             }
           })
@@ -267,11 +265,7 @@
       this.$store.commit('showLoading',true);
       this.currentIndex = 1;
       this._getOutputList();
-      
-      // getBalance().then(res=>{
-      //   console.log(res);
-      // })
-
+    
       this.$bus.$on('paystatus', (info)=>{
         if(info.order_type=='o') {
           if(info.status=='ok') {

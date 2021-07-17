@@ -46,6 +46,7 @@
 
 <style scoped>
   .post {
+    border: 1px solid transparent;
     position: relative;
     padding: 0 20px;
     padding-bottom: 20px;
@@ -76,6 +77,7 @@
     line-height: 30px;
     font-weight: bold;
     text-align: left;
+    white-space:normal; word-break:break-all;overflow:hidden;
   }
   .date {
     line-height: 10px;

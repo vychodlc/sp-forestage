@@ -1,7 +1,6 @@
 import {request} from './request'
 
 export function putOrder(info) {
-  console.log(info);
   let formData = new FormData();
   formData.append('order_type',info.order_type);
   formData.append('id',info.id);
@@ -14,7 +13,6 @@ export function putOrder(info) {
 }
 
 export function paymentBalance(info) {
-  console.log(info);
   let formData = new FormData();
   formData.append('order_type',info.order_type);
   formData.append('id',info.id);

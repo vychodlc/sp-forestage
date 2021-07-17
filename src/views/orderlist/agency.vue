@@ -150,7 +150,6 @@
       _getList() {
         if(this.isSearch==false) {
           getAgency(this.currentIndex).then(res=>{
-            console.log(res);
             if(res.data.status=='200') {
               this.tableData = res.data.data;
               this.pageNum = Math.ceil(res.data.agencys_num/10);
@@ -201,7 +200,6 @@
         this._getList();
       },
       showImg(url) {
-        console.log(url);
       }
     },
     activated() {

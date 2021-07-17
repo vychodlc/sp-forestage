@@ -56,14 +56,12 @@
     },
     methods:{
       test() {
-        // console.log(this.price,this.money,parseInt(this.price)<parseInt(this.money));
       },
       inputChange() {
         let inputPwd = this.$refs.pwdInput;
         if(this.pwd.length>6) {
           this.pwd = this.pwd.slice(0,6)
         }
-        console.log(this.pwd);
       },
       payNo() {
         this.$store.commit('handlePay',{show:false})
@@ -101,15 +99,9 @@
         }
       },
       selectMethod() {
-        console.log(this.$store.state.pay);
-        // checkPayment({
-
-        // })
         if(this.paymethod=='0') {
-          console.log('余额');
           this.$store.commit('handlePay',{method:false,pay_type:'balance'})
         } else if(this.paymethod=='1') {
-          console.log('聚合');
           this.$store.commit('handlePay',{pay_type:'Globepay'});
           putOrder({
             id:this.$store.state.pay.id,
@@ -129,7 +121,6 @@
             }
           })
         } else if(this.paymethod=='2') {
-          console.log('混合');
           this.$store.commit('handlePay',{method:false,pay_type:'mix'})
         } else {
           this.$store.commit('showTip','请选择支付方式')
