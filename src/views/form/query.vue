@@ -63,6 +63,8 @@
         pin: '',
       };
       this.isCommit = false;
+      this.$store.commit('showLoading', false);
+           
     },
     methods:{
       changeRadio(val) {

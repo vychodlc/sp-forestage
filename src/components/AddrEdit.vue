@@ -83,9 +83,9 @@
     left: 0;
     top: 0;
     z-index: 2000;
-    width: 375px;
-    height: 810px;
-    overflow-y: scroll;
+    width: 100vw;
+    height: 100vh;
+    /* overflow-y: scroll; */
     background-color: var(--color-background);
     padding-top: 60px;
   }

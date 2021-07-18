@@ -76,3 +76,15 @@ export function addImg(file) {
     data: formData
   })
 }
+
+export function transmitCrawler(info) {
+  let formData = new FormData()
+  formData.append('id',info.id)
+  formData.append('email',info.email)
+  formData.append('brand',info.brand)
+  return request({
+    method: 'POST',
+    url: '/get_crawler_order.php',
+    data: formData
+  })
+}

@@ -115,6 +115,7 @@
       this.applyOk = false;
       this.submitOk = false;
       this.uploadList = [];
+      this.$store.commit('showLoading',false);
     }
   }
 </script>

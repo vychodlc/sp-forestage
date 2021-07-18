@@ -78,6 +78,7 @@
       }
     },
     activated() {
+      this.$store.commit('showLoading',false);
       // this.hasMore = false;
       // this.data = [];
       // this.search_number = null;

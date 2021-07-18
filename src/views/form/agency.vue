@@ -416,6 +416,7 @@ xxxx xxxx
       
     },
     activated() {
+      this.$store.commit('showLoading',false);
       this.kind = this.$route.params.name?this.$route.params.name:'Nike';
       switch(this.kind){
         case 'Nike':

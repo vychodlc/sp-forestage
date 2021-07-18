@@ -74,7 +74,7 @@
             let select = this.$store.state.address.select;
             let has = false;
             list.map(addr=>{
-              if(addr.address_ID==select.address_ID) {
+              if(addr.address_ID&&select.address_ID&&addr.address_ID==select.address_ID) {
                 has = true
               }
             })
@@ -141,17 +141,15 @@
     left: 0;
     top: 0;
     z-index: 2000;
-    width: 375px;
-    height: 810px;
-    overflow-y: scroll;
+    width: 100vw;
+    height: 100vh;
+    /* overflow-y: scroll; */
     background-color: var(--color-background);
-    padding-top: 60px;
-    padding-bottom: 80px;
   }
   .header {
     z-index: 1000;
     background-color: var(--color-background);
-    position: fixed;
+    /* position: fixed; */
     top: 0;
     width: 100vw;
   }
@@ -180,7 +178,9 @@
   }
 
   .addrCards {
+    overflow-y: scroll;
     border: 1px solid transparent;
+    height: calc(100vh - 130px);
   }
   .addrCard {
     width: 96vw;

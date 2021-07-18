@@ -57,6 +57,7 @@
       },
     },
     mounted() {
+      this.$store.commit('showLoading',false)
       getUserInfo().then(res=>{
         if(res.data.status=='200') {
           this.$store.commit('setBalance',res.data.data.balance)

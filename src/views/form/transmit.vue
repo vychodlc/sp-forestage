@@ -147,7 +147,7 @@
 </template>
 
 <script>
-  import {addApply} from '@/network/transship.js'
+  import {addApply,transmitCrawler} from '@/network/transship.js'
   export default {
     name: "Transmit",
     data () {
@@ -341,7 +341,7 @@
                   document.getElementById('step1').className = 'step step-ed'
                   document.getElementById('step2').className = 'step step-ing'
                   document.getElementsByClassName('line')[0].className = 'line line-ed'
-                  if(falseList.length==0) {
+                  if(this.wrongDataNum==0) {
                     this.wrongDataStatus = false
                   }
                   if(this.currentStep==1) {
@@ -361,7 +361,7 @@
                 document.getElementById('step1').className = 'step step-ed'
                 document.getElementById('step2').className = 'step step-ing'
                 document.getElementsByClassName('line')[0].className = 'line line-ed'
-                if(falseList.length==0) {
+                if(this.wrongDataNum==0) {
                   this.wrongDataStatus = false;
                 }
                 if(this.currentStep==1) {
@@ -444,14 +444,13 @@
             this.$axios.get(url).catch(e=>{
               order.right = false;
               this.handleTimes++;
-              this.wrongDataNum = this.orders.filter(item=>{return item.right==false;}).length;
-              
+              this.wrongDataNum = this.orders.filter(item=>{return item.right==false;}).length;              
               if(this.handleTimes==falseList.length) {
                 this.$store.commit('showLoading', false);
                 document.getElementById('step1').className = 'step step-ed'
                 document.getElementById('step2').className = 'step step-ing'
                 document.getElementsByClassName('line')[0].className = 'line line-ed'
-                if(falseList.length==0) {
+                if(this.wrongDataNum==0) {
                   this.wrongDataStatus = false
                 }
                 if(this.currentStep==1) {
@@ -468,7 +467,7 @@
                   document.getElementById('step1').className = 'step step-ed'
                   document.getElementById('step2').className = 'step step-ing'
                   document.getElementsByClassName('line')[0].className = 'line line-ed'
-                  if(falseList.length==0) {
+                  if(this.wrongDataNum==0) {
                     this.wrongDataStatus = false
                   }
                   if(this.currentStep==1) {
@@ -511,7 +510,7 @@
                 for(let item in returnItem) {
                   returnItem[item] = returnItem[item].join(',')
                 }
-                
+          
                 returnItem.id = order.id;
                 returnItem.email = order.email;
                 this.okOrders.push(returnItem)
@@ -519,111 +518,45 @@
             })
           })
         } else if(this.brand=='A') {
-          falseList.map(order=>{
-            let id = order.id;
-            let email = order.email;
-            let returnItem = {
-              order_time: [],
-              price: [],
-              maxOrderLineStatus:[],
-              minOrderLineStatus:[],
-              rolledUpStatus:[],
-              size:[],
-              style:[],
-              op_date:[],
-              op_description:[],
-              op_quantity:[],
-              first_address:[],
-              second_address:[],
-              city:[],
-              postal:[],
-              country:[],
-              gift:[],
-              tracker:[],
-            }
-            let url = "https://data.smartagent.io/v1/jdsports/track-my-order?orderNumber=" + id + "&facia=jdsportsuk&emailAddress=" + email;
-
-            this.$axios.get(url).catch(e=>{
-              order.right = false;
-              this.handleTimes++;
-              this.wrongDataNum = this.orders.filter(item=>{return item.right==false}).length;
-              
-              if(this.handleTimes==falseList.length) {
-                this.$store.commit('showLoading', false);
-                document.getElementById('step1').className = 'step step-ed'
-                document.getElementById('step2').className = 'step step-ing'
-                document.getElementsByClassName('line')[0].className = 'line line-ed'
-                if(falseList.length==0) {
-                  this.wrongDataStatus = false
-                }
-                if(this.currentStep==1) {
-                  this.currentStep+=1;
-                }
-              }
-            }).then(res=>{
-              if(res!=undefined) {
-                order.right = true;
-                this.handleTimes++;
-                this.wrongDataNum = this.orders.filter(item=>{return item.right==false}).length;
-                if(this.handleTimes==falseList.length) {
-                  this.$store.commit('showLoading', false);
-                  document.getElementById('step1').className = 'step step-ed'
-                  document.getElementById('step2').className = 'step step-ing'
-                  document.getElementsByClassName('line')[0].className = 'line line-ed'
-                  if(falseList.length==0) {
-                    this.wrongDataStatus = false
-                  }
-                  if(this.currentStep==1) {
-                    this.currentStep+=1;
-                  }
-                }
-                
-                let data = res.data;
-                returnItem.order_time.push(data.creationDate?data.creationDate:'');
-                returnItem.price.push(data.totalAmount?data.totalAmount:'');
-                if(data.productLineItems) {
-                  data.productLineItems.map(productLineItem=>{
-                    returnItem.op_description.push(productLineItem.productName?productLineItem.productName:'');
-                    returnItem.op_date.push(productLineItem.statusDate?productLineItem.statusDate:'')
-                    returnItem.style.push((productLineItem.articleNumber&&productLineItem.color)?(productLineItem.articleNumber+productLineItem.color):'')
-                    returnItem.size.push(productLineItem.literalSize?productLineItem.literalSize:'')
-                    returnItem.rolledUpStatus.push(productLineItem.status?productLineItem.status:'')
-                  })
-                }
-                if(data.paymentMethods) {
-                  data.paymentMethods.map(paymentMethod=>{
-                    returnItem.gift.push(paymentMethod.giftCardNumber)
-                  })
-                }
-                if(data.shipping&&data.shipping.shippingAddress) {
-                  returnItem.first_address.push(data.shipping.shippingAddress.addressLine1?data.shipping.shippingAddress.addressLine1:'')
-                  returnItem.second_address.push(data.shipping.shippingAddress.addressLine2?data.shipping.shippingAddress.addressLine2:'')
-                  returnItem.city.push(data.shipping.shippingAddress.city?data.shipping.shippingAddress.city:'')
-                  returnItem.country.push(data.shipping.shippingAddress.country?data.shipping.shippingAddress.country:'')
-                  returnItem.postal.push(data.shipping.shippingAddress.postalCode?data.shipping.shippingAddress.postalCode:'')
-                }
-                if(data.shipments) {
-                  data.shipments.map(shipment=>{
-                    returnItem.tracker.push(shipment.trackingNo?shipment.trackingNo:'')
-                  })
-                }
-                for(let item in returnItem) {
-                  returnItem[item] = returnItem[item].join(',')
-                }
-                
-                returnItem.id = order.id;
-                returnItem.email = order.email;
-                this.okOrders.push(returnItem)
-              }
-            })
-          })
+          // falseList.map(order=>{
+          //   let id = order.id;
+          //   let email = order.email;
+          //   let returnItem = {
+          //     order_time: [],
+          //     price: [],
+          //     maxOrderLineStatus:[],
+          //     minOrderLineStatus:[],
+          //     rolledUpStatus:[],
+          //     size:[],
+          //     style:[],
+          //     op_date:[],
+          //     op_description:[],
+          //     op_quantity:[],
+          //     first_address:[],
+          //     second_address:[],
+          //     city:[],
+          //     postal:[],
+          //     country:[],
+          //     gift:[],
+          //     tracker:[],
+          //   }
+          //   transmitCrawler({
+          //     id: id,
+          //     email: email,
+          //     brand: 'A'
+          //   }).then(res=>{
+          //     console.log(res);
+          //   })
+          // })
+          this.$store.commit('showTip','暂不支持Adidas申报')
+          this.$store.commit('showLoading',false)
         } else {
-          this.$store.commit('showTip','当前仅支持 Nike 和 JD 申报');
           this.$store.commit('showLoading',false);
         }
       },
     },
     activated() {
+      this.$store.commit('showLoading', false);
       this.kind = this.$route.params.name?this.$route.params.name:'Nike';
       switch(this.kind){
         case 'Nike':

@@ -58,6 +58,11 @@
                 this.$router.go(-1)
                 this.$bus.$emit("addrChange");
                 this.$store.commit('showLoading',false)
+                this.newAddress =  {
+                  name: '',
+                  phone: '',
+                  address: '',
+                }
               })
             } else {
               this.$store.commit('showTip','新增地址失败'+msg)
@@ -77,9 +82,9 @@
     left: 0;
     top: 0;
     z-index: 2000;
-    width: 375px;
-    height: 810px;
-    overflow-y: scroll;
+    width: 100vw;
+    height: 100%;
+    /* overflow-y: scroll; */
     background-color: var(--color-background);
     padding-top: 60px;
   }

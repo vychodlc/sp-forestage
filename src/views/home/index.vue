@@ -38,6 +38,7 @@
     methods:{
     },
     created() {
+      this.$store.commit('showLoading',false);
       if((localStorage.token=='')||(localStorage.token==undefined)) {
         this.$store.commit('rmToken');
         if(this.$route.path!='/login') {

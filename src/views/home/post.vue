@@ -201,6 +201,7 @@
       
     },
     activated() {
+      this.$store.commit('showLoading',false);
       this.listenTotop = setInterval(()=>{
         let top;
         if(this.currentTab==0){top = this.$refs.my_scroller0.getPosition().top}

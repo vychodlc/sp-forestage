@@ -13,7 +13,7 @@
       <div class="card">
         <div class="title">
           <span class="titlespan">钱包管理</span>
-          <div class="more" @click="$router.push({name:'Payment'})">
+          <div class="more" @click="routerGo('Payment')">
             <span>交易明细</span>
             <img src="~/assets/images/my/arrow-right.png" alt="">
           </div>
@@ -24,7 +24,7 @@
             <div class="btnName"><span>余额</span></div>
             <div class="btnName" style="margin-top:5px"><span>{{balance}}</span></div>
           </div>
-          <div class="btn" @click="$router.push({name:'Withdrawl'})">
+          <div class="btn" @click="routerGo('Withdrawl')">
             <div class="btnImage"><img src="~/assets/images/my/withdrawl.png" alt=""></div>
             <div class="btnName"><span>提现</span></div>
           </div>
@@ -39,19 +39,19 @@
           </div> -->
         </div>
         <div class="btns">
-          <div class="btn" @click="$router.push({name:'TransmitOrderlist'})">
+          <div class="btn" @click="routerGo('TransmitOrderlist')">
             <div class="btnImage"><img src="~/assets/images/my/input.png" alt=""></div>
             <div class="btnName"><span>入库订单</span></div>
           </div>
-          <div class="btn" @click="$router.push({name:'OutputOrderlist'})">
+          <div class="btn" @click="routerGo('OutputOrderlist')">
             <div class="btnImage"><img src="~/assets/images/my/output.png" alt=""></div>
             <div class="btnName"><span>出库订单</span></div>
           </div>
-          <div class="btn" @click="$router.push({name:'AgencyOrderlist'})">
+          <div class="btn" @click="routerGo('AgencyOrderlist')">
             <div class="btnImage"><img src="~/assets/images/my/agency.png" alt=""></div>
             <div class="btnName"><span>代购订单</span></div>
           </div>
-          <!-- <div class="btn" @click="$router.push({name:'OutputOrderlist'})">
+          <!-- <div class="btn" @click="routerGo('OutputOrderlist')">
             <div class="btnImage"><img src="~/assets/images/application/biaodan.png" alt=""></div>
             <div class="btnName"><span>退税订单</span></div>
           </div> -->
@@ -60,7 +60,7 @@
       <div class="card">
         <div class="title">
           <span class="titlespan">地址管理</span>
-          <div class="more" @click="goAddress">
+          <div class="more" @click="routerGo('Address')">
             <span>管理地址</span>
             <img src="~/assets/images/my/arrow-right.png" alt="">
           </div>
@@ -82,13 +82,23 @@
           </div> -->
         </div>
       </div>
-      <div class="card">
+      <div class="card" v-if="token!=''">
         <div class="title">
           <span class="titlespan">退出登录</span>
           <div class="more" @click="logOut">
             <span>退出</span>
             <img src="~/assets/images/my/arrow-right.png" alt="">
           </div>
+        </div>
+      </div>
+    </div>
+    <div class="confirm" v-show="showDialog">
+      <div class="box">
+        <div class="title">尚未登录</div>
+        <div class="context">是否前往登陆页面从而获取更多权限</div>
+        <div class="btns">
+          <div class="btn" @click="showDialog=false">取消</div>
+          <div class="btn" @click="$router.replace({name:'Login'})">确认</div>
         </div>
       </div>
     </div>
@@ -103,20 +113,22 @@
     name: "My",
     data () {
       return {
-        balance: 0
+        balance: 0,
+        token: '',
+        showDialog: '',
       }
     },
     components: {},
     methods:{
+      routerGo(route) {
+        if(this.token=='') {
+          this.showDialog = true;
+        } else {
+          this.$router.push({name:route})
+        }
+      },
       test() {
         // window.location.push('http://goback.vychod.top/');
-      },
-      goAddress() {
-        // getAddress().then(res=>{
-        //   this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
-        //   this.$store.commit('changeShow',{name:'showAddr',value:true});
-        // })
-        this.$router.push({name:'Address'})
       },
       logOut() {
         this.$store.commit('rmToken');
@@ -131,17 +143,24 @@
       }
     },
     activated() {
-      getAddress().then(res=>{
-        this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
-      })
-      getUserInfo().then(res=>{
-        this.balance = parseFloat(res.data.data.balance/100).toFixed(2)
-      })
-      this.$bus.$on("addrChange",()=>{
+      this.token = localStorage.token;
+      this.showDialog=false;
+      this.$store.commit('showLoading',false);
+      if(localStorage.token=='') {
+
+      } else {
         getAddress().then(res=>{
           this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
         })
-      });
+        getUserInfo().then(res=>{
+          this.balance = parseFloat(res.data.data.balance/100).toFixed(2)
+        })
+        this.$bus.$on("addrChange",()=>{
+          getAddress().then(res=>{
+            this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
+          })
+        });
+      }
     }
   }
 </script>
@@ -318,4 +337,6 @@
     width: 100%;
     height: 100%;
   }
+
+  
 </style>

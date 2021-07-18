@@ -11,12 +11,12 @@
             <div class="name">申报</div>
           </div>
           <div class="optiondetail">
-            <div class="item" @click="$router.push({name:'Transmit',params:{name:'Nike'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Nike</div>
-            <div class="item" @click="$router.push({name:'Transmit',params:{name:'Adidas'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Adidas</div>
-            <div class="item" @click="$router.push({name:'Transmit',params:{name:'JD'}})"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
-            <!-- <div class="item" @click="$router.push({name:'Transmit',params:{name:'通用'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 通用</div> -->
+            <div class="item" @click="routerGo('Transmit','Nike')"><img src="~/assets/images/application/fenlei.png" alt=""> Nike</div>
+            <div class="item" @click="routerGo('Transmit','Adidas')"><img src="~/assets/images/application/fenlei.png" alt=""> Adidas</div>
+            <div class="item" @click="routerGo('Transmit','JD')"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
+            <!-- <div class="item" @click="routerGo('Transmit','通用')"><img src="~/assets/images/application/fenlei.png" alt=""> 通用</div> -->
           </div>
-          <div class="more" @click="$router.push({name:'TransmitOrderlist'})"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
+          <div class="more" @click="routerGo('TransmitOrderlist','')"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
         </div>
         <div class="option">
           <div class="optionheader">
@@ -24,11 +24,11 @@
             <div class="name">仓库</div>
           </div>
           <div class="optiondetail">
-            <div class="item" @click="$router.push({name:'StorageOrderlist'})"><img src="~/assets/images/application/fenlei.png" alt=""> 库存</div>
-            <div class="item" @click="$router.push({name:'Output',params:{name:'普通'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 普通出库</div>
-            <div class="item" @click="$router.push({name:'Outputtax',params:{name:'退税'}})"><img src="~/assets/images/application/fenlei.png" alt=""> 退税出库</div>
+            <div class="item" @click="routerGo('StorageOrderlist','')"><img src="~/assets/images/application/fenlei.png" alt=""> 库存</div>
+            <div class="item" @click="routerGo('Output','普通')"><img src="~/assets/images/application/fenlei.png" alt=""> 普通出库</div>
+            <div class="item" @click="routerGo('Outputtax','退税')"><img src="~/assets/images/application/fenlei.png" alt=""> 退税出库</div>
           </div>
-          <div class="more" @click="$router.push({name:'OutputOrderlist'})"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
+          <div class="more" @click="routerGo('OutputOrderlist','')"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
         </div>
       </div>
     </div>
@@ -43,11 +43,11 @@
             <div class="name">下单</div>
           </div>
           <div class="optiondetail">
-            <div class="item" @click="$router.push({name:'Agency',params:{name:'Nike'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Nike</div>
-            <div class="item" @click="$router.push({name:'Agency',params:{name:'Adidas'}})"><img src="~/assets/images/application/fenlei.png" alt=""> Adidas</div>
-            <div class="item" @click="$router.push({name:'Agency',params:{name:'JD'}})"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
+            <div class="item" @click="routerGo('Agency','Nike')"><img src="~/assets/images/application/fenlei.png" alt=""> Nike</div>
+            <div class="item" @click="routerGo('Agency','Adidas')"><img src="~/assets/images/application/fenlei.png" alt=""> Adidas</div>
+            <div class="item" @click="routerGo('Agency','JD')"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
           </div>
-          <div class="more" @click="$router.push({name:'AgencyOrderlist'})"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
+          <div class="more" @click="routerGo('AgencyOrderlist','')"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
         </div>
         <div class="option">
           <div class="optionheader">
@@ -55,7 +55,7 @@
             <div class="name">服务</div>
           </div>
           <div class="optiondetail">
-            <div class="item" @click="$router.push({name:'Query'})"><img src="~/assets/images/application/fenlei.png" alt=""> 礼品卡查询</div>
+            <div class="item" @click="routerGo('Query','')"><img src="~/assets/images/application/fenlei.png" alt=""> 礼品卡查询</div>
           </div>
         </div>
       </div>
@@ -66,7 +66,7 @@
       </div>
       <div class="options" id="options3">
         <div class="option" v-if="cardStatus==0||cardStatus==4">
-          <div class="optionheader" @click="$router.push({name:'Bankcard'})">
+          <div class="optionheader" @click="routerGo('Bankcard','')">
             <div class="icon"><img src="~/assets/images/application/biaodan.png" alt=""></div>
             <div class="name">提交申请</div>
           </div>
@@ -111,6 +111,16 @@
         </div>
       </div>
     </div>
+    <div class="confirm" v-show="showDialog">
+      <div class="box">
+        <div class="title">尚未登录</div>
+        <div class="context">是否前往登陆页面从而获取更多权限</div>
+        <div class="btns">
+          <div class="btn" @click="showDialog=false">取消</div>
+          <div class="btn" @click="$router.replace({name:'Login'})">确认</div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -122,10 +132,23 @@
       return {
         cardStatus: 0,
         cardNum: '',
+        token: '',
+        showDialog: '',
       }
     },
     methods:{
-      _getBnkcard() {
+      routerGo(route,param) {
+        if(this.token=='') {
+          this.showDialog = true;
+        } else {
+          if(param=='') {
+           this.$router.push({name:route})
+          } else {
+           this.$router.push({name:route,params:{name:param}})
+          }
+        }
+      },
+      _getBankcard() {
         getBankcard().then(res=>{
           if(res.data.status=='200') {
             if(res.data.msg=='Apply') {
@@ -150,10 +173,23 @@
       }
     },
     created() {
-      this._getBnkcard()
+      this.token = localStorage.token;
+      this.showDialog=false;
+      if(localStorage.token=='') {
+
+      } else {
+        this._getBankcard()
+      }
     },
     activated() {
-      this._getBnkcard()
+      this.token = localStorage.token;
+      this.showDialog=false;
+      this.$store.commit('showLoading',false);
+      if(localStorage.token=='') {
+
+      } else {
+        this._getBankcard()
+      }
     }
   }
 </script>

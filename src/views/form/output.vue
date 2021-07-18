@@ -385,6 +385,9 @@
               }
             }
             this.$store.commit('showLoading', false);
+          } else {
+            this.$store.commit('showLoading', false);
+            this.$store.commit('showTip','数据获取失败'+res.data.msg);
           }
         })
         // getStorageList(this.pageIndex).then(res=>{
