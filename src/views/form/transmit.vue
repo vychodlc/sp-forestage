@@ -518,38 +518,93 @@
             })
           })
         } else if(this.brand=='A') {
-          // falseList.map(order=>{
-          //   let id = order.id;
-          //   let email = order.email;
-          //   let returnItem = {
-          //     order_time: [],
-          //     price: [],
-          //     maxOrderLineStatus:[],
-          //     minOrderLineStatus:[],
-          //     rolledUpStatus:[],
-          //     size:[],
-          //     style:[],
-          //     op_date:[],
-          //     op_description:[],
-          //     op_quantity:[],
-          //     first_address:[],
-          //     second_address:[],
-          //     city:[],
-          //     postal:[],
-          //     country:[],
-          //     gift:[],
-          //     tracker:[],
-          //   }
-          //   transmitCrawler({
-          //     id: id,
-          //     email: email,
-          //     brand: 'A'
-          //   }).then(res=>{
-          //     console.log(res);
-          //   })
-          // })
-          this.$store.commit('showTip','暂不支持Adidas申报')
-          this.$store.commit('showLoading',false)
+          falseList.map(order=>{
+            let id = order.id;
+            let email = order.email;
+            let returnItem = {
+              order_time: [],
+              price: [],
+              maxOrderLineStatus:[],
+              minOrderLineStatus:[],
+              rolledUpStatus:[],
+              size:[],
+              style:[],
+              op_date:[],
+              op_description:[],
+              op_quantity:[],
+              first_address:[],
+              second_address:[],
+              city:[],
+              postal:[],
+              country:[],
+              gift:[],
+              tracker:[],
+            }
+            transmitCrawler({
+              id: id,
+              email: email,
+              brand: 'A'
+            }).then(res=>{
+              if(res.data.status!='405') {
+                order.right = true;
+                this.handleTimes++;
+                this.wrongDataNum = this.orders.filter(item=>{return item.right==false}).length;
+                if(this.handleTimes==falseList.length) {
+                  this.$store.commit('showLoading', false);
+                  document.getElementById('step1').className = 'step step-ed'
+                  document.getElementById('step2').className = 'step step-ing'
+                  document.getElementsByClassName('line')[0].className = 'line line-ed'
+                  if(this.wrongDataNum==0) {
+                    this.wrongDataStatus = false
+                  }
+                  if(this.currentStep==1) {
+                    this.currentStep+=1;
+                  }
+                }
+
+                let data = res.data;
+                returnItem.order_time = data[1];
+                returnItem.price = data[2];
+                returnItem.maxOrderLineStatus = data[3].filter(item=>{return item!=''}).join(',');
+                returnItem.minOrderLineStatus = data[4].filter(item=>{return item!=''}).join(',');
+                returnItem.rolledUpStatus = data[5].filter(item=>{return item!=''}).join(',');
+                returnItem.size = data[6].filter(item=>{return item!=''}).join(',');
+                returnItem.style = data[7].filter(item=>{return item!=''}).join(',');
+                returnItem.op_date = data[8];
+                returnItem.op_description = data[9];
+                returnItem.op_quantity = data[10].filter(item=>{return item!=''}).join(',');
+                returnItem.first_address = data[11];
+                returnItem.second_address = data[12];
+                returnItem.city = data[13];
+                returnItem.postal = data[14];
+                returnItem.country = data[15];
+                returnItem.gift = data[16];
+                returnItem.tracker = data[17];
+
+                returnItem.id = orderId;
+                returnItem.email = orderEmail;
+                this.okOrders.push(returnItem)
+              } else {
+                order.right = false;
+                this.handleTimes++;
+                this.wrongDataNum = this.orders.filter(item=>{return item.right==false;}).length;              
+                if(this.handleTimes==falseList.length) {
+                  this.$store.commit('showLoading', false);
+                  document.getElementById('step1').className = 'step step-ed'
+                  document.getElementById('step2').className = 'step step-ing'
+                  document.getElementsByClassName('line')[0].className = 'line line-ed'
+                  if(this.wrongDataNum==0) {
+                    this.wrongDataStatus = false
+                  }
+                  if(this.currentStep==1) {
+                    this.currentStep+=1;
+                  }
+                }
+              }
+            })
+          })
+          // this.$store.commit('showTip','暂不支持Adidas申报')
+          // this.$store.commit('showLoading',false)
         } else {
           this.$store.commit('showLoading',false);
         }
@@ -573,10 +628,10 @@
           break;
       }
       this.orders = [
-        {id:'C00622025833',email:'huang.xi.ng77888877@gmail.com',right:false},
-        {id:'C00627066000',email:'di.nglingguan.gdangdang@gmail.com',right:false},
-        {id:'478003919',email:'d.nkasj.ndondsk@gmail.com',right:false},
-        {id:'12322',email:'123@123.com',right:false},
+        // {id:'C00622025833',email:'huang.xi.ng77888877@gmail.com',right:false},
+        // {id:'C00627066000',email:'di.nglingguan.gdangdang@gmail.com',right:false},
+        // {id:'478003919',email:'d.nkasj.ndondsk@gmail.com',right:false},
+        // {id:'12322',email:'123@123.com',right:false},
       ]
       this.okOrders = [];
       document.getElementsByClassName('footer')[0].style.display = '';
