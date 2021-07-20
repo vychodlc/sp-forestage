@@ -14,7 +14,7 @@
     <div class="messageTip" v-show="$store.state.message.tip.show">
       {{$store.state.message.tip.text}}
     </div>
-    <div class="bigImg" v-if="$store.state.bigImg.show" @click="$store.commit('showImg',['',false])">
+    <div class="bigImg" v-if="$store.state.bigImg.show" @click="$store.commit('showImg',['',false]);$router.go(-1)">
       <img :src="$store.state.bigImg.url" alt="">
     </div>
     <Pay v-if="$store.state.pay.show"></Pay>

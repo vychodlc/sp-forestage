@@ -48,7 +48,7 @@
           </thead>
           <tbody>
             <tr v-for="(item,index) in tableData" :key="index">
-              <td @click="$store.commit('showImg',[item.pic,true])"><img :src="item.pic" alt="" style="width:20vw"></td>
+              <td @click="showImg(item.pic)"><img :src="item.pic" alt="" style="width:20vw"></td>
               <td>{{item.description}}</td>
               <td>{{item.size}}</td>
               <td>{{item.weight}}</td>
@@ -174,13 +174,23 @@
         this._getStorageList();
       },
       showImg(url) {
+        window.history.pushState(null,null,'#')
+        this.$store.commit('showImg',[url,true])
       }
     },
     activated() {
+      window.addEventListener('popstate', e=>{
+        this.$store.commit('showImg',['',false])
+      }, false)
       this.$store.commit('showLoading',true);
       this.currentIndex = 1;
       this._getStorageList();
     },
+    beforeDestroy() {
+      window.removeEventListener('popstate', e=>{
+        this.$store.commit('showImg',['',false])
+      }, false)
+    }
   }
 </script>
 

@@ -39,8 +39,9 @@
         <div class="switch" v-else>
           已经有账户？快去<span class="link" @click="isLogin=true">登录</span>
         </div>
-        <div class="switch">
+        <div class="switch" ref="visitBtn">
           不想登录，直接以<span class="link" @click="visitorGo">游客模式</span>进入
+          <!-- 不想登录，直接以<span class="link" @click="$router.replace({name:'Home'})">游客模式</span>进入 -->
         </div>
       </div>
     </div>
@@ -150,15 +151,28 @@
         localStorage.ID = '';
         localStorage.nickname = '未登录';
         this.$store.commit('setUser', ['','未登录','']);
-        this.$router.replace('/home');
+        this.$nextTick(()=>{      
+          this.$router.replace({name:'Home'});
+        })
         this.$store.commit('showTip', '当前为游客模式');
       }
     },
     created() {
       this.$store.commit('showLoading',false)
-      if((localStorage.token!='')&&(localStorage.token!=undefined)) {
+      if(localStorage.token) {
+        this.$router.replace({name:'Home'});
+      } else {
         if(this.$route.path!='/home') {
-          this.$router.replace('/home');
+          this.$store.commit('setToken', '');
+          localStorage.uuid = '';
+          localStorage.balance = '';
+          localStorage.ID = '';
+          localStorage.nickname = '未登录';
+          this.$store.commit('setUser', ['','未登录','']);
+          this.$nextTick(()=>{      
+            this.$router.replace({name:'Home'});
+          })
+          this.$store.commit('showTip', '当前为游客模式');
         }
       }
     }
@@ -243,12 +257,14 @@
   }
   .bottom .switch {
     text-align: center;
-    line-height: 80px;
+    line-height: 30px;
     color: #aaa;
     font-size: 14px;
+    margin-top: 20px;
   }
   .bottom .switch:last-child {
-    transform: translateY(-50px);
+    margin-top: 0;
+    /* border: 1px solid #666; */
   }
   .bottom .switch span {
     color: var(--color-all);

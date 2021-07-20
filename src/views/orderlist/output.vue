@@ -55,7 +55,7 @@
               </td>
               <td style="width:10vw;">
                 <img class="material" v-for="(i,index2) in item.material.slice(0,1)" 
-                @click="$store.commit('showImg',[i,true])"
+                @click="showImg(i)"
                 :key="index2" :src="i" alt="">
               </td>
               <td>{{parseFloat(item.price/100).toFixed(2)}}</td>
@@ -260,8 +260,15 @@
         //   })
         // }
       },
+      showImg(url) {
+        window.history.pushState(null,null,'#')
+        this.$store.commit('showImg',[url,true])
+      }
     },
     activated() {
+      window.addEventListener('popstate', e=>{
+        this.$store.commit('showImg',['',false])
+      }, false)
       this.$store.commit('showLoading',true);
       this.currentIndex = 1;
       this._getOutputList();
@@ -277,6 +284,11 @@
         }
       })
     },
+    beforeDestroy() {
+      window.removeEventListener('popstate', e=>{
+        this.$store.commit('showImg',['',false])
+      }, false)
+    }
   }
 </script>
 

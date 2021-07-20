@@ -3,6 +3,7 @@
     <div class="formCard">
       <div class="header" id="header1">
         <div class="title">转运</div>
+        <div class="code" v-if="code&&code.code_status=='1'">{{code.code}}</div>
       </div>
       <div class="options" id="options1">
         <div class="option">
@@ -116,7 +117,7 @@
         <div class="title">尚未登录</div>
         <div class="context">是否前往登陆页面从而获取更多权限</div>
         <div class="btns">
-          <div class="btn" @click="showDialog=false">取消</div>
+          <div class="btn" @click="hideDialog()">取消</div>
           <div class="btn" @click="$router.replace({name:'Login'})">确认</div>
         </div>
       </div>
@@ -126,6 +127,7 @@
 
 <script>
   import { getBankcard } from '@/network/bankcard.js'
+  import { getCode } from '@/network/user.js'
   export default {
     name: "Application",
     data () {
@@ -134,12 +136,14 @@
         cardNum: '',
         token: '',
         showDialog: '',
+        code: null,
       }
     },
     methods:{
       routerGo(route,param) {
         if(this.token=='') {
           this.showDialog = true;
+          window.history.pushState(null,null,'#')
         } else {
           if(param=='') {
            this.$router.push({name:route})
@@ -147,6 +151,10 @@
            this.$router.push({name:route,params:{name:param}})
           }
         }
+      },
+      hideDialog() {
+        this.showDialog = false
+        this.$router.go(-1)
       },
       _getBankcard() {
         getBankcard().then(res=>{
@@ -176,9 +184,18 @@
       this.token = localStorage.token;
       this.showDialog=false;
       if(localStorage.token=='') {
-
+        window.addEventListener('popstate', e=>{
+          if(this.showDialog) {
+            this.showDialog = !this.showDialog
+          }
+        }, false)
       } else {
-        this._getBankcard()
+        this._getBankcard();
+        getCode().then(res=>{
+          if(res.data.status=='200') {
+            this.code = res.data;
+          }
+        })
       }
     },
     activated() {
@@ -186,10 +203,26 @@
       this.showDialog=false;
       this.$store.commit('showLoading',false);
       if(localStorage.token=='') {
-
+        window.addEventListener('popstate', e=>{
+          if(this.showDialog) {
+            this.showDialog = !this.showDialog
+          }
+        }, false)
       } else {
         this._getBankcard()
+        getCode().then(res=>{
+          if(res.data.status=='200') {
+            this.code = res.data;
+          }
+        })
       }
+    },
+    beforeDestroy() {
+      window.removeEventListener('popstate', e=>{
+        if(this.showDialog) {
+          this.showDialog = !this.showDialog
+        }
+      }, false)
     }
   }
 </script>
@@ -223,6 +256,14 @@
     color: #fff;
     padding: 20px;
     font-size: 25px;
+  }
+  .header .code {
+    position: absolute;
+    right: 10px;
+    top: 5vh;
+    color: #fff;
+    transform: translateY(-50%);
+    font-size: 20px;
   }
   .icon img {
     width: 30px;

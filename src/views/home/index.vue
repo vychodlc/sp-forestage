@@ -39,7 +39,7 @@
     },
     created() {
       this.$store.commit('showLoading',false);
-      if((localStorage.token=='')||(localStorage.token==undefined)) {
+      if((localStorage.token==undefined)) {
         this.$store.commit('rmToken');
         if(this.$route.path!='/login') {
           this.$router.replace('/login');

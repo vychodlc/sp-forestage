@@ -69,8 +69,16 @@ export default new Vuex.Store({
     rmToken(state) {
       state.token = ''
       state.user.nickname = null
+      state.user.balance = 0
       state.user.id = null
       state.user.right = null
+      state.address = {
+        list: [],
+        default: null,
+        new: {name: '',phone: '',address: ''},
+        edit: {name: '',phone: '',address: '',address_ID:''},
+        select: null,
+      }
       localStorage.clear()
     },
     setTags(state,tags) {

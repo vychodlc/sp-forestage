@@ -5,7 +5,8 @@
       <div class="avatar"><img src="~/assets/images/my/avatar.png" alt=""></div>
       <div class="infos">
         <div class="info" id="nickname">{{$store.state.user.nickname}}</div>
-        <div class="info" id="uuid">编号:{{$store.state.user.id}}</div>
+        <div class="info" v-if="token!=''" id="uuid">编号:{{$store.state.user.id}}</div>
+        <div class="info" v-else @click="$router.replace({name:'Login'})">点击登录</div>
       </div>
       <!-- <div class="icon" @click="test()"><img src="~/assets/images/my/setting.png" alt=""></div> -->
     </div>
@@ -97,7 +98,7 @@
         <div class="title">尚未登录</div>
         <div class="context">是否前往登陆页面从而获取更多权限</div>
         <div class="btns">
-          <div class="btn" @click="showDialog=false">取消</div>
+          <div class="btn" @click="hideDialog()">取消</div>
           <div class="btn" @click="$router.replace({name:'Login'})">确认</div>
         </div>
       </div>
@@ -123,9 +124,14 @@
       routerGo(route) {
         if(this.token=='') {
           this.showDialog = true;
+          window.history.pushState(null,null,'#')
         } else {
           this.$router.push({name:route})
         }
+      },
+      hideDialog() {
+        this.showDialog = false
+        this.$router.go(-1)
       },
       test() {
         // window.location.push('http://goback.vychod.top/');
@@ -147,7 +153,12 @@
       this.showDialog=false;
       this.$store.commit('showLoading',false);
       if(localStorage.token=='') {
-
+        this.balance = 0;
+        window.addEventListener('popstate', e=>{
+          if(this.showDialog) {
+            this.showDialog = !this.showDialog
+          }
+        }, false)
       } else {
         getAddress().then(res=>{
           this.$store.commit('handleAddress',{name:'updateList',value:res.data.data})
@@ -161,6 +172,13 @@
           })
         });
       }
+    },
+    beforeDestroy() {
+      window.removeEventListener('popstate', e=>{
+        if(this.showDialog) {
+          this.showDialog = !this.showDialog
+        }
+      }, false)
     }
   }
 </script>

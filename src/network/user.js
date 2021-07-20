@@ -88,3 +88,9 @@ export function getBalance() {
     url: '/get_balance.php'
   })
 }
+
+export function getCode() {
+  return request({
+    url: '/get_transship_code.php',
+  })
+}

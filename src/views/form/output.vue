@@ -57,7 +57,7 @@
               <td style="width:20vw;">{{item.apply_id}}</td>
               <td style="width:10vw;">{{item.weight}}</td>
               <td style="width:10vw;">{{item.size}}</td>
-              <td style="width:20vw;" @click="$store.commit('showImg',[item.pic,true])"><img :src="item.pic" alt="" style="width:20vw"></td>
+              <td style="width:20vw;" @click="showImg(item.pic)"><img :src="item.pic" alt="" style="width:20vw"></td>
               <td style="width:20vw;">{{item.storage_time}}</td>
               <td style="width:10vw;">
                 <input class="checkbox" type="checkbox" name="select" 
@@ -116,7 +116,7 @@
       </div>
       <div class="addressbox">
         <div class="goodsCard" v-for="(item,index) in selectList" :key="index">
-          <div class="goodsImg"><img :src="item.pic" alt="" @click="$store.commit('showImg',[item.pic,true])"></div>
+          <div class="goodsImg"><img :src="item.pic" alt="" @click="showImg(item.pic)"></div>
           <div class="content">
             <div class="name">库存编号：{{item.storage_ID}}</div>
             <div class="info">
@@ -435,8 +435,21 @@
         })
         this.$router.push({name:'Address'})
       },
+      showImg(url) {
+        window.history.pushState(null,null,'#')
+        this.$store.commit('showImg',[url,true])
+      }
+    },
+    
+    beforeDestroy() {
+      window.removeEventListener('popstate', e=>{
+        this.$store.commit('showImg',['',false])
+      }, false)
     },
     activated() {
+      window.addEventListener('popstate', e=>{
+        this.$store.commit('showImg',['',false])
+      }, false)
       this.kind = this.$route.params.name?this.$route.params.name:'普通';
       if(localStorage.cache&&(localStorage.cache!='')) {
         document.getElementsByClassName('footer')[0].style.display = '';

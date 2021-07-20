@@ -71,6 +71,8 @@
           this.$store.commit('showTip','请填写提现卡号')
         } else if(parseFloat(this.newItem.amount)>parseFloat(this.newItem.balance)) {
           this.$store.commit('showTip','请输入比余额小的提现金额')
+        } else if(parseFloat(this.newItem.amount)<=0) {
+          this.$store.commit('showTip','请输入正确的提现金额')
         } else {
           addWithdrawl(this.newItem).then(res=>{
             if(res.data.status=='200') {
