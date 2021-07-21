@@ -108,6 +108,7 @@
 
 <script>
   import {getApplyList,filterApplyList} from '@/network/transship.js'
+import transmitVue from '../form/transmit.vue'
   export default {
     name: "TransmitOrderlist",
     data () {
@@ -192,152 +193,107 @@
           this.isRefresh = true;
           getApplyList(0).then(res=>{
             let Alldata = res.data.data;
-            let Handledata = Alldata.filter(item=>{return item.apply_status=='0'&&item.op_date!=null})
+            let Handledata = Alldata.filter(item=>{return item.apply_status=='0'&&item.refresh_status=='0'&&item.op_date!=null})
             let handleTimes = 0;
 
-            Handledata.map(item=>{
-              let returnItem = {
-                order_time: [],
-                price: [],
-                maxOrderLineStatus:[],
-                minOrderLineStatus:[],
-                rolledUpStatus:[],
-                size:[],
-                style:[],
-                op_date:[],
-                op_description:[],
-                op_quantity:[],
-                first_address:[],
-                second_address:[],
-                city:[],
-                postal:[],
-                country:[],
-                gift:[],
-                tracker:[],
-              }
-              for(let key in returnItem) {
-                let value = this.tableData.filter(tableItem=>{return tableItem.apply_ID==item.apply_ID})[0];
-                if(value[key]) {
-                  value[key] = 'pending'
+            if(Handledata.length==0) {
+              this.isRefresh = false;
+              this.inCD = true;
+              this.CDTime = 5;
+              this.$store.commit('showTip','无需刷新，皆为最新');
+              this.refreshCD();
+            } else {
+              Handledata.map(item=>{
+                let returnItem = {
+                  order_time: [],
+                  price: [],
+                  maxOrderLineStatus:[],
+                  minOrderLineStatus:[],
+                  rolledUpStatus:[],
+                  size:[],
+                  style:[],
+                  op_date:[],
+                  op_description:[],
+                  op_quantity:[],
+                  first_address:[],
+                  second_address:[],
+                  city:[],
+                  postal:[],
+                  country:[],
+                  gift:[],
+                  tracker:[],
                 }
-              }
-              if(item.brand=='N') {
-                let id = item.expressid;
-                let email = item.email;
-                let headers = {
-                  "Content-Type": "application/x-www-form-urlencoded;",
-                  "accept":"application/json",
-                  "accept-language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,ja-JP;q=0.6,ja;q=0.5",
-                  "appid":"orders",
-                  "x-nike-visitid":"1",
-                  "x-nike-visitorid":this.guid(),
+                for(let key in returnItem) {
+                  let value = this.tableData.filter(tableItem=>{return tableItem.apply_ID==item.apply_ID})[0];
+                  if(value[key]) {
+                    value[key] = 'pending'
+                  }
                 }
-                let url1 = "https://api.nike.com/order_mgmt/user_order_details/v2/" + id + "?filter=email(" + email + ")";
-                let url2 = "https://api.nike.com/ship/user_shipments/v1?locale=en_us&filter=orderNumber(" + id +")&filter=email("+email+")";
-                
-                this.$axios.all([
-                  this.$axios.get(url1, {
-                    headers: headers,
-                  }).catch(e=>{                  
+                if(item.brand=='N') {
+                  let id = item.expressid;
+                  let email = item.email;
+                  let headers = {
+                    "Content-Type": "application/x-www-form-urlencoded;",
+                    "accept":"application/json",
+                    "accept-language":"zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,ja-JP;q=0.6,ja;q=0.5",
+                    "appid":"orders",
+                    "x-nike-visitid":"1",
+                    "x-nike-visitorid":this.guid(),
+                  }
+                  let url1 = "https://api.nike.com/order_mgmt/user_order_details/v2/" + id + "?filter=email(" + email + ")";
+                  let url2 = "https://api.nike.com/ship/user_shipments/v1?locale=en_us&filter=orderNumber(" + id +")&filter=email("+email+")";
+                  
+                  this.$axios.all([
+                    this.$axios.get(url1, {
+                      headers: headers,
+                    }).catch(e=>{                  
+                      handleTimes++;
+                    }),
+                    this.$axios.get(url2, {
+                      headers: headers,
+                    })
+                  ]).then(this.$axios.spread((res1,res2)=>{
+
                     handleTimes++;
-                  }),
-                  this.$axios.get(url2, {
-                    headers: headers,
-                  })
-                ]).then(this.$axios.spread((res1,res2)=>{
 
-                  handleTimes++;
-
-                  let data = res1.data;
-                  returnItem.order_time.push(data.orderCreateDate?data.orderCreateDate:'');
-                  returnItem.price.push(data.totalAmount?data.totalAmount:'');
-                  data.orderLines.map(orderline=>{
-                    returnItem.maxOrderLineStatus.push(orderline.maxOrderLineStatus?orderline.maxOrderLineStatus:'');
-                    returnItem.minOrderLineStatus.push(orderline.minOrderLineStatus?orderline.minOrderLineStatus:'');
-                    returnItem.rolledUpStatus.push(orderline.rolledUpStatus?orderline.rolledUpStatus:'');
-                    returnItem.size.push(orderline.displaySize?orderline.displaySize:'');
-                    returnItem.style.push(orderline.styleNumber?orderline.styleNumber+'-'+orderline.colorCode:'');
-                    if(orderline.statuses) {
-                      orderline.statuses.map(status=>{
-                        returnItem.op_date.push(status.date?status.date:'');
-                        returnItem.op_description.push(status.description?status.description:'');
-                        returnItem.op_quantity.push(status.quantity?status.quantity:'');
+                    let data = res1.data;
+                    returnItem.order_time.push(data.orderCreateDate?data.orderCreateDate:'');
+                    returnItem.price.push(data.totalAmount?data.totalAmount:'');
+                    data.orderLines.map(orderline=>{
+                      returnItem.maxOrderLineStatus.push(orderline.maxOrderLineStatus?orderline.maxOrderLineStatus:'');
+                      returnItem.minOrderLineStatus.push(orderline.minOrderLineStatus?orderline.minOrderLineStatus:'');
+                      returnItem.rolledUpStatus.push(orderline.rolledUpStatus?orderline.rolledUpStatus:'');
+                      returnItem.size.push(orderline.displaySize?orderline.displaySize:'');
+                      returnItem.style.push(orderline.styleNumber?orderline.styleNumber+'-'+orderline.colorCode:'');
+                      if(orderline.statuses) {
+                        orderline.statuses.map(status=>{
+                          returnItem.op_date.push(status.date?status.date:'');
+                          returnItem.op_description.push(status.description?status.description:'');
+                          returnItem.op_quantity.push(status.quantity?status.quantity:'');
+                        });
+                      }
+                      if(orderline.shipTo&&orderline.shipTo.address) {
+                        returnItem.first_address.push(orderline.shipTo.address.address1?orderline.shipTo.address.address1:'');
+                        returnItem.second_address.push(orderline.shipTo.address.address2?orderline.shipTo.address.address2:'');
+                        returnItem.city.push(orderline.shipTo.address.city?orderline.shipTo.address.city:'');
+                        returnItem.postal.push(orderline.shipTo.address.zipCode?orderline.shipTo.address.zipCode:'');
+                        returnItem.country.push(orderline.shipTo.address.country?orderline.shipTo.address.country:'');
+                      }
+                    });
+                    if(data.paymentMethods) {
+                      data.paymentMethods.map(paymentMethod=>{
+                        returnItem.gift.push(paymentMethod.displayGiftCardNumber?paymentMethod.displayGiftCardNumber:'');
                       });
                     }
-                    if(orderline.shipTo&&orderline.shipTo.address) {
-                      returnItem.first_address.push(orderline.shipTo.address.address1?orderline.shipTo.address.address1:'');
-                      returnItem.second_address.push(orderline.shipTo.address.address2?orderline.shipTo.address.address2:'');
-                      returnItem.city.push(orderline.shipTo.address.city?orderline.shipTo.address.city:'');
-                      returnItem.postal.push(orderline.shipTo.address.zipCode?orderline.shipTo.address.zipCode:'');
-                      returnItem.country.push(orderline.shipTo.address.country?orderline.shipTo.address.country:'');
-                    }
-                  });
-                  if(data.paymentMethods) {
-                    data.paymentMethods.map(paymentMethod=>{
-                      returnItem.gift.push(paymentMethod.displayGiftCardNumber?paymentMethod.displayGiftCardNumber:'');
-                    });
-                  }
-                  data = res2.data;
-                  if(data.objects) {
-                    data.objects.map(object=>{
-                      if(object.containers) {
-                        object.containers.map(container=>{
-                          returnItem.tracker.push(container.trackingNumber?container.trackingNumber:'')
-                        })
-                      }
-                    })
-                  }
-                  for(let key in returnItem) {
-                    this.tableData.filter(tableItem=>{return tableItem.apply_ID==item.apply_ID})[0][key] = returnItem[key].join(',')
-                  }
-                  if(handleTimes==Handledata.length) {
-                    this.isRefresh = false;
-                    this.inCD = true;
-                    this.CDTime = 10;
-                    this.refreshCD();
-                  }
-                }))
-              } else if(item.brand=='JD') {
-                let id = item.expressid;
-                let email = item.email;
-                let url = "https://data.smartagent.io/v1/jdsports/track-my-order?orderNumber=" + id + "&facia=jdsportsuk&emailAddress=" + email;
-
-                this.$axios.get(url).catch(e=>{
-                  handleTimes++;
-                }).then(res=>{
-                  if(res!=undefined) {
-                    handleTimes++;
-                    let data = res.data;
-                    returnItem.order_time.push(data.date?data.date.toString():'');
-                    returnItem.price.push(data.totals?data.totals.total.amount.toString():'');
-                    if(data.status&&data.status.full) {
-                      data.status.full.map(fullItem=>{
-                        if(fullItem.state=='done') {
-                          returnItem.op_description.push(fullItem.description?fullItem.description:fullItem.title);
-                          returnItem.op_date.push(fullItem.date?fullItem.date.toString():'')
+                    data = res2.data;
+                    if(data.objects) {
+                      data.objects.map(object=>{
+                        if(object.containers) {
+                          object.containers.map(container=>{
+                            returnItem.tracker.push(container.trackingNumber?container.trackingNumber:'')
+                          })
                         }
                       })
-                    }
-                    if(data.vendors&&data.vendors[0]&&data.vendors[0].items) {
-                      data.vendors[0].items.map(item=>{
-                        returnItem.op_quantity.push(item.qty?item.qty.toString():'')
-                        returnItem.size.push(item.size?item.size.toString():'')
-                        returnItem.style.push(item.sku?item.sku.toString():'')
-                        returnItem.rolledUpStatus.push(item.status?item.status.toString():'')
-                      })
-                    }
-                    if(data.addresses&&data.addresses.billing) {
-                      returnItem.first_address.push(data.addresses.billing.address1)
-                      returnItem.second_address.push(data.addresses.billing.address2)
-                      returnItem.city.push(data.addresses.billing.town)
-                      returnItem.postal.push(data.addresses.billing.postcode)
-                      returnItem.country.push(data.addresses.billing.locale)
-                    }
-                    if(data.delivery) {
-                      returnItem.tracker.push(data.delivery.trackingURL?data.delivery.trackingURL.toString():'');
-                    }
-                    if(data.payment&&data.payment.giftCard) {
-                      returnItem.gift.push(data.payment.giftCard.cardNumber?data.payment.giftCard.cardNumber.toString():'');
                     }
                     for(let key in returnItem) {
                       this.tableData.filter(tableItem=>{return tableItem.apply_ID==item.apply_ID})[0][key] = returnItem[key].join(',')
@@ -346,14 +302,109 @@
                       this.isRefresh = false;
                       this.inCD = true;
                       this.CDTime = 10;
+                      this.$store.commit('showTip','刷新完毕');
                       this.refreshCD();
                     }
-                  }
-                })
-              } else if(item.brand=='A') {
+                  }))
+                } else if(item.brand=='JD') {
+                  let id = item.expressid;
+                  let email = item.email;
+                  let url = "https://data.smartagent.io/v1/jdsports/track-my-order?orderNumber=" + id + "&facia=jdsportsuk&emailAddress=" + email;
+
+                  this.$axios.get(url).catch(e=>{
+                    handleTimes++;
+                  }).then(res=>{
+                    if(res!=undefined) {
+                      handleTimes++;
+                      let data = res.data;
+                      returnItem.order_time.push(data.date?data.date.toString():'');
+                      returnItem.price.push(data.totals?data.totals.total.amount.toString():'');
+                      if(data.status&&data.status.full) {
+                        data.status.full.map(fullItem=>{
+                          if(fullItem.state=='done') {
+                            returnItem.op_description.push(fullItem.description?fullItem.description:fullItem.title);
+                            returnItem.op_date.push(fullItem.date?fullItem.date.toString():'')
+                          }
+                        })
+                      }
+                      if(data.vendors&&data.vendors[0]&&data.vendors[0].items) {
+                        data.vendors[0].items.map(item=>{
+                          returnItem.op_quantity.push(item.qty?item.qty.toString():'')
+                          returnItem.size.push(item.size?item.size.toString():'')
+                          returnItem.style.push(item.sku?item.sku.toString():'')
+                          returnItem.rolledUpStatus.push(item.status?item.status.toString():'')
+                        })
+                      }
+                      if(data.addresses&&data.addresses.billing) {
+                        returnItem.first_address.push(data.addresses.billing.address1)
+                        returnItem.second_address.push(data.addresses.billing.address2)
+                        returnItem.city.push(data.addresses.billing.town)
+                        returnItem.postal.push(data.addresses.billing.postcode)
+                        returnItem.country.push(data.addresses.billing.locale)
+                      }
+                      if(data.delivery) {
+                        returnItem.tracker.push(data.delivery.trackingURL?data.delivery.trackingURL.toString():'');
+                      }
+                      if(data.payment&&data.payment.giftCard) {
+                        returnItem.gift.push(data.payment.giftCard.cardNumber?data.payment.giftCard.cardNumber.toString():'');
+                      }
+                      for(let key in returnItem) {
+                        this.tableData.filter(tableItem=>{return tableItem.apply_ID==item.apply_ID})[0][key] = returnItem[key].join(',')
+                      }
+                      if(handleTimes==Handledata.length) {
+                        this.isRefresh = false;
+                        this.inCD = true;
+                        this.CDTime = 10;
+                        this.$store.commit('showTip','刷新完毕');
+                        this.refreshCD();
+                      }
+                    }
+                  })
+                } else if(item.brand=='A') {
                   handleTimes++;
-              }
-            })
+                  transmitCrawler({
+                    id:item.expressid,
+                    email:item.email,
+                    brand:'A'
+                  }).then(res=>{
+                    if(res.data.status!='405') {
+                      let data = res.data;
+                      let returnItem = {}
+                      returnItem.order_time = data[1];
+                      returnItem.price = data[2];
+                      returnItem.maxOrderLineStatus = data[3].filter(item=>{return item!=''}).join(',');
+                      returnItem.minOrderLineStatus = data[4].filter(item=>{return item!=''}).join(',');
+                      returnItem.rolledUpStatus = data[5].filter(item=>{return item!=''}).join(',');
+                      returnItem.size = data[6].filter(item=>{return item!=''}).join(',');
+                      returnItem.style = data[7].filter(item=>{return item!=''}).join(',');
+                      returnItem.op_date = data[8];
+                      returnItem.op_description = data[9];
+                      returnItem.op_quantity = data[10].filter(item=>{return item!=''}).join(',');
+                      returnItem.first_address = data[11];
+                      returnItem.second_address = data[12];
+                      returnItem.city = data[13];
+                      returnItem.postal = data[14];
+                      returnItem.country = data[15];
+                      returnItem.gift = data[16];
+                      returnItem.tracker = data[17];
+                      returnItem.email = item.email;
+                      
+                      for(let key in returnItem) {
+                        this.tableData.filter(tableItem=>{return tableItem.apply_ID==item.apply_ID})[0][key] = returnItem[key]
+                      }
+                      
+                      if(handleTimes==Handledata.length) {
+                        this.isRefresh = false;
+                        this.inCD = true;
+                        this.CDTime = 10;
+                        this.$store.commit('showTip','刷新完毕');
+                        this.refreshCD();
+                      }
+                    }
+                  })
+                }
+              })
+            }
           })
         } else {
           this.$store.commit('showTip','请稍后，正在刷新');
