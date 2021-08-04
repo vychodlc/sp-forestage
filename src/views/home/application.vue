@@ -15,7 +15,7 @@
             <div class="item" @click="routerGo('Transmit','Nike')"><img src="~/assets/images/application/fenlei.png" alt=""> Nike</div>
             <div class="item" @click="routerGo('Transmit','Adidas')"><img src="~/assets/images/application/fenlei.png" alt=""> Adidas</div>
             <div class="item" @click="routerGo('Transmit','JD')"><img src="~/assets/images/application/fenlei.png" alt=""> JD</div>
-            <!-- <div class="item" @click="routerGo('Transmit','通用')"><img src="~/assets/images/application/fenlei.png" alt=""> 通用</div> -->
+            <div class="item" @click="routerGo('Transmit','通用')"><img src="~/assets/images/application/fenlei.png" alt=""> 通用</div>
           </div>
           <div class="more" @click="routerGo('TransmitOrderlist','')"><img src="~/assets/images/application/arrow-right.png" alt=""></div>
         </div>

@@ -279,9 +279,8 @@
   
   
   .tableBox {
-    margin-top: 20px;
     width: 100vw;
-    height: 642px;
+    height: calc(100vh - 120px);
     display: flex;
     flex-direction: row;
   }
@@ -291,14 +290,14 @@
   .tableBox thead th,
   .tableBox tbody tr {
     white-space: nowrap;
-    height: 60px;
+    height: calc((100vh - 120px) / 11);
     border-bottom: 1px solid #999;
     text-align:center;
   }
   .tableBox thead th {
     background-color: #dedede;
     padding: 0 3px;
-    height: 40px;
+    height: calc((100vh - 120px) / 11);
   }
 
   .tableBox .tableItem:nth-child(1) {

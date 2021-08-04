@@ -523,7 +523,7 @@ import transmitVue from '../form/transmit.vue'
 
   .tableBox {
     width: 100vw;
-    height: 642px;
+    height: calc((100vh - 150px));
     display: flex;
     flex-direction: row;
   }
@@ -533,14 +533,14 @@ import transmitVue from '../form/transmit.vue'
   .tableBox thead th,
   .tableBox tbody tr {
     white-space: nowrap;
-    height: 60px;
+    height: calc((100vh - 150px) / 11);
     border-bottom: 1px solid #999;
     text-align:center;
   }
   .tableBox thead th {
     background-color: #dedede;
     padding: 0 3px;
-    height: 40px;
+    height: calc((100vh - 150px) / 11);
   }
 
   

@@ -605,8 +605,30 @@
           })
           // this.$store.commit('showTip','暂不支持Adidas申报')
           // this.$store.commit('showLoading',false)
-        } else {
-          this.$store.commit('showLoading',false);
+        } else if(this.brand=='U') {
+          
+          falseList.map(order=>{
+            let id = order.id;
+            let email = order.email;
+            
+            order.right = true;
+            this.handleTimes++;
+            this.wrongDataNum = this.orders.filter(item=>{return item.right==false}).length;
+            if(this.handleTimes==falseList.length) {
+              this.$store.commit('showLoading', false);
+              document.getElementById('step1').className = 'step step-ed'
+              document.getElementById('step2').className = 'step step-ing'
+              document.getElementsByClassName('line')[0].className = 'line line-ed'
+              if(this.wrongDataNum==0) {
+                this.wrongDataStatus = false
+              }
+              if(this.currentStep==1) {
+                this.currentStep+=1;
+              }
+            }
+            
+            this.okOrders.push({id:id,email:email})
+          })
         }
       },
     },

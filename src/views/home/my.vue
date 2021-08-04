@@ -264,8 +264,8 @@
     flex: 1;
   }
   .btnImage img {
-    width: 10vw;
-    height: 10vw;
+    width: 8vw;
+    height: 8vw;
     margin-bottom: 10px;
   }
   .btnName span {

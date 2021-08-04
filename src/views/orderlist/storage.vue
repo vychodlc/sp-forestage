@@ -48,7 +48,7 @@
           </thead>
           <tbody>
             <tr v-for="(item,index) in tableData" :key="index">
-              <td @click="showImg(item.pic)"><img :src="item.pic" alt="" style="width:20vw"></td>
+              <td @click="showImg(item.pic)"><img :src="item.pic" alt="" style="height: calc((100vh - 150px) / 11 - 20px);"></td>
               <td>{{item.description}}</td>
               <td>{{item.size}}</td>
               <td>{{item.weight}}</td>
@@ -262,7 +262,7 @@
   }
   .tableBox {
     width: 100vw;
-    height: 642px;
+    height: calc(100vh - 150px);
     display: flex;
     flex-direction: row;
   }
@@ -271,14 +271,14 @@
   .tableBox thead th,
   .tableBox tbody tr {
     white-space: nowrap;
-    height: 60px;
+    height: calc((100vh - 150px) / 11);
     border-bottom: 1px solid #999;
     text-align:center;
   }
   .tableBox thead th {
     background-color: #dedede;
     padding: 0 3px;
-    height: 40px;
+    height: calc((100vh - 150px) / 11);
   }
 
   .tableBox .tableItem:nth-child(1) {
